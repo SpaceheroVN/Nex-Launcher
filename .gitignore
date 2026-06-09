@@ -1,0 +1,35 @@
+# Visual Studio / CMake
+.vscode/
+.vs/
+out/
+build/
+CMakeUserPresets.json
+*.user
+*.suo
+
+# Compiled binaries and debug symbols
+*.exe
+*.dll
+*.lib
+*.obj
+*.o
+*.pdb
+*.ilk
+
+# Qt specific
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+Makefile*
+.qmake.stash
+
+# Temp files
+*.log
+*.tmp
+
+# Windows system files
+Thumbs.db
+Desktop.ini
+
+# Tạm chặn Source
+Source/
