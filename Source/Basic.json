@@ -1,0 +1,542 @@
+[
+    {
+        "name": "Brave Browser",
+        "type": "app",
+        "category": "Web Browsers",
+        "source": {
+            "type": "Winget",
+            "value": "Brave.Brave",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Firefox",
+        "type": "app",
+        "category": "Web Browsers",
+        "source": {
+            "type": "Winget",
+            "value": "Mozilla.Firefox",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Google Chrome (x64)",
+        "type": "app",
+        "category": "Web Browsers",
+        "source": {
+            "type": "Winget",
+            "value": "Google.Chrome",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Microsoft Edge",
+        "type": "app",
+        "category": "Web Browsers",
+        "source": {
+            "type": "Winget",
+            "value": "Microsoft.Edge",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Opera Browser",
+        "type": "app",
+        "category": "Web Browsers",
+        "source": {
+            "type": "Winget",
+            "value": "Opera.Opera",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "7-Zip (x64)",
+        "type": "app",
+        "category": "Compression",
+        "source": {
+            "type": "Link",
+            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/7z2409-x64.exe",
+            "silent_args": "/S"
+        }
+    },
+    {
+        "name": "PeaZip",
+        "type": "app",
+        "category": "Compression",
+        "source": {
+            "type": "Link",
+            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/peazip-10.5.0.WIN64.exe",
+            "silent_args": "/VERYSILENT"
+        }
+    },
+    {
+        "name": "WinRAR (x64)",
+        "type": "app",
+        "category": "Compression",
+        "source": {
+            "type": "Link",
+            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/winrar-x64-712.exe",
+            "silent_args": "/S"
+        }
+    },
+    {
+        "name": "Cursor",
+        "type": "app",
+        "category": "Developer Tools",
+        "source": {
+            "type": "Winget",
+            "value": "Anysphere.Cursor",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Git (x64)",
+        "type": "app",
+        "category": "Developer Tools",
+        "source": {
+            "type": "Winget",
+            "value": "Git.Git",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "VS Code",
+        "type": "app",
+        "category": "Developer Tools",
+        "source": {
+            "type": "Winget",
+            "value": "Microsoft.VisualStudioCode",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Discord",
+        "type": "app",
+        "category": "Messaging",
+        "source": {
+            "type": "Winget",
+            "value": "Discord.Discord",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Microsoft Teams",
+        "type": "app",
+        "category": "Messaging",
+        "source": {
+            "type": "Winget",
+            "value": "Microsoft.Teams",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Zoom (x64)",
+        "type": "app",
+        "category": "Messaging",
+        "source": {
+            "type": "Winget",
+            "value": "Zoom.Zoom",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Audacity",
+        "type": "app",
+        "category": "Media",
+        "source": {
+            "type": "Winget",
+            "value": "Audacity.Audacity",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "K-Lite Codec Pack (Standard)",
+        "type": "app",
+        "category": "Media",
+        "source": {
+            "type": "Link",
+            "value": "https://files2.codecguide.com/K-Lite_Codec_Pack_1905_Standard.exe",
+            "silent_args": "/verysilent"
+        }
+    },
+    {
+        "name": "OBS Studio",
+        "type": "app",
+        "category": "Media",
+        "source": {
+            "type": "Winget",
+            "value": "OBSProject.OBSStudio",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Spotify",
+        "type": "app",
+        "category": "Media",
+        "source": {
+            "type": "Winget",
+            "value": "Spotify.Spotify",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "VLC Media Player",
+        "type": "app",
+        "category": "Media",
+        "source": {
+            "type": "Winget",
+            "value": "VideoLAN.VLC",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "AVG AntiVirus Free",
+        "type": "app",
+        "category": "Security",
+        "source": {
+            "type": "Link",
+            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/avg_antivirus_free_setup.exe",
+            "silent_args": "/verysilent /norestart"
+        }
+    },
+    {
+        "name": "Avast Free Antivirus",
+        "type": "app",
+        "category": "Security",
+        "source": {
+            "type": "Link",
+            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/Avast_Free_Antivirus.exe",
+            "silent_args": "/verysilent /norestart"
+        }
+    },
+    {
+        "name": "AnyDesk",
+        "type": "app",
+        "category": "Utilities",
+        "source": {
+            "type": "Winget",
+            "value": "AnyDeskSoftwareGmbH.AnyDesk",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Net Time",
+        "type": "app",
+        "category": "Utilities",
+        "source": {
+            "type": "Link",
+            "value": "https://timesynctool.com/NetTimeSetup-314.exe",
+            "silent_args": "/VERYSILENT"
+        }
+    },
+    {
+        "name": "TeamViewer",
+        "type": "app",
+        "category": "Utilities",
+        "source": {
+            "type": "Winget",
+            "value": "TeamViewer.TeamViewer",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "TeamViewer QuickSupport",
+        "type": "app",
+        "category": "Utilities",
+        "source": {
+            "type": "Link",
+            "value": "https://download.teamviewer.com/download/TeamViewerQS_x64.exe",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2005_x64",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/8/b/4/8b42259f-5d70-43f4-ac2e-4b208fd8d66a/vcredist_x64.EXE",
+            "silent_args": "/q"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2005_x32",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/8/b/4/8b42259f-5d70-43f4-ac2e-4b208fd8d66a/vcredist_x86.EXE",
+            "silent_args": "/q"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2008_x64",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe",
+            "silent_args": "/qb"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2008_x32",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe",
+            "silent_args": "/qb"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2010_x64",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2010_x32",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2012_x64",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe",
+            "silent_args": "/passive /norestart"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2012_x32",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe",
+            "silent_args": "/passive /norestart"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2013_x64",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://aka.ms/highdpimfc2013x64enu",
+            "silent_args": "/passive /norestart"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2013_x32",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://aka.ms/highdpimfc2013x86enu",
+            "silent_args": "/passive /norestart"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2015-2022_x64",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://aka.ms/vs/17/release/vc_redist.x64.exe",
+            "silent_args": "/passive /norestart"
+        }
+    },
+    {
+        "name": "Visual C++ Redistributable 2015-2022_x32",
+        "type": "app",
+        "category": "VC++ Redistributables",
+        "source": {
+            "type": "Link",
+            "value": "https://aka.ms/vs/17/release/vc_redist.x86.exe",
+            "silent_args": "/passive /norestart"
+        }
+    },
+    {
+        "name": ".NET 5.0 (x64)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/5.0.408/dotnet-sdk-5.0.408-win-x64.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 5.0 (x86)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/5.0.408/dotnet-sdk-5.0.408-win-x86.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 6.0 (x64)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/6.0.428/dotnet-sdk-6.0.428-win-x64.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 6.0 (x86)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/6.0.428/dotnet-sdk-6.0.428-win-x86.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 7.0 (x64)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/7.0.410/dotnet-sdk-7.0.410-win-x64.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 7.0 (x86)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/7.0.410/dotnet-sdk-7.0.410-win-x86.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 8.0 (x64)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.411/dotnet-sdk-8.0.411-win-x64.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 8.0 (x86)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.411/dotnet-sdk-8.0.411-win-x86.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 9.0 (x64)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.301/dotnet-sdk-9.0.301-win-x64.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 9.0 (x86)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.301/dotnet-sdk-9.0.301-win-x86.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 10.0 Preview (x64)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.100-preview.5.25277.114/dotnet-sdk-10.0.100-preview.5.25277.114-win-x64.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": ".NET 10.0 Preview (x86)",
+        "type": "app",
+        "category": ".NET",
+        "source": {
+            "type": "Link",
+            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.100-preview.5.25277.114/dotnet-sdk-10.0.100-preview.5.25277.114-win-x86.exe",
+            "silent_args": "/quiet /norestart"
+        }
+    },
+    {
+        "name": "Garena",
+        "type": "app",
+        "category": "Games",
+        "source": {
+            "type": "Link",
+            "value": "https://cdn.gxx.garenanow.com/gxx/pc/NEX/Garena-v2.0.exe",
+            "silent_args": "/S"
+        }
+    },
+    {
+        "name": "GeForce NOW",
+        "type": "app",
+        "category": "Games",
+        "source": {
+            "type": "Link",
+            "value": "https://download.nvidia.com/gfnpc/GeForceNOW-release.exe",
+            "silent_args": "/S"
+        }
+    },
+    {
+        "name": "Lunar Client",
+        "type": "game",
+        "category": "Games",
+        "source": {
+            "type": "Link",
+            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Games/Lunar%20Client%20-%20NEX.exe",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Mini World",
+        "type": "game",
+        "category": "Games",
+        "source": {
+            "type": "Link",
+            "value": "https://mwu-cdn2.miniworldgame.com/install/1/410/miniworld_universal_1.2.0_410.exe",
+            "silent_args": ""
+        }
+    },
+    {
+        "name": "Valorant",
+        "type": "game",
+        "category": "Games",
+        "source": {
+            "type": "Link",
+            "value": "https://valorant.secure.dyn.riotcdn.net/channels/public/x/installer/current/live.exe",
+            "silent_args": ""
+        }
+    }
+]
