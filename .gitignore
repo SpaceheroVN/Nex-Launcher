@@ -33,3 +33,7 @@ Desktop.ini
 
 # Tạm chặn Source
 Source/
+
+# Ngoại lệ cho Apps và Games
+!Basic/Apps/*.exe
+!Basic/Games/*.exe
