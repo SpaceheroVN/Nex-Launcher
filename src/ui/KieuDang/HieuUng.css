@@ -1,6 +1,3 @@
-/* HieuUng.css - Micro-animations & Transitions */
-
-/* ===== THEME TRANSITION ===== */
 html.dang-chuyen-chu-de,
 html.dang-chuyen-chu-de *,
 html.dang-chuyen-chu-de *::before,
@@ -10,12 +7,9 @@ html.dang-chuyen-chu-de *::after {
               border-color 0.3s ease,
               box-shadow 0.3s ease !important;
 }
-
-/* ===== ROW ENTER ===== */
 .HangUngDung {
   animation: trucXuatHien 0.2s ease backwards;
 }
-
 @keyframes trucXuatHien {
   from {
     opacity: 0;
@@ -26,8 +20,6 @@ html.dang-chuyen-chu-de *::after {
     transform: translateY(0);
   }
 }
-
-/* Stagger animation cho rows */
 .HangUngDung:nth-child(1) { animation-delay: 0.02s; }
 .HangUngDung:nth-child(2) { animation-delay: 0.04s; }
 .HangUngDung:nth-child(3) { animation-delay: 0.06s; }
@@ -38,23 +30,17 @@ html.dang-chuyen-chu-de *::after {
 .HangUngDung:nth-child(8) { animation-delay: 0.16s; }
 .HangUngDung:nth-child(9) { animation-delay: 0.18s; }
 .HangUngDung:nth-child(10) { animation-delay: 0.20s; }
-
-/* ===== FOCUS EFFECTS ===== */
-.Nut:active {
+.HangUngDung:nth-child(n+11) { animation-delay: 0.22s; }
+.Nut:not(:disabled):active {
   transform: scale(0.97);
 }
-
 .ThanhBen_NhomTieuDe:active,
 .ThanhBen_MucCon:active {
   transform: scale(0.98);
 }
-
-/* ===== PULSE for accent buttons ===== */
 .Nut--chinh:focus-visible {
   box-shadow: 0 0 0 3px var(--mau-nhan-nhat);
 }
-
-/* ===== RIPPLE ===== */
 .HangUngDung::after {
   content: '';
   position: absolute;
@@ -71,13 +57,10 @@ html.dang-chuyen-chu-de *::after {
   transition: transform 0.4s, opacity 0.5s;
   pointer-events: none;
 }
-
 .HangUngDung {
   position: relative;
   overflow: hidden;
 }
-
-/* ===== SIDEBAR HOVER GLOW ===== */
 .ThanhBen_NhomTieuDe::after {
   content: '';
   position: absolute;
@@ -90,7 +73,6 @@ html.dang-chuyen-chu-de *::after {
   opacity: 0;
   transition: opacity var(--chuyen-dong);
 }
-
 .ThanhBen_NhomTieuDe.dang-chon::after {
   opacity: 1;
 }
