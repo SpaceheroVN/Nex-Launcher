@@ -1,19 +1,19 @@
 # Node.js
 node_modules/
-dist/
+# dist/
 package-lock.json
 
 # Visual Studio / CMake
 .vscode/
 .vs/
-out/
-build/
+# out/
+# build/
 CMakeUserPresets.json
 *.user
 *.suo
 
 # Compiled binaries and debug symbols
-*.exe
+# *.exe
 *.dll
 *.lib
 *.obj
