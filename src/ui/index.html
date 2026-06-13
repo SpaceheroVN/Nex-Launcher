@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi" data-chu-de="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nex Launcher - Advanced Utility Tool</title>
+  <meta name="description" content="Nex Launcher - Công cụ tiện ích tiên tiến cho Windows">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="KieuDang/GocThietKe.css">
+  <link rel="stylesheet" href="KieuDang/ThanhPhan.css">
+  <link rel="stylesheet" href="KieuDang/CaiDat.css">
+</head>
+
+<body>
+  <header id="thanh-tieu-de" class="ThanhTieuDe">
+    <div class="ThanhTieuDe_Trai">
+      <button id="nut-thu-gon-menu" class="ThanhTieuDe_Nut" title="Thu gọn sidebar">
+        <svg viewBox="0 0 24 24" id="icon-thu-gon">
+          <path
+            d="M2 7.81v8.38c0 1.49.36 2.73 1.05 3.68.29.42.66.79 1.08 1.08.82.6 1.86.95 3.09 1.03V2.03C3.94 2.24 2 4.37 2 7.81zM20.95 4.13c-.29-.42-.66-.79-1.08-1.08C18.92 2.36 17.68 2 16.19 2H8.72v20h7.47c3.64 0 5.81-2.17 5.81-5.81V7.81c0-1.49-.36-2.73-1.05-3.68zm-5.45 9.9c.29.29.29.77 0 1.06-.15.15-.34.22-.53.22s-.38-.07-.53-.22l-2.56-2.56a.754.754 0 0 1 0-1.06l2.56-2.56c.29-.29.77-.29 1.06 0s.29.77 0 1.06L13.48 12z">
+          </path>
+        </svg>
+      </button>
+      <span class="ThanhTieuDe_TenUngDung">Nex Launcher</span>
+    </div>
+    <div class="ThanhTieuDe_Phai">
+      <button id="nut-menu-chinh" class="ThanhTieuDe_Nut" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="1"></circle>
+          <circle cx="12" cy="5" r="1"></circle>
+          <circle cx="12" cy="19" r="1"></circle>
+        </svg>
+      </button>
+      <div id="menu-dropdown" class="MenuDropdown an">
+        <button class="MenuDropdown_Muc" id="menu-cai-dat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
+            </path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span data-i18n="menu_settings">Cài đặt</span>
+        </button>
+        <div class="MenuDropdown_Ngan"></div>
+        <button class="MenuDropdown_Muc" id="menu-cap-nhat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          <span data-i18n="update_btn">Kiểm tra cập nhật</span>
+        </button>
+        <button class="MenuDropdown_Muc" id="menu-gioi-thieu">
+          <svg width="16" height="16" viewBox="-4 -4 72 72" fill="none">
+            <circle r="32" cx="32" cy="32" stroke="currentColor" stroke-width="5"></circle>
+            <g transform="matrix(0.7,0,0,0.7,9.6,9.6)">
+              <path
+                d="M43.22 52.285c-1.08.42-4.5 1.42-6.06.53a1.536 1.536 0 0 1-.76-1.21c-.49-3.12 1.84-10.33 3.1-14.2.42-1.29.72-2.23.84-2.8.91-4.21.46-7.43-1.34-9.57-2.166-2.575-6.008-3.076-9.16-2.61a35.65 35.65 0 0 0-9.31 2.56.99.99 0 0 0-.54.7l-.65 3.11a1.005 1.005 0 0 0 .33.96 1.031 1.031 0 0 0 1 .18c1.19-.44 4.91-1.43 6.24-.21.75.69.54 2.15.24 3.24-.31 1.14-.68 2.37-1.06 3.66-2.46 8.37-5.26 17.86-.82 20.82a12.44 12.44 0 0 0 7.3 2.55c2.6 0 5.81-.82 10.43-2.69a.998.998 0 0 0 .59-.63l.95-3.17a1.013 1.013 0 0 0-.28-1.03.994.994 0 0 0-1.04-.19zM37.44 4.005a7.235 7.235 0 1 0 7.24 7.24 7.242 7.242 0 0 0-7.24-7.24z"
+                fill="currentColor"></path>
+            </g>
+          </svg>
+          <span data-i18n="about_btn">Giới thiệu</span>
+        </button>
+      </div>
+      <div class="ThanhTieuDe_NganCach"></div>
+      <button id="nut-thu-nho" class="ThanhTieuDe_Nut" title="Thu nhỏ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+      <button id="nut-phong-to" class="ThanhTieuDe_Nut" title="Phóng to">
+        <svg class="svg-phong-to" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="5" width="14" height="14" rx="1.5"></rect>
+        </svg>
+        <svg class="svg-thu-nho-lai an" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 5h10v10h-3"></path>
+          <rect x="5" y="9" width="10" height="10" rx="0"></rect>
+        </svg>
+      </button>
+      <button id="nut-dong" class="ThanhTieuDe_Nut ThanhTieuDe_Nut--dong" title="Đóng">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="20" y1="4" x2="4" y2="20"></line>
+          <line x1="4" y1="4" x2="20" y2="20"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="bo-cuc-chinh" class="BoCucChinh">
+    <aside id="thanh-ben" class="ThanhBen">
+      <div class="ThanhBen_Logo">
+        <img src="TaiNguyen/BieuTuong/logo.ico" alt="Nex" class="ThanhBen_BieuTuongLogo" id="logo-sidebar">
+        <span class="ThanhBen_TenPhienBan" id="ten-phien-ban">Nex Launcher v1.6</span>
+      </div>
+      <div class="ThanhBen_NganCach"></div>
+      <div class="ThanhBen_Nhom">
+        <button class="ThanhBen_NhomTieuDe dang-chon dang-mo" id="nav-installer" data-trang="installer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span data-i18n="installer_btn">Trình Cài Đặt</span>
+          <svg class="ThanhBen_MuiTen" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="ThanhBen_DanhSachCon dang-mo" id="ds-installer">
+          <button class="ThanhBen_MucCon dang-chon" data-bo-loc="all" data-i18n="tab_all">Tất cả</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="apps" data-i18n="tab_apps">Phần mềm</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="games" data-i18n="tab_games">Trò chơi</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="updates" data-i18n="tab_updates">Cập nhật</button>
+        </div>
+      </div>
+      <div class="ThanhBen_Nhom">
+        <button class="ThanhBen_NhomTieuDe" id="nav-uninstaller" data-trang="uninstaller">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+          </svg>
+          <span data-i18n="uninstaller_btn">Trình Gỡ Cài Đặt</span>
+          <svg class="ThanhBen_MuiTen" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="ThanhBen_DanhSachCon" id="ds-uninstaller">
+          <button class="ThanhBen_MucCon" data-bo-loc="all-programs">Mọi chương trình</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="recent">Cài đặt gần đây</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="large">Phần mềm lớn</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="system">Hệ thống</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="third-party">Bên ngoài</button>
+        </div>
+      </div>
+    </aside>
+
+    <main id="noi-dung-chinh" class="NoiDungChinh">
+      <section id="trang-installer" class="Trang dang-hien">
+        <div class="ThanhCongCu">
+          <div class="ThanhCongCu_Trai">
+            <div class="OTimKiem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="thanh-tim-kiem-installer" spellcheck="false" class="OTimKiem_Input" placeholder="Tìm kiếm phần mềm..."
+                data-i18n-placeholder="search_placeholder">
+            </div>
+          </div>
+          <div class="ThanhCongCu_Phai">
+            <button id="nut-them-moi" class="Nut Nut--phu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span data-i18n="add_btn">Thêm</span>
+            </button>
+            <button id="nut-xoa-chon" class="Nut Nut--nguy-hiem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+              </svg>
+              <span data-i18n="delete_btn">Xóa</span>
+            </button>
+            <button id="nut-cai-dat" class="Nut Nut--chinh">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span data-i18n="install_btn">Cài đặt</span>
+            </button>
+          </div>
+        </div>
+        <div class="TieuDeCot">
+          <div class="TieuDeCot_Chon"><input type="checkbox" id="chon-tat-ca-installer" class="OChon"></div>
+          <button class="TieuDeCot_Cot TieuDeCot_Cot--ten sap-xep" data-sap-xep="name"><span data-i18n="header_name">Tên
+              phần mềm</span><svg class="BieuTuongSapXep" width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg></button>
+          <button class="TieuDeCot_Cot TieuDeCot_Cot--loai sap-xep" data-sap-xep="category"><span
+              data-i18n="header_category">Thể loại</span><svg class="BieuTuongSapXep" width="12" height="12"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg></button>
+          <button class="TieuDeCot_Cot TieuDeCot_Cot--nguon sap-xep" data-sap-xep="source"><span
+              data-i18n="header_source">Nguồn</span><svg class="BieuTuongSapXep" width="12" height="12"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg></button>
+        </div>
+        <div id="danh-sach-installer" class="DanhSachUngDung"></div>
+      </section>
+
+      <section id="trang-uninstaller" class="Trang">
+        <div class="ThanhCongCu">
+          <div class="ThanhCongCu_Trai">
+            <div class="OTimKiem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="thanh-tim-kiem-uninstaller" spellcheck="false" class="OTimKiem_Input" placeholder="Tìm kiếm phần mềm..."
+                data-i18n-placeholder="search_placeholder">
+            </div>
+          </div>
+          <div class="ThanhCongCu_Phai">
+            <button id="nut-lam-moi" class="Nut Nut--phu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+                <polyline points="21 3 21 9 15 9"></polyline>
+              </svg><span data-i18n="refresh_btn">Làm mới</span></button>
+            <button id="nut-go-cai-dat" class="Nut Nut--nguy-hiem"><svg width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+              </svg><span data-i18n="uninstall_btn">Gỡ cài đặt</span></button>
+          </div>
+        </div>
+        <div class="TieuDeCot">
+          <div class="TieuDeCot_Chon"><input type="checkbox" id="chon-tat-ca-uninstaller" class="OChon"></div>
+          <div style="width: 32px; flex-shrink: 0;"></div>
+          <button class="TieuDeCot_Cot TieuDeCot_Cot--ten sap-xep" data-sap-xep="name"><span data-i18n="header_name">Tên
+              phần mềm</span><svg class="BieuTuongSapXep" width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg></button>
+          <button class="TieuDeCot_Cot TieuDeCot_Cot--nph sap-xep" data-sap-xep="publisher"><span
+              data-i18n="header_publisher">Nhà phát hành</span><svg class="BieuTuongSapXep" width="12" height="12"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg></button>
+          <button class="TieuDeCot_Cot TieuDeCot_Cot--ngay sap-xep" data-sap-xep="date"><span
+              data-i18n="header_date">Ngày cài</span><svg class="BieuTuongSapXep" width="12" height="12"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg></button>
+          <button class="TieuDeCot_Cot TieuDeCot_Cot--size sap-xep" data-sap-xep="size"><svg class="BieuTuongSapXep"
+              width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg><span data-i18n="header_size">Dung lượng</span></button>
+        </div>
+        <div id="danh-sach-uninstaller" class="DanhSachUngDung"></div>
+        <div class="ThanhTrangThai" id="thanh-trang-thai-uninstaller">
+          <span id="so-luong-da-chon" data-i18n="status_selected">Đã chọn 0 phần mềm</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="lop-phu-modal" class="LopPhuModal an"></div>
+
+  <div id="hop-thoai-gioi-thieu" class="HopThoai an">
+    <div class="HopThoai_NoiDung">
+      <img src="TaiNguyen/BieuTuong/logo.ico" alt="Nex" class="HopThoai_Logo">
+      <h2 class="HopThoai_TieuDe">Nex Launcher</h2>
+      <p class="HopThoai_PhienBan" data-i18n="about_version">Phiên bản 1.6</p>
+      <p class="HopThoai_TacGia" data-i18n="about_author">Tác giả: SpaceheroVN</p>
+      <a href="https://github.com/SpaceheroVN/Nex-Launcher" class="HopThoai_LienKet" target="_blank"
+        data-i18n="about_github">Mã nguồn trên GitHub</a>
+      <button class="Nut Nut--chinh HopThoai_NutDong" id="dong-gioi-thieu">OK</button>
+    </div>
+  </div>
+
+  <datalist id="danh-sach-the-loai">
+    <option value="Web Browsers"></option>
+    <option value="Developer Tools"></option>
+    <option value="Media"></option>
+    <option value="Games"></option>
+    <option value="Utilities"></option>
+    <option value="Messaging"></option>
+    <option value="Compression"></option>
+  </datalist>
+
+  <div id="hop-thoai-them-app" class="HopThoai an" style="z-index: 1002;">
+    <div class="HopThoai_NoiDung" style="text-align: left; padding: 32px; width: 480px; max-width: 90%; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid var(--vien);">
+      <h3 style="margin-top: 0; margin-bottom: 24px; font-size: 20px; font-weight: 600; color: var(--chu-chinh);" data-i18n="add_app_title">Thêm phần mềm mới</h3>
+      
+      <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+        <div style="flex: 1;">
+          <label style="display:block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--chu-chinh);" data-i18n="add_app_name">Tên phần mềm</label>
+          <input type="text" id="them-app-ten" spellcheck="false" placeholder="VD: Zalo" data-i18n-ph="add_app_name_ph" style="width: 100%; box-sizing: border-box; border: 1px solid var(--vien); padding: 12px 14px; border-radius: 8px; background: var(--nen-phu); color: var(--chu-chinh); font-size: 14px; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--mau-chinh)'" onblur="this.style.borderColor='var(--vien)'">
+        </div>
+        <div style="flex: 1; position: relative;">
+          <label style="display:block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--chu-chinh);" data-i18n="add_app_category">Thể loại</label>
+          <input type="text" id="them-app-loai" spellcheck="false" placeholder="Tự nhập hoặc chọn..." data-i18n-ph="add_app_category_ph" autocomplete="off" style="width: 100%; box-sizing: border-box; border: 1px solid var(--vien); padding: 12px 14px; border-radius: 8px; background: var(--nen-phu); color: var(--chu-chinh); font-size: 14px; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--mau-chinh)'; document.getElementById('dropdown-loai').classList.remove('an');" onblur="this.style.borderColor='var(--vien)'; setTimeout(()=>document.getElementById('dropdown-loai')?.classList.add('an'), 200);">
+          <div id="dropdown-loai" class="CustomSelect_Dropdown an" style="position: absolute; top: 100%; left: 0; right: 0; background: var(--nen-tang2, var(--nen-chinh)); border: 1px solid var(--vien); border-radius: 8px; margin-top: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 10; max-height: 200px; overflow-y: auto;">
+            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="document.getElementById('them-app-loai').value='Web Browsers'">Web Browsers</div>
+            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="document.getElementById('them-app-loai').value='Developer Tools'">Developer Tools</div>
+            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="document.getElementById('them-app-loai').value='Media'">Media</div>
+            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="document.getElementById('them-app-loai').value='Games'">Games</div>
+            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="document.getElementById('them-app-loai').value='Utilities'">Utilities</div>
+            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="document.getElementById('them-app-loai').value='Messaging'">Messaging</div>
+            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer;" onmousedown="document.getElementById('them-app-loai').value='Compression'">Compression</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display:block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--chu-chinh);" data-i18n="add_app_source">Hình thức cài đặt</label>
+        <div style="display: flex; gap: 8px; align-items: stretch;">
+          <div style="position: relative; width: 140px;" tabindex="0" onfocus="document.getElementById('dropdown-kieu').classList.remove('an'); this.style.borderColor='var(--mau-chinh)'" onblur="setTimeout(()=>document.getElementById('dropdown-kieu')?.classList.add('an'), 200); this.style.borderColor='var(--vien)'">
+            <div id="them-app-kieu-nguon" data-value="Winget" style="border: 1px solid var(--vien); padding: 12px 14px; border-radius: 8px; background: var(--nen-phu); color: var(--chu-chinh); font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; height: 100%; box-sizing: border-box;">
+              <span class="NhanText">Winget</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div id="dropdown-kieu" class="CustomSelect_Dropdown an" style="position: absolute; top: 100%; left: 0; right: 0; background: var(--nen-tang2, var(--nen-chinh)); border: 1px solid var(--vien); border-radius: 8px; margin-top: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 10;">
+              <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Winget'; el.querySelector('.NhanText').textContent='Winget'; document.getElementById('them-app-id').placeholder=t('add_app_id_ph'); document.getElementById('btn-tim-winget').style.display='flex';">Winget</div>
+              <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--vien);" onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Link'; el.querySelector('.NhanText').textContent='Link (.exe/.msi)'; document.getElementById('them-app-id').placeholder='https://...'; document.getElementById('btn-tim-winget').style.display='none';">Link (.exe/.msi)</div>
+              <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 14px; cursor: pointer;" onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Store'; el.querySelector('.NhanText').textContent='MS Store'; document.getElementById('them-app-id').placeholder='Nhập ID Store'; document.getElementById('btn-tim-winget').style.display='none';">MS Store</div>
+            </div>
+          </div>
+          <input type="text" id="them-app-id" spellcheck="false" placeholder="Nhập ID / Link / Từ khóa tìm kiếm" data-i18n-ph="add_app_id_ph" style="flex: 1; border: 1px solid var(--vien); padding: 12px 14px; border-radius: 8px; background: var(--nen-phu); color: var(--chu-chinh); font-size: 14px; transition: border-color 0.2s; min-width: 0;" onfocus="this.style.borderColor='var(--mau-chinh)'" onblur="this.style.borderColor='var(--vien)'">
+          <button id="btn-tim-winget" class="Nut Nut--chinh" data-i18n-title="add_app_search_title" style="padding: 0 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center;" title="Tìm kiếm trên Winget">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
+        <button class="Nut" id="dong-them-app" data-i18n="add_app_cancel" style="background: var(--nen-phu); color: var(--chu-chinh); border: 1px solid var(--vien); padding: 10px 20px; border-radius: 8px; font-weight: 500;">Hủy</button>
+        <button class="Nut Nut--chinh" id="luu-them-app" style="padding: 10px 24px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"></path></svg>
+          <span data-i18n="add_app_add">Thêm</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="hop-thoai-cai-dat" class="HopThoai an">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--rong">
+      <div class="CaiDat_ThanhBen">
+        <div class="CaiDat_TieuDe" data-i18n="menu_settings">Cài đặt</div>
+        <div id="caidat-menu"></div>
+      </div>
+      <div class="CaiDat_NoiDung">
+        <div class="CaiDat_TieuDeChia">
+          <button class="CaiDat_NutDongX" id="dong-cai-dat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="CaiDat_CuonNoiDung" id="noi-dung-cai-dat"></div>
+        <div class="CaiDat_ThanhDuoi">
+          <button class="Nut Nut--phu" id="caidat-dat-lai" data-i18n="reset_btn">Đặt lại</button>
+          <div style="display:flex;gap:8px;">
+            <button class="Nut Nut--phu" id="caidat-huy" data-i18n="cancel_btn">Hủy</button>
+            <button class="Nut Nut--chinh" id="caidat-luu" data-i18n="save_btn">Lưu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="hop-thoai-tro-giup" class="HopThoai an" style="z-index: 1001;">
+    <div class="HopThoai_NoiDung" style="text-align: left; padding: 24px; min-width: 320px; max-width: 400px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+        <h3 id="tro-giup-tieu-de" style="margin: 0; font-size: 18px; color: var(--chu);">Trợ giúp</h3>
+        <button class="CaiDat_NutDongX" onclick="BatTatHopThoai('hop-thoai-tro-giup', false)"
+          style="position:static; margin:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div id="tro-giup-noi-dung"
+        style="font-size: 14px; color: var(--chu-phu); line-height: 1.6; margin-bottom: 24px;"></div>
+      <button class="Nut Nut--chinh HopThoai_NutDong" onclick="BatTatHopThoai('hop-thoai-tro-giup', false)"
+        style="width: 100%;">OK</button>
+    </div>
+  </div>
+
+  <div id="vung-thong-bao" class="VungThongBao"></div>
+  <script src="TaiNguyen/Languages.js"></script>
+  <script src="KhoiChay.js"></script>
+</body>
+
+</html>

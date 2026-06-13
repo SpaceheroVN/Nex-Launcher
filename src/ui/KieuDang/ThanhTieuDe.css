@@ -1,0 +1,111 @@
+/* ThanhTieuDe.css - Custom frameless titlebar */
+
+.ThanhTieuDe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--thanh-tieu-de-cao);
+  background-color: var(--nen-tang0);
+  padding: 0 10px 0 15px;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+  z-index: 100;
+  position: relative;
+}
+
+.ThanhTieuDe_Trai {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ThanhTieuDe_TenUngDung {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mau-nhan);
+  letter-spacing: 0.3px;
+}
+
+.ThanhTieuDe_Phai {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+}
+
+.ThanhTieuDe_NganCach {
+  width: 1px;
+  height: 18px;
+  background-color: var(--vien);
+  margin: 0 6px;
+}
+
+.ThanhTieuDe_Nut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 28px;
+  border-radius: var(--do-bo);
+  color: var(--chu-phu);
+  transition: all var(--chuyen-dong);
+  -webkit-app-region: no-drag;
+}
+
+.ThanhTieuDe_Nut:hover {
+  background-color: var(--nen-tang3);
+  color: var(--chu-chinh);
+}
+
+.ThanhTieuDe_Nut--dong:hover {
+  background-color: var(--nguy-hiem) !important;
+  color: white !important;
+}
+
+/* Menu dropdown */
+.MenuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 80px;
+  margin-top: 4px;
+  background-color: var(--nen-tang0);
+  border: 1px solid var(--vien);
+  border-radius: var(--do-bo);
+  padding: 6px;
+  min-width: 180px;
+  box-shadow: var(--bong-lon);
+  z-index: 200;
+  animation: truotXuong 0.15s ease;
+}
+
+.MenuDropdown_Muc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--do-bo-nho);
+  color: var(--chu-phu);
+  font-size: 13px;
+  transition: all var(--chuyen-dong-nhanh);
+}
+
+.MenuDropdown_Muc:hover {
+  background-color: var(--mau-nhan);
+  color: #FFFFFF;
+}
+
+.MenuDropdown_Muc svg {
+  flex-shrink: 0;
+}
+
+.MenuDropdown_Ngan {
+  height: 1px;
+  background-color: var(--vien);
+  margin: 4px 8px;
+}
+
+@keyframes truotXuong {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

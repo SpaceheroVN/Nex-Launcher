@@ -1,0 +1,31 @@
+/* TrinhCaiDat.css - Installer page specific styles */
+/* (Đã được cover bởi ThanhPhan.css - file này cho các style riêng sau này) */
+
+#trang-installer .ThanhCongCu {
+  border-bottom: 1px solid var(--vien-nhat);
+}
+
+/* Khi khong co ung dung nao */
+.KhongCoKetQua {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 12px;
+  color: var(--chu-tat);
+}
+
+.KhongCoKetQua svg {
+  opacity: 0.3;
+}
+
+.KhongCoKetQua_TieuDe {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--chu-phu);
+}
+
+.KhongCoKetQua_MoTa {
+  font-size: 13px;
+}

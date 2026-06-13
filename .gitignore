@@ -1,3 +1,8 @@
+# Node.js
+node_modules/
+dist/
+package-lock.json
+
 # Visual Studio / CMake
 .vscode/
 .vs/
@@ -31,6 +36,6 @@ Makefile*
 Thumbs.db
 Desktop.ini
 
-# Ngoại lệ cho Apps và Games
+# Ngoai le cho Apps va Games
 !Basic/Apps/*.exe
 !Basic/Games/*.exe

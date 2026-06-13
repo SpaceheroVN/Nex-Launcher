@@ -1,0 +1,20 @@
+{
+  "name": "nex-launcher",
+  "version": "1.6.0",
+  "description": "Nex-Launcher - Advanced Utility Tool",
+  "main": "src/core/TienTrinhChinh.js",
+  "scripts": {
+    "dev": "electron . --disable-gpu --no-sandbox",
+    "start": "electron . --disable-gpu --no-sandbox",
+    "build": "electron-builder",
+    "build-addon": "node-gyp rebuild"
+  },
+  "author": "SpaceheroVN",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^42.4.0"
+  },
+  "dependencies": {
+    "node-addon-api": "^8.8.0"
+  }
+}
