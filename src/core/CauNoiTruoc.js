@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('DienTu', {
   AnCuaSo: () => ipcRenderer.send('dieu-khien-cua-so', 'an-cua-so'),
   PhongTo: () => ipcRenderer.send('dieu-khien-cua-so', 'phong-to'),
   DongCuaSo: () => ipcRenderer.send('dieu-khien-cua-so', 'dong'),
+  HienCuaSo: () => ipcRenderer.send('dieu-khien-cua-so', 'hien-cua-so'),
   LayTrangThaiCuaSo: () => ipcRenderer.invoke('lay-trang-thai-cua-so'),
   LayChuDeHeThong: () => ipcRenderer.invoke('lay-chu-de-he-thong'),
   DatLuonTrenCung: (val) => ipcRenderer.invoke('dat-luon-tren-cung', val),
@@ -41,5 +42,12 @@ contextBridge.exposeInMainWorld('DienTu', {
   ChonDuongDanPhaHuy: (type) => ipcRenderer.invoke('chon-duong-dan-pha-huy', type),
   KhoiPhucDuLieu: (drivePath, outDir) => ipcRenderer.invoke('tien-hanh-khoi-phuc', drivePath, outDir),
   KhiTienTrinhKhoiPhuc: (HamXuLy) => ipcRenderer.on('tien-trinh-khoi-phuc', (SuKien, percent) => HamXuLy(percent)),
-  DatTienTrinh: (percent, text) => ipcRenderer.send('dat-tien-trinh', { percent, text })
+  DatTienTrinh: (percent, text) => ipcRenderer.send('dat-tien-trinh', { percent, text }),
+  MoCuaSoTienTrinh: (tieuDe, danhSachApp) => ipcRenderer.invoke('mo-cua-so-tien-trinh', tieuDe, danhSachApp),
+  DongCuaSoTienTrinh: () => ipcRenderer.send('dong-cua-so-tien-trinh'),
+  CapNhatCuaSoTienTrinh: (DuLieu) => ipcRenderer.send('cap-nhat-cua-so-tien-trinh', DuLieu),
+  HoanTatCuaSoTienTrinh: (ketQua) => ipcRenderer.send('hoan-tat-cua-so-tien-trinh', ketQua),
+  KhiKhoiTaoTienTrinh: (HamXuLy) => ipcRenderer.on('khoi-tao-tien-trinh', (SuKien, DuLieu) => HamXuLy(DuLieu)),
+  KhiCapNhatTienTrinh: (HamXuLy) => ipcRenderer.on('cap-nhat-tien-trinh', (SuKien, DuLieu) => HamXuLy(DuLieu)),
+  KhiHoanTatTienTrinh: (HamXuLy) => ipcRenderer.on('hoan-tat-tien-trinh', (SuKien, ketQua) => HamXuLy(ketQua))
 });

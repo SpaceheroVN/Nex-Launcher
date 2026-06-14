@@ -310,21 +310,21 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
 }
 .ThanhBen_MucCon.dang-chon {
   background-color: var(--mau-nhan-nhat);
-  color: var(--mau-nhan);
+  color: var(--mau-nhan-chon);
   font-weight: 600;
 }
 .ThanhBen_MucCon.dang-chon::before {
-  background-color: var(--mau-nhan);
+  background-color: var(--mau-nhan-chon);
   opacity: 1;
   width: 8px;
   height: 8px;
 }
 #ds-uninstaller .ThanhBen_MucCon.dang-chon {
   background-color: rgba(237, 66, 69, 0.1);
-  color: var(--nguy-hiem);
+  color: var(--nguy-hiem-chon);
 }
 #ds-uninstaller .ThanhBen_MucCon.dang-chon::before {
-  background-color: var(--nguy-hiem);
+  background-color: var(--nguy-hiem-chon);
 }
 [data-chu-de="light"] .ThanhBen_MucCon:hover {
   background-color: rgba(0, 0, 0, 0.04);
@@ -499,6 +499,7 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
 }
 .TieuDeCot_Cot--ngay {
   flex: 0.7;
+  justify-content: center;
 }
 .TieuDeCot_Cot--size {
   flex: 0.8;
@@ -565,6 +566,9 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
 }
 .HangUngDung:hover {
   background-color: rgba(255, 255, 255, 0.03);
+}
+[data-chu-de="light"] .HangUngDung:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 .HangUngDung.da-chon {
   background-color: var(--mau-nhan-nhat);
@@ -655,6 +659,7 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
   font-size: 0.857rem;
   color: var(--chu-tat);
   padding: 0 8px;
+  text-align: center;
 }
 .HangUngDung_DungLuong {
   flex: 0.8;
@@ -747,6 +752,7 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
   right: 20px;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 8px;
   z-index: 9999;
   pointer-events: none;
@@ -756,7 +762,9 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background-color: var(--nen-tang0);
+  background: var(--nen-tang0);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--vien);
   border-radius: var(--do-bo);
   box-shadow: var(--bong-lon);
@@ -765,18 +773,28 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
   pointer-events: auto;
   animation: truotVao 0.3s ease, mooDan 0.3s ease 3s forwards;
   max-width: 360px;
+  position: relative;
+  overflow: hidden;
 }
-.ThongBao--thanh-cong {
-  border-left: 3px solid var(--thanh-cong);
+.ThongBao::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
 }
-.ThongBao--loi {
-  border-left: 3px solid var(--nguy-hiem);
+.ThongBao--thanh-cong::before {
+  background-color: var(--thanh-cong);
 }
-.ThongBao--thong-tin {
-  border-left: 3px solid var(--mau-nhan);
+.ThongBao--loi::before {
+  background-color: var(--nguy-hiem);
 }
-.ThongBao--canh-bao {
-  border-left: 3px solid var(--canh-bao);
+.ThongBao--thong-tin::before {
+  background-color: var(--mau-nhan);
+}
+.ThongBao--canh-bao::before {
+  background-color: var(--canh-bao);
 }
 @keyframes truotVao {
   from {
@@ -923,7 +941,8 @@ html.dang-chuyen-chu-de *::after {
   border-bottom: none;
 }
 .CustomSelect_Muc:hover {
-  background: var(--nen-hover);
+  background: var(--nen-tang3);
+  color: var(--chu-chinh);
 }
 .CustomSelect_Muc.dang-chon {
   background: rgba(52, 152, 219, 0.1);

@@ -18,6 +18,7 @@ function ApDungChuDe(c) {
   var cd = c; if (c === 'system') { cd = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
   document.documentElement.setAttribute('data-chu-de', cd);
 }
+var CacheTimKiemWinget = new Map();
 var DanhSachPhanMem = [], DanhSachDaCaiDat = [], TrangHienTai = 'installer', BoLocHienTai = 'all', CotSapXep = 'name', HuongSapXep = true;
 document.addEventListener('DOMContentLoaded', async function() {
   KhoiTaoChuDe(); KhoiTaoNgonNgu(); CapNhatBanDich(); DangKySuKien();
@@ -47,7 +48,11 @@ document.addEventListener('DOMContentLoaded', async function() {
           let laTai = dl.status === 'downloading';
           let phanTram = dl.percent || 0;
           let demText = laTai ? (NgonNguHienTai === 'VN' ? 'Đang tải (' : 'Downloading (') + phanTram + '%)' : t('installing') + '...';
-          CapNhatHopThoaiTienTrinh(dl.name, phanTram, demText);
+          if (CauHinh.installerThuNho && window.DienTu.CapNhatCuaSoTienTrinh) {
+              window.DienTu.CapNhatCuaSoTienTrinh(dl);
+          } else {
+              CapNhatHopThoaiTienTrinh(dl.name, phanTram, demText);
+          }
       });
   }
   if (window.DienTu.KhiTienTrinhGoCaiDat) {
@@ -151,6 +156,10 @@ function DangKySuKien() {
     });
   });
   var DangXuLyCaiDat = false;
+  document.getElementById('nut-dong-goi')?.addEventListener('click', function() {
+    let msg = NgonNguHienTai === 'VN' ? 'Tính năng đang trong quá trình phát triển!' : 'Feature is under development!';
+    HienThongBao(msg, 'canh-bao');
+  });
   document.getElementById('nut-cai-dat')?.addEventListener('click', async function() {
     if (DangXuLyCaiDat) { HienThongBao(t('processing_wait') || 'Vui lòng chờ tiến trình hoàn tất', 'canh-bao'); return; }
     var dc = document.querySelectorAll('#danh-sach-installer .OChon:checked');
@@ -173,7 +182,11 @@ function DangKySuKien() {
         window.DienTu.AnCuaSo();
     }
     if (CauHinh.chungHienTienTrinh) {
-        MoHopThoaiTienTrinh(t('installing') + '...', danhSachChon);
+        if (CauHinh.installerThuNho && window.DienTu && window.DienTu.MoCuaSoTienTrinh) {
+            await window.DienTu.MoCuaSoTienTrinh(t('installing') + '...', danhSachChon);
+        } else {
+            MoHopThoaiTienTrinh(t('installing') + '...', danhSachChon);
+        }
     }
     try {
         var ketQua = await window.DienTu.TienHanhCaiDat(danhSachChon, {
@@ -186,8 +199,15 @@ function DangKySuKien() {
           }
         }
     } finally {
-        HoanTatHopThoaiTienTrinh(ketQua);
+        if (CauHinh.installerThuNho && window.DienTu && window.DienTu.HoanTatCuaSoTienTrinh) {
+            window.DienTu.HoanTatCuaSoTienTrinh(ketQua);
+        } else {
+            HoanTatHopThoaiTienTrinh(ketQua);
+        }
         DangXuLyCaiDat = false;
+        if (CauHinh.installerThuNho && window.DienTu && window.DienTu.HienCuaSo) {
+            window.DienTu.HienCuaSo();
+        }
     }
   });
   var DangLamMoi = false;
@@ -234,7 +254,16 @@ function DangKySuKien() {
     TienTrinhSoApp = danhSachChon.length;
     TienTrinhHienTai = 0;
     TienTrinhAppTruoc = '';
-    MoHopThoaiTienTrinh(t('uninstalling'), danhSachChon);
+    if (CauHinh.uninstallerThuNho && window.DienTu && window.DienTu.AnCuaSo) {
+        window.DienTu.AnCuaSo();
+    }
+    if (CauHinh.chungHienTienTrinh) {
+        if (CauHinh.uninstallerThuNho && window.DienTu && window.DienTu.MoCuaSoTienTrinh) {
+            await window.DienTu.MoCuaSoTienTrinh(t('uninstalling'), danhSachChon);
+        } else {
+            MoHopThoaiTienTrinh(t('uninstalling'), danhSachChon);
+        }
+    }
     try {
         var ketQua = await window.DienTu.TienHanhGoCaiDat(danhSachChon, {
             silent: CauHinh.chungDaLuong,
@@ -248,12 +277,13 @@ function DangKySuKien() {
           let dsMoi = await window.DienTu.LayPhanMemDaCai();
           DanhSachDaCaiDat = dsMoi;
           HienThiDanhSachUninstaller(document.getElementById('o-tim-kiem-uninstaller')?.value || '');
-          if (CauHinh.uninstallerThuNho && window.DienTu && window.DienTu.AnCuaSo) {
-              window.DienTu.AnCuaSo();
-          }
         }
     } finally {
-        HoanTatHopThoaiTienTrinh(ketQua);
+        if (CauHinh.uninstallerThuNho && window.DienTu && window.DienTu.HoanTatCuaSoTienTrinh) {
+            window.DienTu.HoanTatCuaSoTienTrinh(ketQua);
+        } else {
+            HoanTatHopThoaiTienTrinh(ketQua);
+        }
         DangXuLyGoCaiDat = false;
     }
   });
@@ -264,6 +294,10 @@ function DangKySuKien() {
     if (btnLuu) {
       btnLuu.dataset.editMode = 'true';
       btnLuu.dataset.oldName = tenPm;
+      let spanBtnLuu = btnLuu.querySelector('span');
+      if (spanBtnLuu) spanBtnLuu.textContent = NgonNguHienTai === 'VN' ? 'Xác nhận' : 'Confirm';
+      let svgBtnLuu = btnLuu.querySelector('svg');
+      if (svgBtnLuu) svgBtnLuu.style.display = 'none';
     }
     document.getElementById('them-app-tieu-de').textContent = NgonNguHienTai === 'VN' ? "Chỉnh sửa phần mềm" : "Edit Software";
     document.getElementById('them-app-ten').value = pm.name || "";
@@ -293,7 +327,13 @@ function DangKySuKien() {
       document.getElementById('them-app-id').value = '';
       if (document.getElementById('them-app-tham-so')) document.getElementById('them-app-tham-so').value = '';
       let btnLuu = document.getElementById('luu-them-app');
-      if (btnLuu) btnLuu.dataset.editMode = 'false';
+      if (btnLuu) {
+        btnLuu.dataset.editMode = 'false';
+        let spanBtnLuu = btnLuu.querySelector('span');
+        if (spanBtnLuu) spanBtnLuu.textContent = NgonNguHienTai === 'VN' ? 'Thêm' : 'Add';
+        let svgBtnLuu = btnLuu.querySelector('svg');
+        if (svgBtnLuu) svgBtnLuu.style.display = '';
+      }
       modal.classList.remove('an');
       lopPhu.classList.remove('an');
     }
@@ -335,26 +375,94 @@ function DangKySuKien() {
       HienThongBao(t('error_saving'), 'canh-bao');
     }
   });
-  document.getElementById('btn-tim-winget')?.addEventListener('click', async function() {
-    var tuKhoa = document.getElementById('them-app-id').value.trim() || document.getElementById('them-app-ten').value.trim();
-    if (!tuKhoa) {
-      HienThongBao(t('enter_name_keyword'), 'canh-bao');
+  async function ThucHienTimKiemWinget(tuKhoa, boQuaCache = false) {
+    let listEl = document.getElementById('tim-winget-danh-sach');
+    let statusEl = document.getElementById('tim-winget-trang-thai');
+    statusEl.textContent = t('searching_winget') || 'Đang tìm kiếm...';
+    listEl.innerHTML = '';
+    if (!boQuaCache && CacheTimKiemWinget.has(tuKhoa)) {
+      let cachedResult = CacheTimKiemWinget.get(tuKhoa);
+      CacheTimKiemWinget.delete(tuKhoa);
+      CacheTimKiemWinget.set(tuKhoa, cachedResult);
+      HienThiKetQuaTimKiemWinget(cachedResult);
       return;
     }
-    HienThongBao(t('searching_winget'), 'thong-tin');
     var result = await window.DienTu.TimKiemWinget(tuKhoa);
-    if (result && result.length > 0) {
-      var chon = prompt(t('found_results').replace('{0}', result.length) + result.map(r => r.name + ' (' + r.id + ')').join('\n'), result[0].id);
-      if (chon) {
-        document.getElementById('them-app-id').value = chon;
+    if (result) {
+      CacheTimKiemWinget.set(tuKhoa, result);
+      if (CacheTimKiemWinget.size > 20) {
+        CacheTimKiemWinget.delete(CacheTimKiemWinget.keys().next().value);
+      }
+      HienThiKetQuaTimKiemWinget(result);
+    } else {
+      statusEl.textContent = t('no_results_winget') || 'Không tìm thấy kết quả nào.';
+    }
+  }
+  function HienThiKetQuaTimKiemWinget(ketQua) {
+    let listEl = document.getElementById('tim-winget-danh-sach');
+    let statusEl = document.getElementById('tim-winget-trang-thai');
+    if (!ketQua || ketQua.length === 0) {
+      statusEl.textContent = t('no_results_winget') || 'Không tìm thấy kết quả nào.';
+      listEl.innerHTML = '';
+      return;
+    }
+    statusEl.textContent = (t('found_results') || 'Tìm thấy {0} kết quả.').replace('{0}', ketQua.length);
+    listEl.innerHTML = '';
+    ketQua.forEach(app => {
+      let div = document.createElement('div');
+      div.className = 'CustomSelect_Item';
+      div.style.padding = '16px 20px';
+      div.style.border = '1px solid var(--vien)';
+      div.style.borderRadius = 'var(--do-bo)';
+      div.style.cursor = 'pointer';
+      div.style.display = 'flex';
+      div.style.flexDirection = 'column';
+      div.style.gap = '6px';
+      let nameEl = document.createElement('div');
+      nameEl.style.fontWeight = '600';
+      nameEl.style.fontSize = '1.071rem';
+      nameEl.style.color = 'var(--chu-chinh)';
+      nameEl.textContent = app.name;
+      let idEl = document.createElement('div');
+      idEl.style.fontSize = '0.929rem';
+      idEl.style.color = 'var(--chu-phu)';
+      idEl.textContent = app.id;
+      div.appendChild(nameEl);
+      div.appendChild(idEl);
+      div.addEventListener('click', function() {
+        document.getElementById('them-app-id').value = app.id;
+        document.getElementById('them-app-ten').value = app.name || '';
         var kn = document.getElementById('them-app-kieu-nguon');
         kn.dataset.value = 'Winget';
         kn.querySelector('.NhanText').textContent = 'Winget';
         document.getElementById('btn-tim-winget').style.display = 'flex';
-      }
-    } else {
-      HienThongBao(t('no_results_winget'), 'canh-bao');
+        document.getElementById('hop-thoai-tim-winget')?.classList.add('an');
+      });
+      listEl.appendChild(div);
+    });
+  }
+  document.getElementById('btn-tim-winget')?.addEventListener('click', function() {
+    var tuKhoa = document.getElementById('them-app-id').value.trim() || document.getElementById('them-app-ten').value.trim();
+    if (!tuKhoa) {
+      HienThongBao(t('enter_name_keyword') || 'Vui lòng nhập tên ứng dụng hoặc từ khoá', 'canh-bao');
+      return;
     }
+    document.getElementById('tim-winget-tieu-de').textContent = 'Tìm kiếm Winget: ' + tuKhoa;
+    BatTatHopThoai('hop-thoai-tim-winget', true);
+    document.getElementById('hop-thoai-tim-winget').dataset.tuKhoa = tuKhoa;
+    ThucHienTimKiemWinget(tuKhoa, false);
+  });
+  document.getElementById('lam-moi-tim-winget')?.addEventListener('click', function() {
+    var tuKhoa = document.getElementById('hop-thoai-tim-winget').dataset.tuKhoa;
+    if (tuKhoa) {
+      ThucHienTimKiemWinget(tuKhoa, true);
+    }
+  });
+  document.getElementById('dong-tim-winget')?.addEventListener('click', function() {
+    document.getElementById('hop-thoai-tim-winget')?.classList.add('an');
+  });
+  document.getElementById('dong-tim-winget-x')?.addEventListener('click', function() {
+    document.getElementById('hop-thoai-tim-winget')?.classList.add('an');
   });
   document.getElementById('nut-xoa-chon')?.addEventListener('click', async function() {
     var dc = document.querySelectorAll('#danh-sach-installer .OChon:checked');
@@ -433,7 +541,11 @@ function TaoHangInstaller(pm) {
 }
 function TaoHangCapNhat(pm) {
   var d = document.createElement('div'); d.className = 'HangUngDung';
-  d.innerHTML = '<div class="HangUngDung_Chon"><input type="checkbox" class="OChon" data-ten="' + pm.name + '" data-id="' + pm.id + '"></div><div class="HangUngDung_Ten">' + pm.name + '</div><div class="HangUngDung_Loai"><span>' + pm.current + ' → ' + pm.available + '</span></div><div class="HangUngDung_Nguon" style="display:flex;align-items:center;justify-content:space-between;"><span class="NhanNguon--winget">Winget</span></div>';
+  d.innerHTML = '<div class="HangUngDung_Chon"><input type="checkbox" class="OChon" data-ten="' + pm.name + '" data-id="' + pm.id + '"></div>'
+  + '<div class="HangUngDung_Ten">' + pm.name + '</div>'
+  + '<div class="HangUngDung_Loai"><span style="font-size:0.8em;color:var(--chu-phu);">' + pm.id + '</span>'
+  + (pm.current && pm.available ? '<br><span>' + pm.current + ' → ' + pm.available + '</span>' : '') + '</div>'
+  + '<div class="HangUngDung_Nguon" style="display:flex;align-items:center;justify-content:space-between;"><span class="NhanNguon--winget">Winget</span></div>';
   d.addEventListener('click', function(e) { if (e.target.type === 'checkbox') return; var cb = d.querySelector('.OChon'); if (cb) { cb.checked = !cb.checked; d.classList.toggle('da-chon', cb.checked); CapNhatNutDongGoi(); } });
   d.querySelector('.OChon')?.addEventListener('change', function() { d.classList.toggle('da-chon', this.checked); CapNhatNutDongGoi(); });
   return d;
@@ -469,11 +581,9 @@ function CapNhatNutDongGoi() {
         }
     }
 }
-let TienTrinhRenderUninstaller = null;
 function HienThiDanhSachUninstaller(TuKhoa) {
   TuKhoa = TuKhoa || '';
   var ct = document.getElementById('danh-sach-uninstaller'); if (!ct) return;
-  if (TienTrinhRenderUninstaller) { cancelAnimationFrame(TienTrinhRenderUninstaller); TienTrinhRenderUninstaller = null; }
   var ds = DanhSachDaCaiDat.slice();
   if (TuKhoa.trim()) { var tk = TuKhoa.toLowerCase(); ds = ds.filter(function(p) { return p.name.toLowerCase().includes(tk) || p.publisher.toLowerCase().includes(tk); }); }
   ds.sort(function(a, b) { var gA, gB; switch (CotSapXep) { case 'publisher': gA = a.publisher; gB = b.publisher; break; case 'date': gA = a.installDate; gB = b.installDate; break; case 'size': gA = a.size; gB = b.size; break; default: gA = a.name; gB = b.name; } return (HuongSapXep ? 1 : -1) * String(gA).localeCompare(String(gB)); });
@@ -521,14 +631,14 @@ function TaoHangUninstaller(pm) {
                 let imgContainer = document.getElementById(iconId);
                 if (imgContainer) {
                   if (base64) {
-                    imgContainer.outerHTML = '<img id="' + iconId + '" src="' + base64 + '">';
+                    imgContainer.src = base64;
                   } else {
-                    imgContainer.outerHTML = '<img id="' + iconId + '" src="TaiNguyen/BieuTuong/what_app.svg">';
+                    imgContainer.src = 'TaiNguyen/BieuTuong/what_app.svg';
                   }
                 }
               }).catch(e => {
                 let imgContainer = document.getElementById(iconId);
-                if (imgContainer) imgContainer.outerHTML = '<img id="' + iconId + '" src="TaiNguyen/BieuTuong/what_app.svg">';
+                if (imgContainer) imgContainer.src = 'TaiNguyen/BieuTuong/what_app.svg';
               });
             }
             if (window.DienTu.LayThongTinThem && (el.dataset.needDate === 'true' || el.dataset.needSize === 'true')) {
@@ -544,7 +654,21 @@ function TaoHangUninstaller(pm) {
                   }
                   if (el.dataset.needSize === 'true' && info.size) {
                     let sizeEl = el.querySelector('.HangUngDung_DungLuong');
-                    if (sizeEl) { sizeEl.textContent = info.size; sizeEl.classList.add('ChuUocTinh'); sizeEl.title = t('estimated'); }
+                    if (sizeEl) { 
+                      let bytes = parseInt(info.size, 10);
+                      let displaySize = '-';
+                      if (!isNaN(bytes) && bytes > 0) {
+                        if (bytes < 1024 * 1024) displaySize = (bytes / 1024).toFixed(1) + ' KB';
+                        else if (bytes < 1024 * 1024 * 1024) displaySize = (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                        else if (bytes < 1024 * 1024 * 1024 * 1024) displaySize = (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+                        else displaySize = (bytes / (1024 * 1024 * 1024 * 1024)).toFixed(1) + ' TB';
+                      } else if (info.size !== '0' && isNaN(bytes)) {
+                        displaySize = info.size;
+                      }
+                      sizeEl.textContent = displaySize; 
+                      sizeEl.classList.add('ChuUocTinh'); 
+                      sizeEl.title = t('estimated'); 
+                    }
                   }
                 }
               }).catch(e => {});
@@ -562,10 +686,8 @@ function TaoHangUninstaller(pm) {
   window.ObserverIcon.observe(d);
   return d;
 }
-let TienTrinhRenderBoLoc = null;
 function LocDanhSachUninstaller(bl) {
   var ct = document.getElementById('danh-sach-uninstaller'); if (!ct) return;
-  if (TienTrinhRenderBoLoc) { cancelAnimationFrame(TienTrinhRenderBoLoc); TienTrinhRenderBoLoc = null; }
   var ds = DanhSachDaCaiDat.slice();
   switch (bl) {
     case 'system': 
@@ -820,6 +942,7 @@ function LayHTMLCaiDatTrang(i, ChuDeHT, NgonNguHT) {
       '<div class="ChonChuDe">' +
       '<div class="ChonChuDe_Nut' + (ChuDeHT === 'light' ? ' dang-chon' : '') + '" data-chu-de="light"><img src="TaiNguyen/BieuTuong/theme-light.svg" alt="Light"><span>' + txtLight + '</span></div>' +
       '<div class="ChonChuDe_Nut' + (ChuDeHT === 'dark' ? ' dang-chon' : '') + '" data-chu-de="dark"><img src="TaiNguyen/BieuTuong/theme-dark.svg" alt="Dark"><span>' + txtDark + '</span></div>' +
+      '<div class="ChonChuDe_Nut' + (ChuDeHT === 'nex' ? ' dang-chon' : '') + '" data-chu-de="nex"><img src="TaiNguyen/BieuTuong/theme-nex.svg" alt="Nex"><span>Nex Launcher</span></div>' +
       '</div></div>' +
       '<div class="MucCaiDat" style="align-items:flex-start; gap:24px;">' +
       '  <div style="flex:1; display:flex; flex-direction:column; gap:12px;">' +
@@ -994,7 +1117,10 @@ function DatLaiCaiDat() {
 }
 function KiemTraCapNhat() {
   HienThongBao(t('update_checking'), 'thong-tin');
-  setTimeout(function() { HienThongBao(t('update_latest'), 'thanh-cong'); }, 2000);
+  setTimeout(function() { 
+    let msg = NgonNguHienTai === 'VN' ? 'Tính năng đang trong quá trình phát triển!' : 'Feature is under development!';
+    HienThongBao(msg, 'canh-bao'); 
+  }, 1500);
 }
 function HienThongBao(nd, loai) {
   loai = loai || 'thong-tin';
@@ -1023,6 +1149,8 @@ function MoHopThoaiTienTrinh(tieuDe, danhSachApp) {
       nutDong.textContent = NgonNguHienTai === 'VN' ? 'Hủy' : 'Cancel';
       nutDong.dataset.isCancel = 'true';
   }
+  let btnBaoLoi = document.getElementById('bao-cao-loi');
+  if (btnBaoLoi) btnBaoLoi.style.display = 'none';
   ds.innerHTML = '';
   danhSachApp.forEach(app => {
       var hang = document.createElement('div');
@@ -1063,6 +1191,7 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai) {
   document.getElementById('tien-trinh-phan-tram').textContent = Math.round(tongPhanTram) + '%';
 }
 function HoanTatHopThoaiTienTrinh(ketQua) {
+  let coLoi = false;
   if (ketQua && Array.isArray(ketQua)) {
       ketQua.forEach(k => {
           var idTt = 'tien-trinh-tt-' + encodeURIComponent(k.name).replace(/%/g, '_');
@@ -1071,6 +1200,7 @@ function HoanTatHopThoaiTienTrinh(ketQua) {
               ttEl.textContent = k.success ? 'Hoàn tất' : 'Lỗi';
               ttEl.className = 'TienTrinh_TrangThai ' + (k.success ? 'thanh-cong' : 'loi');
           }
+          if (!k.success) coLoi = true;
       });
   }
   document.getElementById('tien-trinh-thanh').style.width = '100%';
@@ -1082,7 +1212,39 @@ function HoanTatHopThoaiTienTrinh(ketQua) {
       nutDong.textContent = NgonNguHienTai === 'VN' ? 'Đóng' : 'Close';
       nutDong.dataset.isCancel = 'false';
   }
+  let btnBaoLoi = document.getElementById('bao-cao-loi');
+  if (btnBaoLoi && coLoi) {
+      btnBaoLoi.style.display = 'block';
+      btnBaoLoi.onclick = () => {
+          let errorText = "Nex Launcher Error Report\nDate: " + new Date().toLocaleString() + "\nOS: " + navigator.userAgent + "\n\nFailed Apps:\n";
+          ketQua.forEach(k => {
+              if (!k.success) {
+                  errorText += "- " + k.name + (k.error ? " (Error: " + k.error + ")" : " (Unknown Error)") + "\n";
+              }
+          });
+          document.getElementById('chi-tiet-bao-cao-loi').value = errorText;
+          document.getElementById('hop-thoai-bao-cao-loi').classList.remove('an');
+          document.getElementById('lop-phu-modal').classList.remove('an');
+      };
+  }
 }
+document.getElementById('dong-bao-cao-loi-x')?.addEventListener('click', () => {
+    document.getElementById('hop-thoai-bao-cao-loi').classList.add('an');
+    if (!document.querySelectorAll('.HopThoai:not(.an)').length) document.getElementById('lop-phu-modal').classList.add('an');
+});
+document.getElementById('dong-bao-cao-loi-ok')?.addEventListener('click', () => {
+    document.getElementById('hop-thoai-bao-cao-loi').classList.add('an');
+    if (!document.querySelectorAll('.HopThoai:not(.an)').length) document.getElementById('lop-phu-modal').classList.add('an');
+});
+document.getElementById('copy-bao-cao-loi')?.addEventListener('click', () => {
+    let text = document.getElementById('chi-tiet-bao-cao-loi').value;
+    navigator.clipboard.writeText(text).then(() => {
+        let btn = document.getElementById('copy-bao-cao-loi');
+        let oldText = btn.innerHTML;
+        btn.innerHTML = 'Đã Copy!';
+        setTimeout(() => { btn.innerHTML = oldText; }, 2000);
+    });
+});
 function HienThiXacNhanGoCaiDat(danhSachChon) {
     return new Promise((resolve) => {
         var hopThoai = document.getElementById('hop-thoai-xac-nhan-go');
@@ -1090,39 +1252,61 @@ function HienThiXacNhanGoCaiDat(danhSachChon) {
         var cauHoi = document.getElementById('xac-nhan-go-cau-hoi');
         var lp = document.getElementById('lop-phu-modal');
         if (cauHoi) cauHoi.textContent = (t('confirm_remove_apps') || 'Bạn có chắc chắn muốn gỡ cài đặt {0} chương trình đã chọn không?').replace('{0}', danhSachChon.length);
-        if (danhSach) {
-            danhSach.innerHTML = '';
-            danhSachChon.forEach(app => {
-                var div = document.createElement('div');
-                div.className = 'XacNhanGo_App';
-                var img = document.createElement('img');
-                img.className = 'XacNhanGo_Icon';
-                img.src = 'TaiNguyen/BieuTuong/logo.ico';
-                if (window.DienTu && window.DienTu.LayIconApp) {
-                    window.DienTu.LayIconApp(app.name).then(base64 => {
-                        if (base64) img.src = base64;
-                    });
-                }
-                var ten = document.createElement('div');
-                ten.className = 'XacNhanGo_Ten';
-                ten.textContent = app.name;
-                ten.title = app.name;
-                var size = document.createElement('div');
-                size.className = 'XacNhanGo_Size';
-                if (window.DienTu && window.DienTu.LayThongTinThem) {
-                    window.DienTu.LayThongTinThem(app.name).then(info => {
-                        if (info && info.size) size.textContent = info.size;
-                        else size.textContent = '-';
-                    });
-                } else {
-                    size.textContent = '-';
-                }
-                div.appendChild(img);
-                div.appendChild(ten);
-                div.appendChild(size);
-                danhSach.appendChild(div);
-            });
-        }
+        var TrangHienTai = 0;
+        var SoLuongTrenTrang = 3;
+        var nutPrev = document.getElementById('xac-nhan-go-prev');
+        var nutNext = document.getElementById('xac-nhan-go-next');
+        var renderTrang = () => {
+            if (danhSach) {
+                danhSach.innerHTML = '';
+                var batDau = TrangHienTai * SoLuongTrenTrang;
+                var ketThuc = Math.min(batDau + SoLuongTrenTrang, danhSachChon.length);
+                var trangHienTaiApps = danhSachChon.slice(batDau, ketThuc);
+                trangHienTaiApps.forEach(app => {
+                    var div = document.createElement('div');
+                    div.className = 'XacNhanGo_App';
+                    var img = document.createElement('img');
+                    img.className = 'XacNhanGo_Icon';
+                    img.src = 'TaiNguyen/BieuTuong/logo.ico';
+                    if (window.DienTu && window.DienTu.LayIconApp) {
+                        window.DienTu.LayIconApp(app.name).then(base64 => {
+                            if (base64) img.src = base64;
+                        });
+                    }
+                    var ten = document.createElement('div');
+                    ten.className = 'XacNhanGo_Ten';
+                    ten.textContent = app.name;
+                    ten.title = app.name;
+                    var size = document.createElement('div');
+                    size.className = 'XacNhanGo_Size';
+                    if (window.DienTu && window.DienTu.LayThongTinThem) {
+                        window.DienTu.LayThongTinThem(app.name).then(info => {
+                            if (info && info.size) size.textContent = info.size;
+                            else size.textContent = '-';
+                        });
+                    } else {
+                        size.textContent = '-';
+                    }
+                    div.appendChild(img);
+                    div.appendChild(ten);
+                    div.appendChild(size);
+                    danhSach.appendChild(div);
+                });
+            }
+            if (nutPrev) {
+                nutPrev.disabled = TrangHienTai === 0;
+                nutPrev.style.display = danhSachChon.length > SoLuongTrenTrang ? 'block' : 'none';
+            }
+            if (nutNext) {
+                nutNext.disabled = ketThuc >= danhSachChon.length;
+                nutNext.style.display = danhSachChon.length > SoLuongTrenTrang ? 'block' : 'none';
+            }
+        };
+        var xuliPrev = () => { if (TrangHienTai > 0) { TrangHienTai--; renderTrang(); } };
+        var xuliNext = () => { if ((TrangHienTai + 1) * SoLuongTrenTrang < danhSachChon.length) { TrangHienTai++; renderTrang(); } };
+        if (nutPrev) nutPrev.addEventListener('click', xuliPrev);
+        if (nutNext) nutNext.addEventListener('click', xuliNext);
+        renderTrang();
         var nutHuy = document.getElementById('dong-xac-nhan-go');
         var nutGo = document.getElementById('luu-xac-nhan-go');
         var xuliHuy = () => {
@@ -1130,12 +1314,16 @@ function HienThiXacNhanGoCaiDat(danhSachChon) {
             if (!document.querySelectorAll('.HopThoai:not(.an)').length) lp.classList.add('an');
             nutHuy?.removeEventListener('click', xuliHuy);
             nutGo?.removeEventListener('click', xuliGo);
+            nutPrev?.removeEventListener('click', xuliPrev);
+            nutNext?.removeEventListener('click', xuliNext);
             resolve(false);
         };
         var xuliGo = () => {
             hopThoai.classList.add('an');
             nutHuy?.removeEventListener('click', xuliHuy);
             nutGo?.removeEventListener('click', xuliGo);
+            nutPrev?.removeEventListener('click', xuliPrev);
+            nutNext?.removeEventListener('click', xuliNext);
             resolve(true);
         };
         nutHuy?.addEventListener('click', xuliHuy);

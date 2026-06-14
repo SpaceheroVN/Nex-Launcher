@@ -54,15 +54,29 @@ function runSilentCommand(command, args, onProgress) {
             }
         });
         child.on('close', (code) => {
-            if (code === 0 || code === 0x8A150101 || code === -1978334975) {
-                resolve(true);
+            if (code === 0 || code === 0x8A150101 || code === -1978334975 || code === 3010) {
+                resolve({ success: true, code: code });
             } else {
-                resolve(false);
+                resolve({ success: false, code: code });
             }
         });
         child.on('error', () => {
-            resolve(false);
+            resolve({ success: false, code: -1 });
         });
+    });
+}
+async function waitForMSI() {
+    return new Promise(resolve => {
+        const check = () => {
+            exec(`powershell -NoProfile -Command "try { $m = [System.Threading.Mutex]::OpenExisting('Global\\_MSIExecute'); $m.Dispose(); exit 1 } catch { exit 0 }"`, (err) => {
+                if (err && err.code === 1) {
+                    setTimeout(check, 3000);
+                } else {
+                    resolve();
+                }
+            });
+        };
+        check();
     });
 }
 function KiemTraThuMucNhayCam(targetPath) {
@@ -89,13 +103,14 @@ async function PhaHuyDuLieu(targetPath, options = {}) {
         const passes = options.passes || 3;
         return addon.wipeRegion(drive, 0, options.length || 1024 * 1024 * 1024, passes);
     }
+    const MAX_BUF_SIZE = 4 * 1024 * 1024;
+    const buf = Buffer.alloc(MAX_BUF_SIZE);
     const wipeFile = (filePath) => {
         const stat = fs.statSync(filePath);
         const size = stat.size;
         if (size === 0) { fs.unlinkSync(filePath); return true; }
         const passes = options.passes || 3;
-        const BUF_SIZE = Math.min(size, 4 * 1024 * 1024);
-        const buf = Buffer.alloc(BUF_SIZE);
+        const BUF_SIZE = Math.min(size, MAX_BUF_SIZE);
         const fd = fs.openSync(filePath, 'r+');
         for (let pass = 0; pass < passes; pass++) {
             let remaining = size;
@@ -121,19 +136,25 @@ async function PhaHuyDuLieu(targetPath, options = {}) {
     if (wipeStat.isFile()) {
         return wipeFile(targetPath);
     } else if (wipeStat.isDirectory()) {
-        const walkDir = (dir) => {
-            const entries = fs.readdirSync(dir, { withFileTypes: true });
+        const dirsToRM = [];
+        const queue = [targetPath];
+        while (queue.length > 0) {
+            const currentDir = queue.shift();
+            dirsToRM.push(currentDir);
+            let entries;
+            try { entries = fs.readdirSync(currentDir, { withFileTypes: true }); } catch(e) { continue; }
             for (const entry of entries) {
-                const full = path.join(dir, entry.name);
-                if (entry.isDirectory()) walkDir(full);
+                const full = path.join(currentDir, entry.name);
+                if (entry.isDirectory()) queue.push(full);
                 else {
                     try { wipeFile(full); }
                     catch(e) { console.warn('Skip locked file:', full, e.message); }
                 }
             }
-            fs.rmdirSync(dir);
-        };
-        walkDir(targetPath);
+        }
+        while (dirsToRM.length > 0) {
+            try { fs.rmdirSync(dirsToRM.pop()); } catch(e) {}
+        }
         return true;
     }
     throw new Error("Đường dẫn không hợp lệ.");
@@ -152,26 +173,34 @@ function DangKyIPCLogic() {
                 continue;
             }
             let success = false;
+            let errorMsg = "";
             let type = app.source ? app.source.type : 'Winget';
             if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'downloading', percent: 0 });
             if (type === 'Link') {
                 try {
                     let exeName = app.source.value.split('/').pop() || 'installer.exe';
                     if (exeName.includes('?')) exeName = exeName.split('?')[0];
-                    let dest = path.join(os.tmpdir(), exeName);
+                    let uniqueId = Date.now().toString() + '_' + Math.random().toString(36).substring(2, 7);
+                    let dest = path.join(os.tmpdir(), uniqueId + '_' + exeName);
                     await downloadFile(app.source.value, dest, (percent) => {
                         if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'downloading', percent });
                     });
                     if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'installing', percent: 100 });
+                    await waitForMSI();
                     let args = app.source.silent_args ? app.source.silent_args.split(' ').filter(a => a) : [];
                     let commandStr = `"${dest}" ` + args.join(" ");
                     if (addon && addon.nativeInstallApp) {
                         success = addon.nativeInstallApp(commandStr);
+                        if (!success) errorMsg = "Lỗi thực thi (Native Addon Failed)";
                     } else {
-                        success = await runSilentCommand(dest, args);
+                        let res = await runSilentCommand(dest, args);
+                        success = res.success;
+                        if (!success) errorMsg = "Mã lỗi: " + res.code + (res.code === 1618 ? " (Đang có tiến trình MSI khác chạy)" : "");
                     }
+                    await waitForMSI();
                 } catch(e) {
                     success = false;
+                    errorMsg = e.message;
                 }
             } else {
                 let id = app.source ? app.source.value : app.name;
@@ -181,14 +210,18 @@ function DangKyIPCLogic() {
                 if (addon && addon.nativeInstallApp) {
                     if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'downloading/installing', percent: 50 });
                     success = addon.nativeInstallApp(commandStr);
+                    if (!success) errorMsg = "Lỗi Winget qua Native Addon";
                     if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'done', percent: 100 });
                 } else {
-                    success = await runSilentCommand('winget', args, (percent) => {
+                    let res = await runSilentCommand('winget', args, (percent) => {
                         if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'downloading', percent });
                     });
+                    success = res.success;
+                    if (!success) errorMsg = "Winget trả về mã lỗi: " + res.code;
                 }
+                await waitForMSI();
             }
-            results.push({ name: app.name, success });
+            results.push({ name: app.name, success, error: errorMsg });
         }
         return results;
     });
@@ -196,6 +229,7 @@ function DangKyIPCLogic() {
         let results = [];
         for (let app of apps) {
             let success = false;
+            let errorMsg = "";
             if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'downloading', percent: 0 });
             let id = app.id || app.name;
             let args = ['upgrade', '--id', `"${id}"`, '--accept-package-agreements', '--accept-source-agreements'];
@@ -205,14 +239,18 @@ function DangKyIPCLogic() {
                 if (addon && addon.nativeInstallApp) {
                     if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: 'downloading/installing', percent: 50 });
                     success = addon.nativeInstallApp(commandStr);
+                    if (!success) errorMsg = "Lỗi cập nhật qua Native Addon";
                 } else {
-                    success = await runSilentCommand("winget", args);
+                    let res = await runSilentCommand("winget", args);
+                    success = res.success;
+                    if (!success) errorMsg = "Winget trả về mã lỗi: " + res.code;
                 }
             } catch(e) {
                 success = false;
+                errorMsg = e.message;
             }
             if (options.showProgress) event.sender.send('tien-trinh-cai-dat', { name: app.name, status: success ? 'done' : 'error', percent: 100 });
-            results.push({ name: app.name, success: success });
+            results.push({ name: app.name, success, error: errorMsg });
         }
         return results;
     });
@@ -234,12 +272,17 @@ function DangKyIPCLogic() {
             }
             let commandStr = "winget " + args.join(" ");
             let success = false;
+            let errorMsg = "";
             if (addon && addon.nativeUninstallApp) {
                 success = addon.nativeUninstallApp(commandStr);
+                if (!success) errorMsg = "Lỗi gỡ cài đặt qua Native Addon";
             } else {
-                success = await runSilentCommand('winget', args);
+                let res = await runSilentCommand('winget', args);
+                success = res.success;
+                if (!success) errorMsg = "Winget trả về mã lỗi: " + res.code;
             }
-            results.push({ name: name, success });
+            await waitForMSI();
+            results.push({ name: name, success, error: errorMsg });
         }
         return results;
     });
@@ -260,40 +303,6 @@ function DangKyIPCLogic() {
                 if (isDone !== undefined) {
                     resolve(isDone);
                 }
-            });
-        });
-    });
-    ipcMain.handle('kiem-tra-cap-nhat', async () => {
-        return new Promise((resolve) => {
-            exec('winget upgrade --accept-source-agreements', { encoding: 'utf8', timeout: 30000, windowsHide: true }, (error, stdout) => {
-                if (error && (!stdout || stdout.trim() === '')) {
-                    resolve([]);
-                    return;
-                }
-                let results = [];
-                let lines = stdout.split('\n').map(l => l.trim());
-                let startIndex = -1;
-                for (let i = 0; i < lines.length; i++) {
-                    if (lines[i].startsWith('----')) {
-                        startIndex = i + 1;
-                        break;
-                    }
-                }
-                if (startIndex !== -1) {
-                    for (let i = startIndex; i < lines.length; i++) {
-                        let line = lines[i];
-                        if (!line || line.includes('upgrades available')) continue;
-                        let parts = line.split(/\s{2,}/);
-                        if (parts.length >= 4) {
-                            let available = parts[parts.length - 2];
-                            let current = parts[parts.length - 3];
-                            let id = parts[parts.length - 4] || parts[1];
-                            let name = parts[0];
-                            results.push({ name: name, id: id, current: current, available: available });
-                        }
-                    }
-                }
-                resolve(results);
             });
         });
     });

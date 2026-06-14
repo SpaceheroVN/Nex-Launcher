@@ -11,10 +11,12 @@
   --chu-phu: #B5BAC1;
   --chu-tat: #949BA4;
   --mau-nhan: #5865F2;
+  --mau-nhan-chon: #8EA1FA;
   --mau-nhan-hover: #4752C4;
   --mau-nhan-nhat: rgba(88, 101, 242, 0.15);
   --mau-uoc-tinh: #fcd34d; 
   --nguy-hiem: #ED4245;
+  --nguy-hiem-chon: #F27A7C;
   --nguy-hiem-hover: #D83C3E;
   --thanh-cong: #57F287;
   --canh-bao: #FEE75C;
@@ -49,16 +51,47 @@ html[data-chu-de="light"] {
   --chu-phu: #4E5058;
   --chu-tat: #80848E;
   --mau-nhan: #5865F2;
+  --mau-nhan-chon: #4752C4;
   --mau-nhan-hover: #4752C4;
   --mau-nhan-nhat: rgba(88, 101, 242, 0.1);
   --mau-uoc-tinh: #d97706; 
   --nguy-hiem: #DA373C;
+  --nguy-hiem-chon: #A1282D;
   --nguy-hiem-hover: #C0302E;
   --vien: #D1D3D6;
   --vien-nhat: rgba(0, 0, 0, 0.06);
   --bong: 0 2px 10px rgba(0, 0, 0, 0.08);
   --bong-lon: 0 8px 32px rgba(0, 0, 0, 0.12);
   --bong-nang: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+html[data-chu-de="nex"] {
+  --rgb-nen-tang0: 15, 23, 42;
+  --rgb-nen-tang1: 30, 41, 59;
+  --rgb-nen-tang2: 51, 65, 85;
+  --nen-tang0: rgba(var(--rgb-nen-tang0), var(--alpha-nen, 1));
+  --nen-tang1: rgba(var(--rgb-nen-tang1), var(--alpha-nen, 1));
+  --nen-tang2: rgba(var(--rgb-nen-tang2), var(--alpha-nen, 1));
+  --nen-tang3: #475569;
+  --nen-tang4: #64748B;
+  --chu-chinh: #F8FAFC;
+  --chu-phu: #94A3B8;
+  --chu-tat: #64748B;
+  --mau-nhan: #3B82F6;
+  --mau-nhan-chon: #60A5FA;
+  --mau-nhan-hover: #2563EB;
+  --mau-nhan-nhat: rgba(59, 130, 246, 0.15);
+  --mau-uoc-tinh: #FBBF24; 
+  --nguy-hiem: #EF4444;
+  --nguy-hiem-chon: #F87171;
+  --nguy-hiem-hover: #DC2626;
+  --thanh-cong: #10B981;
+  --canh-bao: #F59E0B;
+  --thong-tin: #3B82F6;
+  --vien: rgba(255, 255, 255, 0.08);
+  --vien-nhat: rgba(255, 255, 255, 0.04);
+  --bong: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --bong-lon: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --bong-nang: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html {
