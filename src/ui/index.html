@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nex Launcher</title>
   <meta name="description" content="Nex Launcher - Công cụ tiện ích tiên tiến cho Windows">
+  <link rel="icon" type="image/svg+xml" href="TaiNguyen/BieuTuong/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -93,7 +94,7 @@
   <div id="bo-cuc-chinh" class="BoCucChinh">
     <aside id="thanh-ben" class="ThanhBen">
       <div class="ThanhBen_Logo">
-        <img src="TaiNguyen/BieuTuong/logo.ico" alt="Nex" class="ThanhBen_BieuTuongLogo" id="logo-sidebar">
+        <img src="TaiNguyen/BieuTuong/logo.svg" alt="Nex" class="ThanhBen_BieuTuongLogo" id="logo-sidebar">
         <span class="ThanhBen_TenPhienBan" id="ten-phien-ban">Nex Launcher v1.6</span>
       </div>
       <div class="ThanhBen_NganCach"></div>
@@ -139,8 +140,7 @@
         </div>
       </div>
       <div class="ThanhBen_Nhom">
-        <button class="ThanhBen_NhomTieuDe" id="nav-tien-ich" data-trang="tien-ich" disabled
-          style="opacity: 0.5; cursor: not-allowed;">
+        <button class="ThanhBen_NhomTieuDe" id="nav-tien-ich" data-trang="tien-ich">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="none">
             <g>
               <path
@@ -453,7 +453,7 @@
   <div id="lop-phu-modal" class="LopPhuModal an"></div>
   <div id="hop-thoai-gioi-thieu" class="HopThoai an">
     <div class="HopThoai_NoiDung">
-      <img src="TaiNguyen/BieuTuong/logo.ico" alt="Nex" class="HopThoai_Logo">
+      <img src="TaiNguyen/BieuTuong/logo.svg" alt="Nex" class="HopThoai_Logo">
       <h2 class="HopThoai_TieuDe">Nex Launcher</h2>
       <p class="HopThoai_PhienBan" data-i18n="about_version">Phiên bản 1.6</p>
       <p class="HopThoai_TacGia" data-i18n="about_author">Tác giả: SpaceheroVN</p>
@@ -706,13 +706,11 @@
     <div class="HopThoai_NoiDung"
       style="text-align: center; padding: 32px; width: 600px; max-width: 90%; border-radius: var(--do-bo-lon); box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--vien);">
       <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px;">
-        <button class="Nut Nut--phu" id="xac-nhan-go-prev" style="padding: 8px; border-radius: 50%;"
-          disabled>&lt;</button>
+        <button class="XacNhanGo_NutChuyen" id="xac-nhan-go-prev" disabled>&lt;</button>
         <div id="xac-nhan-go-danh-sach" class="XacNhanGo_DanhSachApp"
           style="display: flex; gap: 16px; justify-content: center; overflow: hidden; min-height: 120px; width: 450px;">
         </div>
-        <button class="Nut Nut--phu" id="xac-nhan-go-next" style="padding: 8px; border-radius: 50%;"
-          disabled>&gt;</button>
+        <button class="XacNhanGo_NutChuyen" id="xac-nhan-go-next" disabled>&gt;</button>
       </div>
       <h3 id="xac-nhan-go-cau-hoi"
         style="margin: 0 0 24px 0; font-size: 1.143rem; font-weight: 500; color: var(--chu-chinh);">Bạn có chắc chắn
@@ -721,15 +719,15 @@
         style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 32px; max-width: fit-content; margin-left: auto; margin-right: auto;">
         <label class="TuyChonCheckbox"
           style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; text-align: left;">
-          <input type="checkbox" id="chk-tao-diem-khoi-phuc"
-            style="width: 18px; height: 18px; accent-color: var(--mau-nhan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+          <input type="checkbox" id="chk-tao-diem-khoi-phuc" class="OChon"
+            style="margin-top: 2px; flex-shrink: 0;">
           <span style="font-size: 0.929rem; color: var(--chu-phu); line-height: 1.4;">Tạo điểm khôi phục hệ thống trước
             khi gỡ cài đặt</span>
         </label>
         <label class="TuyChonCheckbox"
           style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; text-align: left;">
-          <input type="checkbox" id="chk-don-tep-thua"
-            style="width: 18px; height: 18px; accent-color: var(--mau-nhan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+          <input type="checkbox" id="chk-don-tep-thua" class="OChon"
+            style="margin-top: 2px; flex-shrink: 0;">
           <span style="font-size: 0.929rem; color: var(--chu-phu); line-height: 1.4;">Tự động loại bỏ các tệp tin
             thừa</span>
         </label>
@@ -739,6 +737,29 @@
           style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Hủy</button>
         <button class="Nut Nut--nguy-hiem" id="luu-xac-nhan-go"
           style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Gỡ cài đặt</button>
+      </div>
+    </div>
+  </div>
+  <div id="hop-thoai-tan-du" class="HopThoai an" style="z-index: 1002;">
+    <div class="HopThoai_NoiDung" style="text-align: left; padding: 24px; width: 650px; max-width: 90%; border-radius: var(--do-bo-lon); border: 1px solid var(--vien); box-shadow: 0 20px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; max-height: 80vh;">
+      <h3 style="margin: 0 0 16px 0; font-size: 1.143rem; font-weight: 500; color: var(--chu-chinh);">Quét Tàn Dư Ứng Dụng</h3>
+      <p style="margin: 0 0 16px 0; font-size: 0.929rem; color: var(--chu-phu);">Vui lòng kiểm tra và chọn những tệp tin/registry bạn muốn xóa. Cẩn thận khi xóa các mục Registry nếu bạn không chắc chắn.</p>
+      
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--vien);">
+        <label class="TuyChonCheckbox" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="chk-chon-tat-ca-tan-du" class="OChon" checked>
+          <span style="font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);">Chọn tất cả</span>
+        </label>
+        <span id="tan-du-so-luong" style="font-size: 0.857rem; color: var(--chu-phu);">0 mục được chọn</span>
+      </div>
+
+      <div id="danh-sach-tan-du" style="flex: 1; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;">
+        <!-- Items will be injected here -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: auto;">
+        <button class="Nut Nut--phu" id="dong-tan-du" style="padding: 8px 24px; border-radius: var(--do-bo);">Bỏ qua</button>
+        <button class="Nut Nut--nguy-hiem" id="xoa-tan-du" style="padding: 8px 24px; border-radius: var(--do-bo);">Xóa Tàn Dư</button>
       </div>
     </div>
   </div>
@@ -816,6 +837,7 @@
   </div>
   <div id="vung-thong-bao" class="VungThongBao"></div>
   <script src="TaiNguyen/Languages.js"></script>
+  <script src="CauNoiTauri.js"></script>
   <script src="KhoiChay.js"></script>
 </body>
 </html>

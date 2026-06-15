@@ -867,7 +867,7 @@ html.dang-chuyen-chu-de *::after {
 }
 .TienTrinh_Muc { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--vien); }
 .TienTrinh_Muc:last-child { border-bottom: none; }
-.TienTrinh_Ten { font-size: 1rem; font-weight: 500; color: var(--chu-chinh); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px; }
+.TienTrinh_Ten { font-size: 1rem; font-weight: 500; color: var(--chu-chinh); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; margin-right: 16px; }
 .TienTrinh_TrangThai { font-size: 0.929rem; color: var(--chu-phu); font-weight: 500; }
 .TienTrinh_TrangThai.thanh-cong { color: var(--thanh-cong); }
 .TienTrinh_TrangThai.loi { color: var(--nguy-hiem); }
@@ -954,3 +954,28 @@ html.dang-chuyen-chu-de *::after {
 .KhongCoKetQua svg { opacity: 0.3; }
 .KhongCoKetQua_TieuDe { font-size: 1.143rem; font-weight: 600; color: var(--chu-phu); }
 .KhongCoKetQua_MoTa { font-size: 0.929rem; }
+
+.XacNhanGo_NutChuyen {
+    background: transparent;
+    border: none;
+    color: var(--chu-phu);
+    font-size: 2.5rem;
+    font-weight: 300;
+    width: 50px;
+    height: 90px;
+    border-radius: var(--do-bo-nho);
+    cursor: pointer;
+    transition: background-color var(--chuyen-dong-nhanh), color var(--chuyen-dong-nhanh);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.XacNhanGo_NutChuyen:hover:not(:disabled) {
+    background-color: var(--vien);
+    color: var(--chu-chinh);
+}
+.XacNhanGo_NutChuyen:disabled {
+    opacity: 0.2;
+    cursor: default;
+}

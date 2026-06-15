@@ -9,6 +9,7 @@ Cảm ơn bạn đã quan tâm đến Nex Launcher! Tài liệu này sẽ giúp 
 - [Yêu cầu](#yêu-cầu)
 - [Thiết lập](#thiết-lập)
 - [Cấu trúc thư mục](#cấu-trúc-thư-mục)
+- [Kiến trúc Tauri](#kiến-trúc-tauri)
 - [Quy ước đặt tên](#quy-ước-đặt-tên)
 - [Kiến trúc CSS](#kiến-trúc-css)
 - [Đa ngôn ngữ (i18n)](#đa-ngôn-ngữ-i18n)
@@ -22,7 +23,10 @@ Cảm ơn bạn đã quan tâm đến Nex Launcher! Tài liệu này sẽ giúp 
 |---------|-----------|
 | Node.js | v18+ |
 | npm | Đi kèm Node.js |
+| Rust | v1.77+ |
 | Windows | 10 hoặc 11 |
+
+> **Lưu ý:** Cần cài đặt [Rust toolchain](https://www.rust-lang.org/tools/install) và [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) trước khi chạy.
 
 ## Thiết lập
 
@@ -31,43 +35,79 @@ Cảm ơn bạn đã quan tâm đến Nex Launcher! Tài liệu này sẽ giúp 
 git clone https://github.com/SpaceheroVN/Nex-Launcher.git
 cd Nex-Launcher
 
-# 2. Cài đặt dependencies
+# 2. Cài đặt JS dependencies
 npm install
 
-# 3. Chạy development mode
+# 3. Chạy development mode (tự build Rust backend + serve frontend)
 npm run dev
 ```
-
-> **Lưu ý:** App đã tự thêm `--disable-gpu --no-sandbox` trong script để tránh lỗi GPU trên một số máy.
 
 ## Cấu trúc thư mục
 
 ```
 Nex-Launcher/
-├── package.json              # Metadata & scripts
+├── package.json              # Metadata & scripts (tauri dev/build)
 ├── README.md                 # Giới thiệu cho người dùng
-├── ReadmeDev.md              # Tài liệu này
+├── README_DEV.md             # Tài liệu này
 ├── LICENSE
-│
-├── src/
-│   ├── ui/                   # ─── Frontend (Electron Renderer) ───
-│   │   ├── index.html        # Giao diện chính
-│   │   ├── KhoiChay.js       # Logic renderer (i18n, theme, UI, settings)
-│   │   ├── TienTrinhChinh.js # Main process (tạo cửa sổ, IPC)
-│   │   ├── CauNoiTruoc.js    # Preload script (bridge IPC)
-│   │   │
-│   │   ├── KieuDang/         # CSS (3 files)
-│   │   │   ├── GocThietKe.css    # Design tokens, reset, base
-│   │   │   ├── ThanhPhan.css     # Components (titlebar, sidebar, list, toast...)
-│   │   │   └── CaiDat.css        # Settings modal, dialogs, sliders
-│   │   │
-│   │   └── TaiNguyen/        # Static assets
-│   │       └── BieuTuong/    # SVG icons, logo.ico
-│   │
-│   └── core/                 # ─── Backend C++ (bản gốc Qt, chỉ tham khảo) ───
-│
 ├── Basic.json                # Danh sách phần mềm mẫu
-└── Basic/                    # Dữ liệu bổ sung
+├── Basic/                    # Dữ liệu bổ sung (Apps/Games)
+│
+└── src-tauri/                # ─── Toàn bộ mã nguồn ───
+    ├── Cargo.toml            # Rust dependencies
+    ├── tauri.conf.json       # Tauri configuration
+    ├── build.rs              # Tauri build script
+    ├── capabilities/         # Tauri permission capabilities
+    │   └── default.json
+    │
+    ├── core/                 # ─── Backend Rust ───
+    │   ├── main.rs           # Rust entry point
+    │   ├── lib.rs            # Plugin setup & handler registration
+    │   └── GiaoTiepIPC.rs    # Tất cả IPC command handlers
+    │
+    └── ui/                   # ─── Frontend (WebView) ───
+        ├── index.html        # Giao diện chính
+        ├── TienTrinh.html    # Cửa sổ tiến trình (multi-window)
+        ├── KhoiChay.js       # Logic renderer (i18n, theme, UI, settings)
+        ├── TienTrinh.js      # Logic cửa sổ tiến trình
+        ├── CauNoiTauri.js    # Tauri IPC Bridge (window.__TAURI__)
+        │
+        ├── KieuDang/         # CSS (3 files)
+        │   ├── GocThietKe.css    # Design tokens, reset, base
+        │   ├── ThanhPhan.css     # Components (titlebar, sidebar, list, toast...)
+        │   └── CaiDat.css        # Settings modal, dialogs, sliders
+        │
+        └── TaiNguyen/        # Static assets
+            ├── BieuTuong/    # SVG icons, logo.ico
+            └── Languages.js  # Dữ liệu đa ngôn ngữ (VN/EN)
+```
+
+## Kiến trúc Tauri
+
+```
+┌─────────────────────────────────────────┐
+│  GiaoTiepIPC.rs  (Rust Backend)         │
+│  - IPC command handlers                 │
+│  - Winget integration (install/remove)  │
+│  - System info (sysinfo crate)          │
+│  - File operations (phá hủy, dọn dẹp)  │
+│  - PowerShell scripts (registry scan)   │
+└────────────┬────────────────────────────┘
+             │ Tauri IPC (invoke/listen)
+┌────────────▼────────────────────────────┐
+│  CauNoiTauri.js  (IPC Bridge)           │
+│  - window.__TAURI__.core.invoke()       │
+│  - window.__TAURI__.event.listen()      │
+│  - Expose window.DienTu API             │
+└────────────┬────────────────────────────┘
+             │
+┌────────────▼────────────────────────────┐
+│  KhoiChay.js  (Renderer / UI Logic)     │
+│  - UI logic, i18n, theme                │
+│  - Settings dialog (5 tabs)             │
+│  - Installer & Uninstaller lists        │
+│  - Tiện ích (dọn dẹp, phá hủy, khôi phục)│
+└─────────────────────────────────────────┘
 ```
 
 ## Quy ước đặt tên
@@ -78,8 +118,9 @@ Dự án dùng **tiếng Việt PascalCase** (không dấu). Đây là quy ướ
 
 | Loại | Quy tắc | Ví dụ |
 |------|---------|-------|
-| File JS | PascalCase | `KhoiChay.js`, `TienTrinhChinh.js` |
+| File JS | PascalCase | `KhoiChay.js`, `CauNoiTauri.js` |
 | File CSS | PascalCase | `GocThietKe.css`, `ThanhPhan.css` |
+| File Rust | PascalCase | `GiaoTiepIPC.rs` |
 | Thư mục | PascalCase | `KieuDang/`, `TaiNguyen/` |
 
 ### CSS Classes (BEM-style)
@@ -130,10 +171,10 @@ Hỗ trợ **VN** (Tiếng Việt) và **EN** (English).
 
 ### Cách thêm chuỗi mới
 
-Thêm key vào cả 2 ngôn ngữ trong object `banDich` ở đầu file `KhoiChay.js`:
+Thêm key vào cả 2 ngôn ngữ trong file `TaiNguyen/Languages.js`:
 
 ```js
-var banDich = {
+var Languages = {
   EN: {
     my_new_key: "English text",
     // ...
@@ -151,34 +192,9 @@ Sau đó dùng `t('my_new_key')` trong JS hoặc `data-i18n="my_new_key"` trong 
 
 | Lệnh | Mô tả |
 |-------|--------|
-| `npm run dev` | Chạy dev mode (có `--disable-gpu --no-sandbox`) |
-| `npm run start` | Tương tự `dev` |
-| `npm run build` | Build production (cần cài thêm `electron-builder`) |
-
-## Electron Architecture
-
-```
-┌─────────────────────────────────────────┐
-│  TienTrinhChinh.js  (Main Process)      │
-│  - Tạo BrowserWindow                   │
-│  - Xử lý IPC (thu nhỏ, phóng to, đóng)│
-│  - System tray                          │
-└────────────┬────────────────────────────┘
-             │ IPC (contextBridge)
-┌────────────▼────────────────────────────┐
-│  CauNoiTruoc.js  (Preload Script)       │
-│  - Expose window.dienTu API             │
-│  - thuNho(), phongTo(), dongCuaSo()     │
-└────────────┬────────────────────────────┘
-             │
-┌────────────▼────────────────────────────┐
-│  KhoiChay.js  (Renderer Process)        │
-│  - UI logic, i18n, theme                │
-│  - Settings dialog (5 tabs)             │
-│  - Installer & Uninstaller lists        │
-└─────────────────────────────────────────┘
-```
+| `npm run dev` | Chạy dev mode (Tauri dev server + Rust hot reload) |
+| `npm run build` | Build production (Tauri bundle → NSIS installer) |
 
 ---
 
-*Nex Launcher v1.6.0 — Phát triển bởi SpaceheroVN*
+*Nex Launcher v1.6.0 — Phát triển bởi SpaceheroVN — Powered by Tauri v2*

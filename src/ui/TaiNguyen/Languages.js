@@ -61,7 +61,14 @@ var Languages = {
     add_app_title: "Add New App", add_app_name: "App Name", add_app_name_ph: "Ex: Zalo",
     add_app_category: "Category", add_app_category_ph: "Type or select...", add_app_source: "Source type",
     add_app_id_ph: "Enter ID / Link / Search keyword", add_app_search_title: "Search on Winget",
-    add_app_cancel: "Cancel", add_app_add: "Add", theme_light: "Light", theme_dark: "Dark"
+    add_app_cancel: "Cancel", add_app_add: "Add", theme_light: "Light", theme_dark: "Dark",
+    tray_show: "Show", tray_installer: "Installer", tray_uninstaller: "Uninstaller", tray_quit: "Quit",
+    downloading_prefix: "Downloading (", feature_dev: "Feature is under development!",
+    confirm_btn: "Confirm", edit_software_title: "Edit Software", add_software_title: "Add new software",
+    btn_update: "Update", weak_machine_warning: "Your system resources are low. Enabling effects might cause lag. Are you sure?",
+    close_btn: "Close", canceling: "Canceling...", clean_confirm: "This action will clean system files according to the selected mode. Are you sure you want to continue?",
+    clean_analyzing: "Analyzing and cleaning...", clean_finished: "Cleanup finished. Deleted: {0} items, Errors: {1} items.",
+    clean_success: "Cleanup finished!", clean_error_occurred: "An error occurred.", clean_error: "Error during cleanup!"
   },
   VN: {
     window_title: "Nex-Launcher - Công cụ tiện ích tiên tiến",
@@ -112,7 +119,7 @@ var Languages = {
     date_format: "DD/MM/YYYY",
     unknown: "Không rõ",
     installing: "Đang cài đặt", downloading: "Đang tải ", uninstalling: "Đang gỡ ",
-    processing_wait: "Hệ thống đang xử lý, vui lòng chờ...", no_software_selected: "Chưa chọn phần mềm nào",
+    processing_wait: "Đang xử lý...", no_software_selected: "Chưa chọn phần mềm nào",
     start_installing: "Bắt đầu cài đặt ", apps_suffix: " phần mềm...", apps_suffix_short: " phần mềm",
     finish_installing: "Hoàn tất cài đặt ", slow_down: "Vui lòng thao tác chậm lại!",
     refreshing_list: "Đang làm mới danh sách...", list_refreshed: "Đã làm mới danh sách", no_changes: "Không có sự thay đổi mới nào.",
@@ -125,6 +132,13 @@ var Languages = {
     add_app_title: "Thêm phần mềm mới", add_app_name: "Tên phần mềm", add_app_name_ph: "VD: Zalo",
     add_app_category: "Thể loại", add_app_category_ph: "Tự nhập hoặc chọn...", add_app_source: "Hình thức cài đặt",
     add_app_id_ph: "Nhập ID / Link / Từ khóa tìm kiếm", add_app_search_title: "Tìm kiếm trên Winget",
-    add_app_cancel: "Hủy", add_app_add: "Thêm", theme_light: "Sáng", theme_dark: "Tối"
+    add_app_cancel: "Hủy", add_app_add: "Thêm", theme_light: "Sáng", theme_dark: "Tối",
+    tray_show: "Hiển thị", tray_installer: "Trình cài đặt", tray_uninstaller: "Trình gỡ cài đặt", tray_quit: "Thoát",
+    downloading_prefix: "Đang tải (", feature_dev: "Tính năng đang trong quá trình phát triển!",
+    confirm_btn: "Xác nhận", edit_software_title: "Chỉnh sửa phần mềm", add_software_title: "Thêm phần mềm mới",
+    btn_update: "Cập nhật", weak_machine_warning: "Máy bạn có cấu hình khá yếu hoặc đang thiếu tài nguyên trống. Việc BẬT hiệu ứng có thể gây giật lag hoặc phản hồi chậm. Bạn có chắc chắn muốn bật hiệu ứng không?",
+    close_btn: "Đóng", canceling: "Đang hủy...", clean_confirm: "Hành động này sẽ dọn dẹp các tập tin hệ thống theo chế độ đã chọn. Bạn có chắc chắn muốn tiếp tục?",
+    clean_analyzing: "Đang phân tích và dọn dẹp...", clean_finished: "Đã dọn dẹp xong. Xóa: {0} mục, Lỗi: {1} mục.",
+    clean_success: "Dọn dẹp hoàn tất!", clean_error_occurred: "Đã có lỗi xảy ra.", clean_error: "Lỗi khi dọn dẹp!"
   }
 };

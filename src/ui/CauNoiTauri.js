@@ -1,0 +1,52 @@
+const { invoke } = window.__TAURI__.core;
+const { listen } = window.__TAURI__.event;
+
+window.DienTu = {
+  ThuNho: () => invoke('DieuKhienCuaSo', { hanhDong: 'thu-nho' }),
+  AnCuaSo: () => invoke('DieuKhienCuaSo', { hanhDong: 'an-cua-so' }),
+  PhongTo: () => invoke('DieuKhienCuaSo', { hanhDong: 'phong-to' }),
+  DongCuaSo: () => invoke('DieuKhienCuaSo', { hanhDong: 'dong' }),
+  HienCuaSo: () => invoke('DieuKhienCuaSo', { hanhDong: 'hien-cua-so' }),
+  LayTrangThaiCuaSo: () => invoke('LayTrangThaiCuaSo'),
+  LayChuDeHeThong: () => invoke('LayChuDeHeThong'),
+  DatLuonTrenCung: (giaTri) => invoke('DatLuonTrenCung', { giaTri }),
+  DatThuNhoKhay: (giaTri) => invoke('DatThuNhoKhay', { giaTri }),
+  KiemTraCapNhat: () => invoke('KiemTraCapNhat'),
+  LayIconApp: (tenApp) => invoke('LayIconApp', { tenApp }),
+  LayIconDebug: (tenApp) => invoke('LayIconDebug', { tenApp }),
+  LayThongTinThem: (tenApp, viTriCaiDat) => invoke('LayThongTinThem', { tenApp, viTriCaiDat }),
+  KiemTraTaiNguyen: () => invoke('KiemTraTaiNguyen'),
+  DonDepHeThong: (cheDo) => invoke('DonDepHeThong', { cheDo }),
+  KhiTrangThaiCuaSoThayDoi: (hamXuLy) => listen('trang-thai-cua-so', (event) => hamXuLy(event.payload)),
+  KhiChuyenTrang: (hamXuLy) => listen('chuyen-trang', (event) => hamXuLy(event.payload)),
+  LayDanhSachUngDung: () => invoke('LayDanhSachUngDung'),
+  LayPhanMemDaCai: () => invoke('LayPhanMemDaCai'),
+  TienHanhCaiDat: (danhSachApp, tuyChon) => invoke('TienHanhCaiDat', { danhSachApp, tuyChon }),
+  TienHanhGoCaiDat: (danhSachApp, tuyChon) => invoke('TienHanhGoCaiDat', { danhSachApp, tuyChon }),
+  TienHanhCapNhat: (danhSachApp, tuyChon) => invoke('TienHanhCapNhat', { danhSachApp, tuyChon }),
+  XoaTanDu: (danhSachDuongDan) => invoke('XoaTanDu', { danhSachDuongDan }),
+  HuyTienTrinh: () => invoke('HuyTienTrinh'),
+  SuaPhanMemKhac: (thongTinApp) => invoke('SuaPhanMemKhac', { thongTinApp }),
+  ThemUngDungInstaller: (thongTinApp) => invoke('ThemUngDungInstaller', { thongTinApp }),
+  SuaUngDungInstaller: (tenCu, thongTinMoi) => invoke('SuaUngDungInstaller', { tenCu, thongTinMoi }),
+  XoaUngDungInstaller: (tenApp) => invoke('XoaUngDungInstaller', { tenApp }),
+  TimKiemWinget: (tuKhoa) => invoke('TimKiemWinget', { tuKhoa }),
+  KhiTienTrinhCaiDat: (hamXuLy) => listen('tien-trinh-cai-dat', (event) => hamXuLy(event.payload)),
+  KhiTienTrinhGoCaiDat: (hamXuLy) => listen('tien-trinh-go-cai-dat', (event) => hamXuLy(event.payload)),
+  PhaHuyDuLieu: (duongDanTarget, tuyChon) => invoke('PhaHuyDuLieu', { duongDanTarget, tuyChon }),
+  KiemTraThuMucNhayCam: (duongDan) => invoke('KiemTraThuMucNhayCam', { duongDan }),
+  ChonDuongDanPhaHuy: async (loai) => {
+    const { open } = window.__TAURI__.dialog;
+    return await open({ directory: true, multiple: false });
+  },
+  KhoiPhucDuLieu: (duongDanO, thuMucXuat) => invoke('TienHanhKhoiPhuc', { duongDanO, thuMucXuat }),
+  KhiTienTrinhKhoiPhuc: (hamXuLy) => listen('tien-trinh-khoi-phuc', (event) => hamXuLy(event.payload)),
+  DatTienTrinh: (phanTram, noiDung) => invoke('DatTienTrinh', { phanTram, noiDung }),
+  MoCuaSoTienTrinh: (tieuDe, danhSachApp) => invoke('MoCuaSoTienTrinh', { tieuDe, danhSachApp }),
+  DongCuaSoTienTrinh: () => invoke('DongCuaSoTienTrinh'),
+  CapNhatCuaSoTienTrinh: (duLieu) => invoke('CapNhatCuaSoTienTrinh', { duLieu }),
+  HoanTatCuaSoTienTrinh: (ketQua) => invoke('HoanTatCuaSoTienTrinh', { ketQua }),
+  KhiKhoiTaoTienTrinh: (hamXuLy) => listen('khoi-tao-tien-trinh', (event) => hamXuLy(event.payload)),
+  KhiCapNhatTienTrinh: (hamXuLy) => listen('cap-nhat-tien-trinh', (event) => hamXuLy(event.payload)),
+  KhiHoanTatTienTrinh: (hamXuLy) => listen('hoan-tat-tien-trinh', (event) => hamXuLy(event.payload))
+};

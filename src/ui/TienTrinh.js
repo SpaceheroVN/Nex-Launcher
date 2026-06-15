@@ -2,31 +2,26 @@ let TienTrinhSoApp = 0;
 let TienTrinhHienTai = 0;
 let TienTrinhAppTruoc = '';
 function ApDungCauHinh() {
-    let luu = localStorage.getItem('NexCauHinh');
-    if (luu) {
-        try {
-            let CauHinh = JSON.parse(luu);
-            let cd = CauHinh.chuDe;
-            if (cd === 'system' && window.DienTu) {
-                window.DienTu.LayChuDeHeThong().then(sysTheme => {
-                    document.documentElement.setAttribute('data-chu-de', sysTheme.toLowerCase());
-                });
-            } else {
-                document.documentElement.setAttribute('data-chu-de', cd || 'dark');
-            }
-            if (CauHinh.mauNhan) document.documentElement.style.setProperty('--mau-nhan', CauHinh.mauNhan);
-            if (CauHinh.doBoGoc) {
-                document.documentElement.style.setProperty('--do-bo', CauHinh.doBoGoc + 'px');
-                document.documentElement.style.setProperty('--do-bo-lon', (CauHinh.doBoGoc * 1.5) + 'px');
-                document.documentElement.style.setProperty('--do-bo-nho', (CauHinh.doBoGoc * 0.5) + 'px');
-            }
-            if (typeof CauHinh.moAo !== 'undefined') {
-                document.documentElement.style.setProperty('--alpha-nen', CauHinh.moAo ? 0.85 : 1);
-            }
-        } catch(e) {}
+    var cd = localStorage.getItem('nex_chu_de') || 'dark';
+    if (cd === 'system' && window.DienTu) {
+        window.DienTu.LayChuDeHeThong().then(function(s) {
+            document.documentElement.setAttribute('data-chu-de', s.toLowerCase());
+        });
     } else {
-        document.documentElement.setAttribute('data-chu-de', 'dark');
+        document.documentElement.setAttribute('data-chu-de', cd);
     }
+    var boTron = localStorage.getItem('caidat-bo-tron') !== 'false';
+    document.documentElement.style.setProperty('--do-bo', boTron ? '8px' : '0px');
+    document.documentElement.style.setProperty('--do-bo-nho', boTron ? '4px' : '0px');
+    document.documentElement.style.setProperty('--do-bo-lon', boTron ? '12px' : '0px');
+    var tatAnim = localStorage.getItem('caidat-tat-anim') === 'true';
+    document.documentElement.style.setProperty('--chuyen-dong', tatAnim ? '0s' : '0.2s cubic-bezier(0.4,0,0.2,1)');
+    document.documentElement.style.setProperty('--chuyen-dong-nhanh', tatAnim ? '0s' : '0.15s cubic-bezier(0.4,0,0.2,1)');
+    document.documentElement.style.setProperty('--chuyen-dong-cham', tatAnim ? '0s' : '0.3s cubic-bezier(0.4,0,0.2,1)');
+    var coChu = parseInt(localStorage.getItem('caidat-co-chu') || '14', 10);
+    document.documentElement.style.fontSize = coChu + 'px';
+    var trongSuot = parseInt(localStorage.getItem('caidat-trong-suot') || '0', 10);
+    document.documentElement.style.setProperty('--alpha-nen', 1 - (trongSuot / 100));
 }
 if (window.DienTu) {
   ApDungCauHinh();
@@ -105,6 +100,7 @@ if (window.DienTu) {
         if (!k.success) coLoi = true;
       });
     }
+    document.getElementById('tien-trinh-tieu-de').textContent = coLoi ? 'Hoàn tất (có lỗi)' : 'Hoàn tất';
     document.getElementById('tien-trinh-thanh').style.width = '100%';
     document.getElementById('tien-trinh-phan-tram').textContent = '100%';
     let nutDong = document.getElementById('dong-tien-trinh');
@@ -159,3 +155,16 @@ document.getElementById('dong-tien-trinh').addEventListener('click', () => {
     if (window.DienTu) window.DienTu.DongCuaSoTienTrinh();
   }
 });
+
+if (window.DienTu && window.DienTu.KiemTraDevMode) {
+    window.DienTu.KiemTraDevMode().then(isDev => {
+        if (!isDev) {
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12' || e.key === 'F5' || (e.ctrlKey && (e.key === 'r' || e.key === 'R'))) {
+                    e.preventDefault();
+                }
+            });
+        }
+    }).catch(e => {});
+}

@@ -9,6 +9,14 @@ function t(k) { return (Languages[NgonNguHienTai] && Languages[NgonNguHienTai][k
 function CapNhatBanDich() {
   document.querySelectorAll('[data-i18n]').forEach(function(el) { var k = el.getAttribute('data-i18n'), v = t(k); if (v !== k) el.textContent = v; });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) { var k = el.getAttribute('data-i18n-placeholder'), v = t(k); if (v !== k) el.placeholder = v; });
+  if (window.DienTu && window.DienTu.CapNhatTrayMenu) {
+      window.DienTu.CapNhatTrayMenu(
+          t('tray_show'),
+          t('tray_installer'),
+          t('tray_uninstaller'),
+          t('tray_quit')
+      ).catch(e => {});
+  }
 }
 function KhoiTaoChuDe() { ChuDeHienTai = localStorage.getItem('nex_chu_de') || 'dark'; ApDungChuDe(ChuDeHienTai); }
 let ChuDeKhiMo = '', NgonNguKhiMo = '';
@@ -19,9 +27,70 @@ function ApDungChuDe(c) {
   document.documentElement.setAttribute('data-chu-de', cd);
 }
 var CacheTimKiemWinget = new Map();
+window.IconCache = {};
+window.SizeCache = {};
+window.DateCache = {};
+var _renderVersion = 0;
+function renderDanhSachChunk(ds, ct, taoHang) {
+    var CHUNK = 25, idx = 0, ver = ++_renderVersion;
+    function doChunk() {
+        if (ver !== _renderVersion) return;
+        var frag = document.createDocumentFragment();
+        var end = Math.min(idx + CHUNK, ds.length);
+        for (; idx < end; idx++) frag.appendChild(taoHang(ds[idx]));
+        ct.appendChild(frag);
+        if (idx < ds.length) requestAnimationFrame(doChunk);
+    }
+    requestAnimationFrame(doChunk);
+}
+window.IconFetchQueue = [];
+window.IconFetchActive = 0;
+function IconFetchDrain() {
+    while (window.IconFetchActive < 4 && window.IconFetchQueue.length > 0) {
+        var item = window.IconFetchQueue.shift();
+        if (window.IconCache[item.name]) {
+            var img = document.getElementById(item.iconId);
+            if (img && img.src.includes('what_app')) img.src = window.IconCache[item.name];
+            continue;
+        }
+        window.IconFetchActive++;
+        (function(it) {
+            window.DienTu.LayIconApp(it.name).then(function(b64) {
+                window.IconFetchActive--;
+                if (b64) window.IconCache[it.name] = b64;
+                var img = document.getElementById(it.iconId);
+                if (img) img.src = b64 || 'TaiNguyen/BieuTuong/what_app.svg';
+                IconFetchDrain();
+            }).catch(function() {
+                window.IconFetchActive--;
+                var img = document.getElementById(it.iconId);
+                if (img) img.src = 'TaiNguyen/BieuTuong/what_app.svg';
+                IconFetchDrain();
+            });
+        })(item);
+    }
+}
+(function() {
+    var s = document.createElement('style');
+    s.textContent = '.TieuDeCot_Cot.bi-khoa { opacity: 0.4; cursor: not-allowed !important; pointer-events: none; } ' +
+                    '.TieuDeCot_Cot.tang, .TieuDeCot_Cot.giam { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px; }';
+    document.head.appendChild(s);
+})();
 var DanhSachPhanMem = [], DanhSachDaCaiDat = [], TrangHienTai = 'installer', BoLocHienTai = 'all', CotSapXep = 'name', HuongSapXep = true;
 document.addEventListener('DOMContentLoaded', async function() {
   KhoiTaoChuDe(); KhoiTaoNgonNgu(); CapNhatBanDich(); DangKySuKien();
+  if (window.DienTu && window.DienTu.KiemTraDevMode) {
+      window.DienTu.KiemTraDevMode().then(isDev => {
+          if (!isDev) {
+              document.addEventListener('contextmenu', e => e.preventDefault());
+              document.addEventListener('keydown', e => {
+                  if (e.key === 'F12' || e.key === 'F5' || (e.ctrlKey && (e.key === 'r' || e.key === 'R'))) {
+                      e.preventDefault();
+                  }
+              });
+          }
+      }).catch(e => {});
+  }
     if (window.DienTu && window.DienTu.KiemTraTaiNguyen) {
       try {
         let res = await window.DienTu.KiemTraTaiNguyen();
@@ -47,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           }
           let laTai = dl.status === 'downloading';
           let phanTram = dl.percent || 0;
-          let demText = laTai ? (NgonNguHienTai === 'VN' ? 'Đang tải (' : 'Downloading (') + phanTram + '%)' : t('installing') + '...';
+          let demText = laTai ? t('downloading_prefix') + phanTram + '%)' : t('installing') + '...';
           if (CauHinh.installerThuNho && window.DienTu.CapNhatCuaSoTienTrinh) {
               window.DienTu.CapNhatCuaSoTienTrinh(dl);
           } else {
@@ -68,9 +137,18 @@ document.addEventListener('DOMContentLoaded', async function() {
 function DangKySuKien() {
   document.getElementById('nut-thu-nho')?.addEventListener('click', function() { window.DienTu?.ThuNho(); });
   document.getElementById('nut-phong-to')?.addEventListener('click', function() { window.DienTu?.PhongTo(); });
-  document.getElementById('nut-dong')?.addEventListener('click', function() { window.DienTu?.DongCuaSo(); });
+  document.getElementById('nut-dong')?.addEventListener('click', function() { 
+    if (localStorage.getItem('caidat-thu-nho-khay') !== 'false') {
+        window.DienTu?.AnCuaSo();
+    } else {
+        window.DienTu?.DongCuaSo(); 
+    }
+  });
   document.getElementById('dong-tien-trinh')?.addEventListener('click', DongHopThoaiTienTrinh);
-  if (window.DienTu?.KhiTrangThaiCuaSoThayDoi) window.DienTu.KhiTrangThaiCuaSoThayDoi(function(dl) { document.body.classList.toggle('da-phong-to', dl.DaPhongTo); });
+  if (window.DienTu?.KhiTrangThaiCuaSoThayDoi) window.DienTu.KhiTrangThaiCuaSoThayDoi(function(dl) { 
+    document.body.classList.toggle('da-phong-to', dl.DaPhongTo); 
+    if (typeof CapNhatBoTron === 'function') CapNhatBoTron(dl.DaPhongTo);
+  });
   if (window.DienTu?.KhiChuyenTrang) window.DienTu.KhiChuyenTrang(function(trang) { ChuyenTrang(trang); });
   document.getElementById('nut-thu-gon-menu')?.addEventListener('click', function() { 
     var tb = document.getElementById('thanh-ben');
@@ -148,16 +226,25 @@ function DangKySuKien() {
   });
   document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function(c) {
     c.addEventListener('click', function() {
+      if (document.getElementById('chon-tat-ca-installer')) document.getElementById('chon-tat-ca-installer').checked = false;
+      if (this.classList.contains('bi-khoa')) return;
       var tr = c.getAttribute('data-sap-xep');
       if (CotSapXep === tr) HuongSapXep = !HuongSapXep; else { CotSapXep = tr; HuongSapXep = true; }
       document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function(x) { x.classList.remove('tang', 'giam'); });
       c.classList.add(HuongSapXep ? 'tang' : 'giam');
-      if (TrangHienTai === 'installer') HienThiDanhSachInstaller(); else HienThiDanhSachUninstaller();
+      if (TrangHienTai === 'installer') {
+          HienThiDanhSachInstaller();
+      } else if (TrangHienTai === 'uninstaller') {
+          var tabActive = document.querySelector('#ds-uninstaller .ThanhBen_MucCon.dang-chon');
+          var blActive = tabActive ? tabActive.getAttribute('data-bo-loc') : 'all';
+          if (blActive === 'all') HienThiDanhSachUninstaller();
+          else LocDanhSachUninstaller(blActive);
+      }
     });
   });
   var DangXuLyCaiDat = false;
   document.getElementById('nut-dong-goi')?.addEventListener('click', function() {
-    let msg = NgonNguHienTai === 'VN' ? 'Tính năng đang trong quá trình phát triển!' : 'Feature is under development!';
+    let msg = t('feature_dev');
     HienThongBao(msg, 'canh-bao');
   });
   document.getElementById('nut-cai-dat')?.addEventListener('click', async function() {
@@ -243,11 +330,35 @@ function DangKySuKien() {
         var pm = DanhSachDaCaiDat.find(p => p.name === ten);
         if (pm) danhSachChon.push(pm);
     });
+    let goCaiDatOptions = {
+        silent: CauHinh.chungDaLuong,
+        showProgress: CauHinh.chungHienTienTrinh,
+        taoDiemKhoiPhuc: false,
+        tenDiemKhoiPhuc: null
+    };
+
     if (CauHinh.uninstallerHoiXacNhan) {
         let xacNhan = await HienThiXacNhanGoCaiDat(danhSachChon);
         if (!xacNhan) {
             DangXuLyGoCaiDat = false;
             return;
+        }
+        let chkRestore = document.getElementById('chk-tao-diem-khoi-phuc');
+        if (chkRestore && chkRestore.checked) {
+            goCaiDatOptions.taoDiemKhoiPhuc = true;
+            let dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+            let n = 1;
+            let savedDate = localStorage.getItem('restore_point_date');
+            if (savedDate === dateStr) {
+                n = parseInt(localStorage.getItem('restore_point_n') || '0', 10) + 1;
+            }
+            localStorage.setItem('restore_point_date', dateStr);
+            localStorage.setItem('restore_point_n', n);
+            goCaiDatOptions.tenDiemKhoiPhuc = `Nex Launcher - ${dateStr} : ${n}`;
+        }
+        let chkCleanup = document.getElementById('chk-don-tep-thua');
+        if (chkCleanup && chkCleanup.checked) {
+            goCaiDatOptions.loaiBoFileThua = true;
         }
     }
     DangXuLyGoCaiDat = true;
@@ -265,12 +376,21 @@ function DangKySuKien() {
         }
     }
     try {
-        var ketQua = await window.DienTu.TienHanhGoCaiDat(danhSachChon, {
-            silent: CauHinh.chungDaLuong,
-            showProgress: CauHinh.chungHienTienTrinh
-        });
+        var ketQua = await window.DienTu.TienHanhGoCaiDat(danhSachChon, goCaiDatOptions);
         if (ketQua) {
           var thanhCong = ketQua.filter(k => k.success).length;
+          
+          let allLeftovers = [];
+          ketQua.forEach(k => {
+              if (k.success && k.leftovers && k.leftovers.length > 0) {
+                  allLeftovers.push(...k.leftovers.map(l => ({...l, appName: k.name})));
+              }
+          });
+
+          if (allLeftovers.length > 0) {
+              await HienThiHopThoaiTanDu(allLeftovers);
+          }
+
           if (CauHinh.chungHienThongBao) {
               HienThongBao(t('finish_uninstalling') + thanhCong + '/' + ketQua.length + t('apps_suffix_short'), thanhCong === ketQua.length ? 'thanh-cong' : 'canh-bao');
           }
@@ -295,11 +415,11 @@ function DangKySuKien() {
       btnLuu.dataset.editMode = 'true';
       btnLuu.dataset.oldName = tenPm;
       let spanBtnLuu = btnLuu.querySelector('span');
-      if (spanBtnLuu) spanBtnLuu.textContent = NgonNguHienTai === 'VN' ? 'Xác nhận' : 'Confirm';
+      if (spanBtnLuu) spanBtnLuu.textContent = t('confirm_btn');
       let svgBtnLuu = btnLuu.querySelector('svg');
       if (svgBtnLuu) svgBtnLuu.style.display = 'none';
     }
-    document.getElementById('them-app-tieu-de').textContent = NgonNguHienTai === 'VN' ? "Chỉnh sửa phần mềm" : "Edit Software";
+    document.getElementById('them-app-tieu-de').textContent = t('edit_software_title');
     document.getElementById('them-app-ten').value = pm.name || "";
     document.getElementById('them-app-loai').value = pm.category || "";
     document.getElementById('them-app-id').value = pm.source?.value || "";
@@ -318,10 +438,14 @@ function DangKySuKien() {
     document.getElementById('lop-phu-modal')?.classList.remove('an');
   };
   document.getElementById('nut-them-moi')?.addEventListener('click', function() {
+    if (this.dataset.isRefresh === 'true') {
+        HienThiDanhSachInstaller(document.getElementById('o-tim-kiem-installer')?.value, true);
+        return;
+    }
     var modal = document.getElementById('hop-thoai-them-app');
     var lopPhu = document.getElementById('lop-phu-modal');
     if (modal && lopPhu) {
-      document.getElementById('them-app-tieu-de').textContent = NgonNguHienTai === 'VN' ? "Thêm phần mềm mới" : "Add new software";
+      document.getElementById('them-app-tieu-de').textContent = t('add_software_title');
       document.getElementById('them-app-ten').value = '';
       document.getElementById('them-app-loai').value = '';
       document.getElementById('them-app-id').value = '';
@@ -330,7 +454,7 @@ function DangKySuKien() {
       if (btnLuu) {
         btnLuu.dataset.editMode = 'false';
         let spanBtnLuu = btnLuu.querySelector('span');
-        if (spanBtnLuu) spanBtnLuu.textContent = NgonNguHienTai === 'VN' ? 'Thêm' : 'Add';
+        if (spanBtnLuu) spanBtnLuu.textContent = t('add_btn');
         let svgBtnLuu = btnLuu.querySelector('svg');
         if (svgBtnLuu) svgBtnLuu.style.display = '';
       }
@@ -497,19 +621,59 @@ function ChuyenTrang(trang) {
   if (trang === 'uninstaller') { var m = du?.querySelector('.ThanhBen_MucCon'); if (m && !du.querySelector('.dang-chon')) m.classList.add('dang-chon'); }
   if (trang === 'tien-ich') { var mt = dti?.querySelector('.ThanhBen_MucCon'); if (mt && !dti.querySelector('.dang-chon')) mt.classList.add('dang-chon'); }
 }
-function HienThiDanhSachInstaller(TuKhoa) {
+let CacheCapNhat = null;
+let TrangThaiQuetCapNhat = false;
+function HienThiDanhSachInstaller(TuKhoa, isRefresh) {
   TuKhoa = TuKhoa || '';
   var ct = document.getElementById('danh-sach-installer'); if (!ct) return; ct.innerHTML = '';
   var ds = DanhSachPhanMem.slice();
+  let nutThemMoi = document.getElementById('nut-them-moi');
+  if (nutThemMoi) {
+      let span = nutThemMoi.querySelector('span');
+      let svg = nutThemMoi.querySelector('svg');
+      if (BoLocHienTai === 'updates') {
+          if (span) span.textContent = t('refresh_btn') || 'Làm mới';
+          if (svg) svg.innerHTML = '<path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>';
+          nutThemMoi.dataset.isRefresh = 'true';
+      } else {
+          if (span) span.textContent = t('add_btn') || 'Thêm';
+          if (svg) svg.innerHTML = '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>';
+          nutThemMoi.dataset.isRefresh = 'false';
+      }
+  }
   if (BoLocHienTai === 'apps') ds = ds.filter(function(p) { return p.type === 'app'; });
   else if (BoLocHienTai === 'games') ds = ds.filter(function(p) { return p.type === 'game'; });
   else if (BoLocHienTai === 'updates') {
     let nutCaiDatSpan = document.getElementById('nut-cai-dat')?.querySelector('span');
-    if (nutCaiDatSpan) nutCaiDatSpan.textContent = 'Cập nhật';
+    if (nutCaiDatSpan) nutCaiDatSpan.textContent = t('btn_update');
+    if (isRefresh) {
+      CacheCapNhat = null;
+    }
+    if (CacheCapNhat !== null) {
+      if (CacheCapNhat.length === 0) {
+        ct.innerHTML = '<div class="KhongCoKetQua"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><div class="KhongCoKetQua_TieuDe">Phần mềm đã mới nhất</div><div class="KhongCoKetQua_MoTa">Không tìm thấy bản cập nhật nào cho các ứng dụng trên máy của bạn.</div></div>';
+        CapNhatNutDongGoi(); return;
+      }
+      ct.innerHTML = '';
+      CacheCapNhat.forEach(pm => {
+          ct.appendChild(TaoHangCapNhat(pm));
+      });
+      CapNhatNutDongGoi();
+      return;
+    }
+    if (TrangThaiQuetCapNhat) {
+      ct.innerHTML = '<div class="KhongCoKetQua"><div class="KhongCoKetQua_MoTa">Đang quét bản cập nhật...</div></div>';
+      return;
+    }
     ct.innerHTML = '<div class="KhongCoKetQua"><div class="KhongCoKetQua_MoTa">Đang quét bản cập nhật...</div></div>';
     if (window.DienTu && window.DienTu.KiemTraCapNhat) {
+        TrangThaiQuetCapNhat = true;
         window.DienTu.KiemTraCapNhat().then(results => {
-            if (!results || results.length === 0) {
+            TrangThaiQuetCapNhat = false;
+            if (!results) results = [];
+            CacheCapNhat = results;
+            if (BoLocHienTai !== 'updates') return;
+            if (results.length === 0) {
                 ct.innerHTML = '<div class="KhongCoKetQua"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><div class="KhongCoKetQua_TieuDe">Phần mềm đã mới nhất</div><div class="KhongCoKetQua_MoTa">Không tìm thấy bản cập nhật nào cho các ứng dụng trên máy của bạn.</div></div>';
                 CapNhatNutDongGoi(); return;
             }
@@ -517,6 +681,11 @@ function HienThiDanhSachInstaller(TuKhoa) {
             results.forEach(pm => {
                 ct.appendChild(TaoHangCapNhat(pm));
             });
+            CapNhatNutDongGoi();
+        }).catch(err => {
+            TrangThaiQuetCapNhat = false;
+            if (BoLocHienTai !== 'updates') return;
+            ct.innerHTML = '<div class="KhongCoKetQua"><div class="KhongCoKetQua_TieuDe">Lỗi</div><div class="KhongCoKetQua_MoTa">Không thể kiểm tra cập nhật.</div></div>';
             CapNhatNutDongGoi();
         });
     }
@@ -570,27 +739,59 @@ function CapNhatNutDongGoi() {
     }
     const nutXoaChon = document.getElementById('nut-xoa-chon');
     if (nutXoaChon) {
-        if (checkedCount > 0) {
-            nutXoaChon.disabled = false;
-            nutXoaChon.style.opacity = '1';
-            nutXoaChon.style.cursor = 'pointer';
+        if (BoLocHienTai === 'updates') {
+            nutXoaChon.style.display = 'none';
         } else {
-            nutXoaChon.disabled = true;
-            nutXoaChon.style.opacity = '0.5';
-            nutXoaChon.style.cursor = 'not-allowed';
+            nutXoaChon.style.display = '';
+            if (checkedCount > 0) {
+                nutXoaChon.disabled = false;
+                nutXoaChon.style.opacity = '1';
+                nutXoaChon.style.cursor = 'pointer';
+            } else {
+                nutXoaChon.disabled = true;
+                nutXoaChon.style.opacity = '0.5';
+                nutXoaChon.style.cursor = 'not-allowed';
+            }
         }
     }
 }
 function HienThiDanhSachUninstaller(TuKhoa) {
   TuKhoa = TuKhoa || '';
   var ct = document.getElementById('danh-sach-uninstaller'); if (!ct) return;
+  CotSapXep = 'name'; HuongSapXep = true;
+  document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function(c) {
+      c.classList.remove('bi-khoa', 'tang', 'giam');
+  });
+  document.querySelectorAll('.TieuDeCot_Cot[data-sap-xep="name"]').forEach(function(c) {
+      c.classList.add('tang');
+  });
   var ds = DanhSachDaCaiDat.slice();
   if (TuKhoa.trim()) { var tk = TuKhoa.toLowerCase(); ds = ds.filter(function(p) { return p.name.toLowerCase().includes(tk) || p.publisher.toLowerCase().includes(tk); }); }
-  ds.sort(function(a, b) { var gA, gB; switch (CotSapXep) { case 'publisher': gA = a.publisher; gB = b.publisher; break; case 'date': gA = a.installDate; gB = b.installDate; break; case 'size': gA = a.size; gB = b.size; break; default: gA = a.name; gB = b.name; } return (HuongSapXep ? 1 : -1) * String(gA).localeCompare(String(gB)); });
+  ds.sort(function(a, b) {
+      var mul = HuongSapXep ? 1 : -1;
+      switch (CotSapXep) {
+          case 'size': {
+              let sA = a.cachedSize || a.size || 0;
+              let sB = b.cachedSize || b.size || 0;
+              return mul * (sA - sB);
+          }
+          case 'date': {
+              let dA = String(a.cachedDate || a.installDate || '').replace(/\D/g,'');
+              let dB = String(b.cachedDate || b.installDate || '').replace(/\D/g,'');
+              return mul * dA.localeCompare(dB);
+          }
+          case 'publisher':
+              return mul * (a.publisher||'').localeCompare(b.publisher||'');
+          default:
+              return mul * (a.name||'').localeCompare(b.name||'');
+      }
+  });
+  _renderVersion++;
   ct.innerHTML = '';
   CapNhatSoLuongDaChon();
   if (ds.length === 0) { ct.innerHTML = '<div class="KhongCoKetQua"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><div class="KhongCoKetQua_TieuDe">' + t('no_apps') + '</div></div>'; return; }
-  ds.forEach(function(pm) { ct.appendChild(TaoHangUninstaller(pm)); });
+  window.IconFetchQueue = [];
+  renderDanhSachChunk(ds, ct, TaoHangUninstaller);
 }
 function TaoHangUninstaller(pm) {
   var d = document.createElement('div'); d.className = 'HangUngDung';
@@ -598,11 +799,20 @@ function TaoHangUninstaller(pm) {
   var formattedDate = pm.installDate || '-';
   var dStr = String(formattedDate).replace(/\D/g, '');
   if (dStr.length === 8) {
-    var format = t('date_format') || 'DD/MM/YYYY';
-    var year = dStr.substring(0,4);
-    var month = dStr.substring(4,6);
-    var day = dStr.substring(6,8);
-    formattedDate = format.replace('YYYY', year).replace('MM', month).replace('DD', day);
+    var year = parseInt(dStr.substring(0,4), 10);
+    var month = parseInt(dStr.substring(4,6), 10);
+    var day = parseInt(dStr.substring(6,8), 10);
+    if (year >= 2000 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+        var format = t('date_format') || 'DD/MM/YYYY';
+        formattedDate = format
+            .replace('YYYY', year)
+            .replace('MM', String(month).padStart(2,'0'))
+            .replace('DD', String(day).padStart(2,'0'));
+    } else {
+        formattedDate = '-';
+    }
+  } else {
+    formattedDate = '-';
   }
   var displaySize = '-';
   if (pm.size) {
@@ -619,31 +829,60 @@ function TaoHangUninstaller(pm) {
   d.querySelector('.OChon')?.addEventListener('change', function() { d.classList.toggle('da-chon', this.checked); CapNhatSoLuongDaChon(); });
   if (!window.ObserverIcon) {
     window.ObserverIcon = new IntersectionObserver(async (entries, obs) => {
-      for (let entry of entries) {
+      var sorted = [...entries].filter(e => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      for (let entry of sorted) {
         if (entry.isIntersecting) {
           let el = entry.target;
           obs.unobserve(el);
           let appName = el.dataset.appName;
           let iconId = el.dataset.iconId;
           if (appName && window.DienTu) {
-            if (window.DienTu.LayIconApp) {
-              window.DienTu.LayIconApp(appName).then(base64 => {
-                let imgContainer = document.getElementById(iconId);
-                if (imgContainer) {
-                  if (base64) {
-                    imgContainer.src = base64;
-                  } else {
-                    imgContainer.src = 'TaiNguyen/BieuTuong/what_app.svg';
-                  }
+            window.IconFetchQueue.push({ name: appName, iconId: iconId });
+            IconFetchDrain();
+            let needFetch = (el.dataset.needDate === 'true' && !window.DateCache[appName])
+                         || (el.dataset.needSize === 'true' && !window.SizeCache[appName]);
+
+            if (window.SizeCache[appName] && el.dataset.needSize === 'true') {
+                let pmObj = DanhSachDaCaiDat.find(p => p.name === appName);
+                if (pmObj) pmObj.cachedSize = window.SizeCache[appName];
+                let sizeEl = el.querySelector('.HangUngDung_DungLuong');
+                if (sizeEl) {
+                    let bytes = parseInt(window.SizeCache[appName], 10);
+                    let displaySize = '-';
+                    if (!isNaN(bytes) && bytes > 0) {
+                        if (bytes < 1024 * 1024) displaySize = (bytes / 1024).toFixed(1) + ' KB';
+                        else if (bytes < 1024 * 1024 * 1024) displaySize = (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                        else if (bytes < 1024 * 1024 * 1024 * 1024) displaySize = (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+                        else displaySize = (bytes / (1024 * 1024 * 1024 * 1024)).toFixed(1) + ' TB';
+                    } else if (window.SizeCache[appName] !== '0' && isNaN(bytes)) {
+                        displaySize = window.SizeCache[appName];
+                    }
+                    sizeEl.textContent = displaySize;
+                    sizeEl.classList.add('ChuUocTinh'); sizeEl.title = t('estimated');
                 }
-              }).catch(e => {
-                let imgContainer = document.getElementById(iconId);
-                if (imgContainer) imgContainer.src = 'TaiNguyen/BieuTuong/what_app.svg';
-              });
             }
-            if (window.DienTu.LayThongTinThem && (el.dataset.needDate === 'true' || el.dataset.needSize === 'true')) {
-              window.DienTu.LayThongTinThem(appName, el.dataset.installLocation).then(info => {
+            if (window.DateCache[appName] && el.dataset.needDate === 'true') {
+                let pmObj = DanhSachDaCaiDat.find(p => p.name === appName);
+                if (pmObj) pmObj.cachedDate = window.DateCache[appName];
+                let ngayEl = el.querySelector('.HangUngDung_Ngay');
+                if (ngayEl) {
+                    let dStr = window.DateCache[appName];
+                    let format = t('date_format') || 'DD/MM/YYYY';
+                    let y = dStr.substring(0,4), m = dStr.substring(4,6), day = dStr.substring(6,8);
+                    let fDate = format.replace('YYYY', y).replace('MM', m).replace('DD', day);
+                    ngayEl.textContent = fDate; ngayEl.classList.add('ChuUocTinh'); ngayEl.title = t('estimated');
+                }
+            }
+
+            if (needFetch && window.DienTu.LayThongTinThem) {
+              window.DienTu.LayThongTinThem(appName, el.dataset.installLocation, el.dataset.installDate || null).then(info => {
                 if (info) {
+                  let pmObj = DanhSachDaCaiDat.find(p => p.name === appName);
+                  if (pmObj) {
+                    if (info.size) { pmObj.cachedSize = info.size; window.SizeCache[appName] = info.size; }
+                    if (info.date) { pmObj.cachedDate = info.date; window.DateCache[appName] = info.date; }
+                  }
                   if (el.dataset.needDate === 'true' && info.date) {
                     let dStr = info.date;
                     let format = t('date_format') || 'DD/MM/YYYY';
@@ -676,12 +915,20 @@ function TaoHangUninstaller(pm) {
           }
         }
       }
-    }, { root: null, rootMargin: '100px', threshold: 0 });
+    }, { root: null, rootMargin: '800px', threshold: 0 });
   }
   d.dataset.appName = pm.name;
   d.dataset.iconId = idIcon;
   if (pm.installLocation) d.dataset.installLocation = pm.installLocation;
-  if (!pm.installDate || pm.installDate === '-') d.dataset.needDate = 'true';
+  if (pm.installDate) d.dataset.installDate = pm.installDate;
+  var dateNeedFetch = !pm.installDate || pm.installDate === '-';
+  if (!dateNeedFetch && pm.installDate && pm.installDate.length === 8) {
+      var _y = parseInt(pm.installDate.substring(0,4),10);
+      var _m = parseInt(pm.installDate.substring(4,6),10);
+      var _d = parseInt(pm.installDate.substring(6,8),10);
+      if (!(_y >= 2000 && _m >= 1 && _m <= 12 && _d >= 1 && _d <= 31)) dateNeedFetch = true;
+  }
+  if (dateNeedFetch) d.dataset.needDate = 'true';
   if (!pm.size || pm.size === 0) d.dataset.needSize = 'true';
   window.ObserverIcon.observe(d);
   return d;
@@ -716,35 +963,101 @@ function LocDanhSachUninstaller(bl) {
       break;
     case 'large': 
       ds = ds.filter(function(p) { 
-        if (!p.size) return false;
+        let sz = p.cachedSize || p.size || 0;
+        if (!sz) return false;
         let pub = (p.publisher || '').toLowerCase();
         let name = (p.name || '').toLowerCase();
         let isSysPub = pub.includes('microsoft') || pub.includes('intel') || pub.includes('amd') || pub.includes('nvidia') || pub.includes('realtek');
         let isUserApp = name.includes('edge') || name.includes('visual studio') || name.includes('geforce now') || name.includes('onedrive') || name.includes('skype') || name.includes('teams') || name.includes('discord');
         let isSystem = (isSysPub && !isUserApp) || (name.includes('redistributable') || name.includes('c++') || name.includes('runtime') || name.includes('framework') || name.includes('sdk'));
         if (isSystem) return false;
-        return p.size > 500 * 1024 * 1024;
+        return sz > 500 * 1024 * 1024;
       }); 
       break;
     case 'recent': 
       var g = new Date(); 
       g.setMonth(g.getMonth() - 3); 
       ds = ds.filter(function(p) { 
-        if (!p.installDate) return false;
-        var dStr = String(p.installDate).replace(/\D/g, '');
+        var dateStr = p.cachedDate || p.installDate;
+        if (!dateStr) return false;
+        var dStr = String(dateStr).replace(/\D/g, '');
         if (dStr.length === 8) {
-            var y = parseInt(dStr.substring(0,4));
-            var m = parseInt(dStr.substring(4,6)) - 1;
-            var d = parseInt(dStr.substring(6,8));
+            var y = parseInt(dStr.substring(0,4), 10);
+            var m = parseInt(dStr.substring(4,6), 10) - 1;
+            var d = parseInt(dStr.substring(6,8), 10);
+            if (m < 0 || m > 11) return false;
             return new Date(y, m, d) >= g;
         }
-        return new Date(p.installDate) >= g; 
+        return false;
       }); 
       break;
   }
+  var cotSort, huongMacDinh;
+  if (bl === 'large') {
+      cotSort = 'size';
+      huongMacDinh = (CotSapXep === 'size') ? HuongSapXep : false;
+      ds.sort((a, b) => {
+          let sA = a.cachedSize || a.size || 0;
+          let sB = b.cachedSize || b.size || 0;
+          return huongMacDinh ? (sA - sB) : (sB - sA);
+      });
+  } else if (bl === 'recent') {
+      cotSort = 'date';
+      huongMacDinh = (CotSapXep === 'date') ? HuongSapXep : false;
+      ds.sort((a, b) => {
+          let dA = String(a.cachedDate || a.installDate || '').replace(/\D/g,'');
+          let dB = String(b.cachedDate || b.installDate || '').replace(/\D/g,'');
+          return huongMacDinh ? dA.localeCompare(dB) : dB.localeCompare(dA);
+      });
+  } else {
+      if (CotSapXep === 'size' || CotSapXep === 'date') {
+          CotSapXep = 'name'; HuongSapXep = true;
+          document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function(c) {
+              c.classList.remove('tang', 'giam');
+          });
+          document.querySelectorAll('.TieuDeCot_Cot[data-sap-xep="name"]').forEach(function(c) {
+              c.classList.add('tang');
+          });
+      }
+      var mul = HuongSapXep ? 1 : -1;
+      ds.sort(function(a, b) {
+          switch (CotSapXep) {
+              case 'size': {
+                  let sA = a.cachedSize || a.size || 0;
+                  let sB = b.cachedSize || b.size || 0;
+                  return mul * (sA - sB);
+              }
+              case 'date': {
+                  let dA = String(a.cachedDate || a.installDate || '').replace(/\D/g,'');
+                  let dB = String(b.cachedDate || b.installDate || '').replace(/\D/g,'');
+                  return mul * dA.localeCompare(dB);
+              }
+              case 'publisher':
+                  return mul * (a.publisher||'').localeCompare(b.publisher||'');
+              default:
+                  return mul * (a.name||'').localeCompare(b.name||'');
+          }
+      });
+  }
+  document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function(c) {
+      c.classList.remove('tang', 'giam', 'bi-khoa');
+  });
+  if (bl === 'large' || bl === 'recent') {
+      var colLock = bl === 'large' ? 'size' : 'date';
+      document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function(c) {
+          if (c.getAttribute('data-sap-xep') !== colLock) c.classList.add('bi-khoa');
+          else c.classList.add(huongMacDinh ? 'tang' : 'giam');
+      });
+  } else {
+      document.querySelectorAll('.TieuDeCot_Cot[data-sap-xep="' + CotSapXep + '"]').forEach(function(c) {
+          c.classList.add(HuongSapXep ? 'tang' : 'giam');
+      });
+  }
+  _renderVersion++;
   ct.innerHTML = '';
   if (ds.length === 0) { ct.innerHTML = '<div class="KhongCoKetQua"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><div class="KhongCoKetQua_TieuDe">' + t('no_apps') + '</div></div>'; return; }
-  ds.forEach(function(pm) { ct.appendChild(TaoHangUninstaller(pm)); });
+  window.IconFetchQueue = [];
+  renderDanhSachChunk(ds, ct, TaoHangUninstaller);
 }
 function CapNhatSoLuongDaChon() {
   var sl = document.querySelectorAll('#danh-sach-uninstaller .OChon:checked').length;
@@ -902,12 +1215,21 @@ let CauHinh = {
   uninstallerHoiXacNhan: localStorage.getItem('caidat-uninstaller-hoi-xac-nhan') !== 'false',
   uninstallerHienTienTrinh: localStorage.getItem('caidat-uninstaller-hien-tien-trinh') !== 'false',
   uninstallerHienThongBao: localStorage.getItem('caidat-uninstaller-hien-thong-bao') === 'true',
-  uninstallerThuNho: localStorage.getItem('caidat-uninstaller-thu-nho') !== 'false'
+  uninstallerThuNho: localStorage.getItem('caidat-uninstaller-thu-nho') === 'true'
 };
+function CapNhatBoTron(isMaximized = document.body.classList.contains('da-phong-to')) {
+  if (isMaximized) {
+    document.documentElement.style.setProperty('--do-bo', '0px');
+    document.documentElement.style.setProperty('--do-bo-nho', '0px');
+    document.documentElement.style.setProperty('--do-bo-lon', '0px');
+  } else {
+    document.documentElement.style.setProperty('--do-bo', CauHinh.boTron ? '8px' : '0px');
+    document.documentElement.style.setProperty('--do-bo-nho', CauHinh.boTron ? '4px' : '0px');
+    document.documentElement.style.setProperty('--do-bo-lon', CauHinh.boTron ? '12px' : '0px');
+  }
+}
 function ApDungCauHinh() {
-  document.documentElement.style.setProperty('--do-bo', CauHinh.boTron ? '8px' : '0px');
-  document.documentElement.style.setProperty('--do-bo-nho', CauHinh.boTron ? '4px' : '0px');
-  document.documentElement.style.setProperty('--do-bo-lon', CauHinh.boTron ? '12px' : '0px');
+  CapNhatBoTron();
   document.documentElement.style.setProperty('--chuyen-dong', CauHinh.tatAnim ? '0s' : '0.2s cubic-bezier(0.4, 0, 0.2, 1)');
   document.documentElement.style.setProperty('--chuyen-dong-nhanh', CauHinh.tatAnim ? '0s' : '0.15s cubic-bezier(0.4, 0, 0.2, 1)');
   document.documentElement.style.setProperty('--chuyen-dong-cham', CauHinh.tatAnim ? '0s' : '0.3s cubic-bezier(0.4, 0, 0.2, 1)');
@@ -981,8 +1303,10 @@ function LayHTMLCaiDatTrang(i, ChuDeHT, NgonNguHT) {
       '</div>';
   } else if (i === 3) {
     let ttXacNhan = NgonNguHT === 'VN' ? 'Hiển thị hộp thoại xác nhận trước khi bắt đầu quá trình gỡ cài đặt' : 'Show confirmation dialog before uninstalling';
+    let ttThuNhoCaiDat = NgonNguHT === 'VN' ? 'Thu nhỏ giao diện chính xuống khay hệ thống khi quá trình gỡ cài đặt bắt đầu' : 'Minimize main window to tray when uninstallation starts';
     return '<div class="NhomCaiDat">' +
       '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttXacNhan + '">' + t('show_confirmation') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-uninstaller-hoi-xac-nhan" '+(CauHinh.uninstallerHoiXacNhan?'checked':'')+'><span class="CongTac_Thanh"></span></label></div>' +
+      '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttThuNhoCaiDat + '">Thu nhỏ xuống khay khi gỡ cài đặt</div></div><label class="CongTac"><input type="checkbox" id="cd-uninstaller-thu-nho" '+(CauHinh.uninstallerThuNho?'checked':'')+'><span class="CongTac_Thanh"></span></label></div>' +
       '</div>';
   } else if (i === 4) {
     let mode = localStorage.getItem('tienich-che-do') || 'thong_minh';
@@ -1034,7 +1358,7 @@ async function LuuCaiDat() {
         let res = await window.DienTu.KiemTraTaiNguyen();
         if ((res.totalRAM / 1073741824) < 2 || (res.freeRAM / 1073741824) < 1 || res.cpus <= 2 || res.cpuUsage > 90) {
           let txt = t('weak_machine_warning');
-          if (!txt || txt === 'weak_machine_warning') txt = NgonNguHienTai === 'VN' ? "Máy bạn có cấu hình khá yếu hoặc đang thiếu tài nguyên trống. Việc BẬT hiệu ứng có thể gây giật lag hoặc phản hồi chậm. Bạn có chắc chắn muốn bật hiệu ứng không?" : "Your system resources are low. Enabling effects might cause lag. Are you sure?";
+          if (!txt || txt === 'weak_machine_warning') txt = t('weak_machine_warning');
           let xacNhan = await HienHopThoaiXacNhanCustom(txt);
           if (!xacNhan) elTatAnim.checked = true;
         }
@@ -1064,7 +1388,8 @@ async function LuuCaiDat() {
     { id: 'cd-chung-an-khong-ho-tro', key: 'caidat-chung-an-khong-ho-tro', cauHinhKey: 'chungAnKhongHoTro' },
     { id: 'cd-chung-hien-thong-bao', key: 'caidat-chung-hien-thong-bao', cauHinhKey: 'chungHienThongBao' },
     { id: 'cd-installer-thu-nho', key: 'caidat-installer-thu-nho', cauHinhKey: 'installerThuNho' },
-    { id: 'cd-uninstaller-hoi-xac-nhan', key: 'caidat-uninstaller-hoi-xac-nhan', cauHinhKey: 'uninstallerHoiXacNhan' }
+    { id: 'cd-uninstaller-hoi-xac-nhan', key: 'caidat-uninstaller-hoi-xac-nhan', cauHinhKey: 'uninstallerHoiXacNhan' },
+    { id: 'cd-uninstaller-thu-nho', key: 'caidat-uninstaller-thu-nho', cauHinhKey: 'uninstallerThuNho' }
   ];
   idsToSave.forEach(item => {
     let el = document.getElementById(item.id);
@@ -1118,7 +1443,7 @@ function DatLaiCaiDat() {
 function KiemTraCapNhat() {
   HienThongBao(t('update_checking'), 'thong-tin');
   setTimeout(function() { 
-    let msg = NgonNguHienTai === 'VN' ? 'Tính năng đang trong quá trình phát triển!' : 'Feature is under development!';
+    let msg = t('feature_dev');
     HienThongBao(msg, 'canh-bao'); 
   }, 1500);
 }
@@ -1146,7 +1471,7 @@ function MoHopThoaiTienTrinh(tieuDe, danhSachApp) {
   if (nutDong) { 
       nutDong.disabled = false; 
       nutDong.style.opacity = '1'; 
-      nutDong.textContent = NgonNguHienTai === 'VN' ? 'Hủy' : 'Cancel';
+      nutDong.textContent = t('cancel_btn');
       nutDong.dataset.isCancel = 'true';
   }
   let btnBaoLoi = document.getElementById('bao-cao-loi');
@@ -1209,7 +1534,7 @@ function HoanTatHopThoaiTienTrinh(ketQua) {
   if (nutDong) { 
       nutDong.disabled = false; 
       nutDong.style.opacity = '1'; 
-      nutDong.textContent = NgonNguHienTai === 'VN' ? 'Đóng' : 'Close';
+      nutDong.textContent = t('close_btn');
       nutDong.dataset.isCancel = 'false';
   }
   let btnBaoLoi = document.getElementById('bao-cao-loi');
@@ -1267,7 +1592,7 @@ function HienThiXacNhanGoCaiDat(danhSachChon) {
                     div.className = 'XacNhanGo_App';
                     var img = document.createElement('img');
                     img.className = 'XacNhanGo_Icon';
-                    img.src = 'TaiNguyen/BieuTuong/logo.ico';
+                    img.src = 'TaiNguyen/BieuTuong/logo.svg';
                     if (window.DienTu && window.DienTu.LayIconApp) {
                         window.DienTu.LayIconApp(app.name).then(base64 => {
                             if (base64) img.src = base64;
@@ -1279,10 +1604,31 @@ function HienThiXacNhanGoCaiDat(danhSachChon) {
                     ten.title = app.name;
                     var size = document.createElement('div');
                     size.className = 'XacNhanGo_Size';
-                    if (window.DienTu && window.DienTu.LayThongTinThem) {
-                        window.DienTu.LayThongTinThem(app.name).then(info => {
-                            if (info && info.size) size.textContent = info.size;
-                            else size.textContent = '-';
+                    
+                    let formatSize = (rawSize) => {
+                        let bytes = parseInt(rawSize, 10);
+                        if (!isNaN(bytes) && bytes > 0) {
+                            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                            if (bytes < 1024 * 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+                            return (bytes / (1024 * 1024 * 1024 * 1024)).toFixed(1) + ' TB';
+                        }
+                        if (rawSize && rawSize !== '0' && isNaN(bytes)) return rawSize;
+                        return '-';
+                    };
+
+                    if (app.cachedSize) {
+                        size.textContent = formatSize(app.cachedSize);
+                    } else if (app.size && app.size > 0) {
+                        size.textContent = formatSize(app.size);
+                    } else if (window.DienTu && window.DienTu.LayThongTinThem) {
+                        window.DienTu.LayThongTinThem(app.name, app.installLocation).then(info => {
+                            if (info && info.size) {
+                                app.cachedSize = info.size;
+                                size.textContent = formatSize(info.size);
+                            } else {
+                                size.textContent = '-';
+                            }
                         });
                     } else {
                         size.textContent = '-';
@@ -1296,10 +1642,12 @@ function HienThiXacNhanGoCaiDat(danhSachChon) {
             if (nutPrev) {
                 nutPrev.disabled = TrangHienTai === 0;
                 nutPrev.style.display = danhSachChon.length > SoLuongTrenTrang ? 'block' : 'none';
+                nutPrev.style.visibility = TrangHienTai === 0 ? 'hidden' : 'visible';
             }
             if (nutNext) {
                 nutNext.disabled = ketThuc >= danhSachChon.length;
                 nutNext.style.display = danhSachChon.length > SoLuongTrenTrang ? 'block' : 'none';
+                nutNext.style.visibility = ketThuc >= danhSachChon.length ? 'hidden' : 'visible';
             }
         };
         var xuliPrev = () => { if (TrangHienTai > 0) { TrangHienTai--; renderTrang(); } };
@@ -1340,7 +1688,7 @@ function DongHopThoaiTienTrinh() {
       }
       nutDong.disabled = true;
       nutDong.style.opacity = '0.5';
-      nutDong.textContent = NgonNguHienTai === 'VN' ? 'Đang hủy...' : 'Canceling...';
+      nutDong.textContent = t('canceling');
       return;
   }
   BatTatHopThoai('hop-thoai-tien-trinh', false);
@@ -1467,7 +1815,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-bat-dau-quet-rac')?.addEventListener('click', async function() {
         let xacNhan = localStorage.getItem('tienich-xac-nhan-don');
         if (xacNhan !== 'false') {
-            let msg = NgonNguHienTai === 'VN' ? "Hành động này sẽ dọn dẹp các tập tin hệ thống theo chế độ đã chọn. Bạn có chắc chắn muốn tiếp tục?" : "This action will clean system files according to the selected mode. Are you sure you want to continue?";
+            let msg = t('clean_confirm');
             let x = await HienHopThoaiXacNhanCustom(msg);
             if (!x) return;
         }
@@ -1480,16 +1828,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let thanhTienTrinh = document.getElementById('thanh-tien-trinh-don-dep');
         if (btn) btn.disabled = true;
         if (tienTrinh) tienTrinh.style.display = 'block';
-        if (txtTienTrinh) txtTienTrinh.innerText = (NgonNguHienTai === 'VN' ? 'Đang phân tích và dọn dẹp...' : 'Analyzing and cleaning...');
+        if (txtTienTrinh) txtTienTrinh.innerText = t('clean_analyzing');
         if (thanhTienTrinh) thanhTienTrinh.style.width = '50%';
         try {
             let res = await window.DienTu.DonDepHeThong(cheDo);
             if (thanhTienTrinh) thanhTienTrinh.style.width = '100%';
-            if (txtTienTrinh) txtTienTrinh.innerText = (NgonNguHienTai === 'VN' ? `Đã dọn dẹp xong. Xóa: ${res.tongXoa} mục, Lỗi: ${res.tongLoi} mục.` : `Cleanup finished. Deleted: ${res.tongXoa} items, Errors: ${res.tongLoi} items.`);
-            HienThongBao(NgonNguHienTai === 'VN' ? 'Dọn dẹp hoàn tất!' : 'Cleanup finished!', 'thanh-cong');
+            if (txtTienTrinh) txtTienTrinh.innerText = t('clean_finished').replace('{0}', res.tongXoa).replace('{1}', res.tongLoi);
+            HienThongBao(t('clean_success'), 'thanh-cong');
         } catch (e) {
-            if (txtTienTrinh) txtTienTrinh.innerText = (NgonNguHienTai === 'VN' ? 'Đã có lỗi xảy ra.' : 'An error occurred.');
-            HienThongBao(NgonNguHienTai === 'VN' ? 'Lỗi khi dọn dẹp!' : 'Error during cleanup!', 'loi');
+            if (txtTienTrinh) txtTienTrinh.innerText = t('clean_error_occurred');
+            HienThongBao(t('clean_error'), 'loi');
         } finally {
             if (btn) btn.disabled = false;
             setTimeout(() => { if (tienTrinh) tienTrinh.style.display = 'none'; }, 5000);
@@ -1555,11 +1903,85 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             HienThongBao("Đã xảy ra lỗi: " + e.message, "loi");
             divTienTrinhKhoiPhuc.style.display = "none";
-        } finally {
-            btnBatDauKhoiPhuc.disabled = false;
-            if (window.DienTu.DatTienTrinh) {
-                window.DienTu.DatTienTrinh(-1, "");
-            }
         }
     });
 });
+
+function HienThiHopThoaiTanDu(leftovers) {
+    return new Promise((resolve) => {
+        let hopThoai = document.getElementById('hop-thoai-tan-du');
+        let lp = document.getElementById('lop-phu-modal');
+        let danhSachContainer = document.getElementById('danh-sach-tan-du');
+        let chkAll = document.getElementById('chk-chon-tat-ca-tan-du');
+        let txtSoLuong = document.getElementById('tan-du-so-luong');
+        let btnXoa = document.getElementById('xoa-tan-du');
+        let btnDong = document.getElementById('dong-tan-du');
+
+        danhSachContainer.innerHTML = '';
+        
+        let updateCount = () => {
+            let checked = danhSachContainer.querySelectorAll('.chk-tan-du:checked').length;
+            txtSoLuong.textContent = `${checked} / ${leftovers.length} mục được chọn`;
+            chkAll.checked = (checked === leftovers.length);
+        };
+
+        leftovers.forEach((item, index) => {
+            let id = `tan-du-item-${index}`;
+            let row = document.createElement('label');
+            row.className = 'TuyChonCheckbox';
+            row.style.cssText = 'display: flex; align-items: flex-start; gap: 12px; cursor: pointer; text-align: left; padding: 8px; border-radius: var(--do-bo); background: var(--nen-chinh); border: 1px solid var(--vien);';
+            
+            let icon = item.type === 'registry' ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #0078D7; margin-top: 2px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #FFA000; margin-top: 2px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>';
+            let labelType = item.type === 'registry' ? 'Registry Key' : 'Thư mục / Tệp tin';
+
+            row.innerHTML = `
+                <input type="checkbox" class="OChon chk-tan-du" id="${id}" value="${index}" checked style="margin-top: 2px; flex-shrink: 0;">
+                <div style="display: flex; flex-direction: column; gap: 2px; overflow: hidden;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        ${icon}
+                        <span style="font-size: 0.857rem; font-weight: 500; color: var(--chu-chinh);">${labelType} (${item.appName})</span>
+                    </div>
+                    <span style="font-size: 0.857rem; color: var(--chu-phu); word-break: break-all; font-family: monospace;">${item.path}</span>
+                </div>
+            `;
+            
+            row.querySelector('.chk-tan-du').addEventListener('change', updateCount);
+            danhSachContainer.appendChild(row);
+        });
+
+        chkAll.onchange = (e) => {
+            let isChecked = e.target.checked;
+            danhSachContainer.querySelectorAll('.chk-tan-du').forEach(chk => chk.checked = isChecked);
+            updateCount();
+        };
+
+        updateCount();
+
+        let closeDialog = () => {
+            hopThoai.classList.add('an');
+            if (!document.querySelectorAll('.HopThoai:not(.an)').length) lp.classList.add('an');
+            btnDong.onclick = null;
+            btnXoa.onclick = null;
+            resolve();
+        };
+
+        btnDong.onclick = closeDialog;
+        btnXoa.onclick = async () => {
+            let selectedIndexes = Array.from(danhSachContainer.querySelectorAll('.chk-tan-du:checked')).map(chk => parseInt(chk.value));
+            if (selectedIndexes.length > 0) {
+                let pathsToDelete = selectedIndexes.map(i => leftovers[i]);
+                btnXoa.disabled = true;
+                btnXoa.textContent = 'Đang xóa...';
+                if (window.DienTu && window.DienTu.XoaTanDu) {
+                    await window.DienTu.XoaTanDu(pathsToDelete);
+                }
+                btnXoa.disabled = false;
+                btnXoa.textContent = 'Xóa Tàn Dư';
+            }
+            closeDialog();
+        };
+
+        hopThoai.classList.remove('an');
+        lp.classList.remove('an');
+    });
+}

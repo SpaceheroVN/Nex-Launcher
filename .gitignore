@@ -4,11 +4,12 @@ dist/
 out/
 build/
 .npm/
+.env
+.env.local
 
-# Visual Studio / CMake
+# IDEs & Editors
 .vscode/
 .vs/
-CMakeUserPresets.json
 *.user
 *.suo
 
@@ -21,22 +22,21 @@ CMakeUserPresets.json
 *.pdb
 *.ilk
 
-# Qt specific
-moc_*.cpp
-qrc_*.cpp
-ui_*.h
-Makefile*
-.qmake.stash
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/
+**/*.rs.bk
 
-# Temp files
+# Temp & Log files
 *.log
 *.tmp
 temp/
 
-# Windows system files
+# OS system files
 Thumbs.db
 Desktop.ini
+.DS_Store
 
-# Ngoai le cho Apps va Games
+# Ngoại lệ cho Apps và Games
 !Basic/Apps/*.exe
 !Basic/Games/*.exe

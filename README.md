@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/ui/TaiNguyen/BieuTuong/logo.ico" alt="Nex Launcher" width="96">
+  <img src="src-tauri/ui/TaiNguyen/BieuTuong/logo.ico" alt="Nex Launcher" width="96">
 </p>
 
 <h1 align="center">Nex Launcher</h1>
@@ -8,7 +8,8 @@
   <img src="https://img.shields.io/badge/version-1.6.0-5865F2?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
-  <img src="https://img.shields.io/badge/electron-35.x-47848F?style=flat-square" alt="Electron">
+  <img src="https://img.shields.io/badge/tauri-2.x-FFC131?style=flat-square" alt="Tauri">
+  <img src="https://img.shields.io/badge/rust-1.77+-DEA584?style=flat-square" alt="Rust">
 </p>
 
 ---
@@ -34,7 +35,10 @@ Tải phiên bản mới nhất tại [**Releases**](https://github.com/Spaceher
 
 ### Chạy từ mã nguồn
 
-Yêu cầu: [Node.js](https://nodejs.org/) v18 trở lên.
+Yêu cầu:
+- [Node.js](https://nodejs.org/) v18 trở lên
+- [Rust](https://www.rust-lang.org/tools/install) v1.77 trở lên
+- [Tauri CLI](https://v2.tauri.app/start/prerequisites/) (`npm install -g @tauri-apps/cli`)
 
 ```bash
 git clone https://github.com/SpaceheroVN/Nex-Launcher.git
