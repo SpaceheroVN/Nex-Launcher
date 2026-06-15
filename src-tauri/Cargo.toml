@@ -1,6 +1,6 @@
 [package]
-name = "app"
-version = "0.1.0"
+name = "nex-launcher"
+version = "1.6.0"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
@@ -16,7 +16,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 path = "../src/core/lib.rs"
 
 [[bin]]
-name = "app"
+name = "nex-launcher"
 path = "../src/core/main.rs"
 
 [build-dependencies]

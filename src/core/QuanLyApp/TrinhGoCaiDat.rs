@@ -3,7 +3,7 @@
 use serde::Serialize;
 use crate::HeThong::HUY_TIEN_TRINH;
 use std::sync::atomic::Ordering;
-use crate::TienIch::encode_ps_command;
+use crate::LayThongTin::encode_ps_command;
 
 #[derive(Serialize, Clone)]
 pub struct ThongTinCapNhat {

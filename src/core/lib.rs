@@ -8,6 +8,9 @@ pub mod HeThong;
 #[path = "HeThong/DuLieu.rs"]
 pub mod DuLieu;
 
+#[path = "HeThong/LayThongTin.rs"]
+pub mod LayThongTin;
+
 #[path = "QuanLyApp/TrinhCaiDat.rs"]
 pub mod TrinhCaiDat;
 
@@ -23,7 +26,7 @@ pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_dialog::init())
     .manage(HeThong::SysState(std::sync::Mutex::new(sysinfo::System::new_all())))
-    .manage(crate::TienIch::IconCacheState {
+    .manage(crate::LayThongTin::IconCacheState {
         cache: std::sync::Mutex::new(std::collections::HashMap::new()),
     })
     .setup(|app| {
@@ -89,9 +92,9 @@ pub fn run() {
         CuaSo::DatLuonTrenCung,
         HeThong::DatThuNhoKhay,
         TrinhGoCaiDat::KiemTraCapNhat,
-        TienIch::LayIconApp,
-        TienIch::LayIconDebug,
-        TienIch::LayThongTinThem,
+        LayThongTin::LayIconApp,
+        LayThongTin::LayIconDebug,
+        LayThongTin::LayThongTinThem,
         HeThong::KiemTraTaiNguyen,
         HeThong::DonDepHeThong,
         HeThong::KiemTraDevMode,
