@@ -13,7 +13,6 @@ pub static THU_NHO_KHI_DONG: AtomicBool = AtomicBool::new(true);
 pub static HUY_TIEN_TRINH: AtomicBool = AtomicBool::new(false);
 
 
-// Helper function for winget to access HUY_TIEN_TRINH
 pub fn lay_trang_thai_huy() -> bool {
     HUY_TIEN_TRINH.load(Ordering::Relaxed)
 }
@@ -133,7 +132,6 @@ pub fn HuyTienTrinh() {
 
 #[tauri::command]
 pub fn DatTienTrinh(AppHandle: tauri::AppHandle, PhanTram: f64, _NoiDung: String) {
-    // Tauri v2 hỗ trợ set progress bar trên taskbar
     if let Some(window) = AppHandle.get_webview_window("main") {
         if !(0.0..100.0).contains(&PhanTram) {
             let _ = window.set_progress_bar(tauri::window::ProgressBarState {

@@ -24,6 +24,28 @@ pub fn DieuKhienCuaSo(Window: Window, HanhDong: &str) {
     }
 }
 
+#[tauri::command]
+pub fn MoLienKet(LienKet: String) {
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", "", &LienKet])
+            .spawn();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open")
+            .arg(&LienKet)
+            .spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open")
+            .arg(&LienKet)
+            .spawn();
+    }
+}
+
 #[derive(Serialize)]
 pub struct TrangThaiCuaSo {
     DaPhongTo: bool,
@@ -44,21 +66,24 @@ pub fn DatLuonTrenCung(Window: Window, GiaTri: bool) {
 }
 
 #[tauri::command]
-pub async fn MoCuaSoTienTrinh(AppHandle: tauri::AppHandle, TieuDe: String, DanhSachApp: serde_json::Value) {
+pub async fn MoCuaSoTienTrinh(AppHandle: tauri::AppHandle, TieuDe: String, DanhSachApp: serde_json::Value, ChuDe: Option<String>, DaLuong: Option<bool>) {
     use tauri::Emitter;
     use tauri::{WebviewWindowBuilder, WebviewUrl};
     
-    // Kiểm tra xem cửa sổ đã tồn tại chưa
+    let chu_de_str = ChuDe.unwrap_or_else(|| "dark".to_string());
+    let da_luong_val = DaLuong.unwrap_or(false);
+    
     if let Some(existing) = AppHandle.get_webview_window("tien-trinh") {
         let _ = existing.set_focus();
         let _ = AppHandle.emit_to("tien-trinh", "khoi-tao-tien-trinh", serde_json::json!({
             "tieuDe": TieuDe,
-            "danhSachApp": DanhSachApp
+            "danhSachApp": DanhSachApp,
+            "chuDe": chu_de_str,
+            "daLuong": da_luong_val
         }));
         return;
     }
     
-    // Tạo cửa sổ mới
     let window = WebviewWindowBuilder::new(
         &AppHandle,
         "tien-trinh",
@@ -80,19 +105,19 @@ pub async fn MoCuaSoTienTrinh(AppHandle: tauri::AppHandle, TieuDe: String, DanhS
         let ds_app = DanhSachApp.clone();
         
         win.on_window_event(move |_event| {
-            // Xử lý khi cửa sổ đóng
         });
         
-        // Chờ window ready rồi gửi data
         let _ = win.show();
         
-        // Gửi data sau khi window đã load
+        use tauri::Listener;
         let app_for_emit = AppHandle.clone();
-        std::thread::spawn(move || {
-            std::thread::sleep(std::time::Duration::from_millis(500));
-            let _ = app_for_emit.emit_to("tien-trinh", "khoi-tao-tien-trinh", serde_json::json!({
+        let app_for_emit_inner = app_for_emit.clone();
+        app_for_emit.once_any("tien-trinh-ready", move |_event| {
+            let _ = app_for_emit_inner.emit_to("tien-trinh", "khoi-tao-tien-trinh", serde_json::json!({
                 "tieuDe": tieu_de,
-                "danhSachApp": ds_app
+                "danhSachApp": ds_app,
+                "chuDe": chu_de_str,
+                "daLuong": da_luong_val
             }));
         });
     }

@@ -54,9 +54,9 @@
         "type": "app",
         "category": "Compression",
         "source": {
-            "type": "Link",
-            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/7z2409-x64.exe",
-            "silent_args": "/S"
+            "type": "Winget",
+            "value": "7zip.7zip",
+            "silent_args": ""
         }
     },
     {
@@ -64,9 +64,9 @@
         "type": "app",
         "category": "Compression",
         "source": {
-            "type": "Link",
-            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/peazip-10.5.0.WIN64.exe",
-            "silent_args": "/VERYSILENT"
+            "type": "Winget",
+            "value": "Giorgiotani.Peazip",
+            "silent_args": ""
         }
     },
     {
@@ -74,9 +74,9 @@
         "type": "app",
         "category": "Compression",
         "source": {
-            "type": "Link",
-            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/winrar-x64-712.exe",
-            "silent_args": "/S"
+            "type": "Winget",
+            "value": "RARLab.WinRAR",
+            "silent_args": ""
         }
     },
     {
@@ -154,9 +154,9 @@
         "type": "app",
         "category": "Media",
         "source": {
-            "type": "Link",
-            "value": "https://files2.codecguide.com/K-Lite_Codec_Pack_1905_Standard.exe",
-            "silent_args": "/verysilent"
+            "type": "Winget",
+            "value": "CodecGuide.K-LiteCodecPack.Standard",
+            "silent_args": ""
         }
     },
     {
@@ -194,9 +194,9 @@
         "type": "app",
         "category": "Security",
         "source": {
-            "type": "Link",
-            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/avg_antivirus_free_setup.exe",
-            "silent_args": "/verysilent /norestart"
+            "type": "Winget",
+            "value": "XP8BX2DWV7TF50",
+            "silent_args": ""
         }
     },
     {
@@ -204,9 +204,9 @@
         "type": "app",
         "category": "Security",
         "source": {
-            "type": "Link",
-            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Apps/Avast_Free_Antivirus.exe",
-            "silent_args": "/verysilent /norestart"
+            "type": "Winget",
+            "value": "XPDNZJFNCR1B07",
+            "silent_args": ""
         }
     },
     {
@@ -244,8 +244,8 @@
         "type": "app",
         "category": "Utilities",
         "source": {
-            "type": "Link",
-            "value": "https://download.teamviewer.com/download/TeamViewerQS_x64.exe",
+            "type": "Winget",
+            "value": "TeamViewer.TeamViewer.QuickSupport",
             "silent_args": ""
         }
     },
@@ -254,9 +254,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/8/b/4/8b42259f-5d70-43f4-ac2e-4b208fd8d66a/vcredist_x64.EXE",
-            "silent_args": "/q"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2005.x64",
+            "silent_args": ""
         }
     },
     {
@@ -264,9 +264,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/8/b/4/8b42259f-5d70-43f4-ac2e-4b208fd8d66a/vcredist_x86.EXE",
-            "silent_args": "/q"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2005.x86",
+            "silent_args": ""
         }
     },
     {
@@ -274,9 +274,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe",
-            "silent_args": "/qb"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2008.x64",
+            "silent_args": ""
         }
     },
     {
@@ -284,9 +284,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe",
-            "silent_args": "/qb"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2008.x86",
+            "silent_args": ""
         }
     },
     {
@@ -294,9 +294,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2010.x64",
+            "silent_args": ""
         }
     },
     {
@@ -304,9 +304,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2010.x86",
+            "silent_args": ""
         }
     },
     {
@@ -314,9 +314,10 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe",
-            "silent_args": "/passive /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2012.x64",
+            "silent_args": "",
+            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
         }
     },
     {
@@ -324,9 +325,10 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe",
-            "silent_args": "/passive /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2012.x86",
+            "silent_args": "",
+            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
         }
     },
     {
@@ -334,9 +336,10 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://aka.ms/highdpimfc2013x64enu",
-            "silent_args": "/passive /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2013.x64",
+            "silent_args": "",
+            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
         }
     },
     {
@@ -344,9 +347,10 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://aka.ms/highdpimfc2013x86enu",
-            "silent_args": "/passive /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2013.x86",
+            "silent_args": "",
+            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
         }
     },
     {
@@ -354,9 +358,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://aka.ms/vs/17/release/vc_redist.x64.exe",
-            "silent_args": "/passive /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2015+.x64",
+            "silent_args": ""
         }
     },
     {
@@ -364,9 +368,9 @@
         "type": "app",
         "category": "VC++ Redistributables",
         "source": {
-            "type": "Link",
-            "value": "https://aka.ms/vs/17/release/vc_redist.x86.exe",
-            "silent_args": "/passive /norestart"
+            "type": "Winget",
+            "value": "Microsoft.VCRedist.2015+.x86",
+            "silent_args": ""
         }
     },
     {
@@ -374,9 +378,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/5.0.408/dotnet-sdk-5.0.408-win-x64.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.5",
+            "silent_args": ""
         }
     },
     {
@@ -384,9 +388,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/5.0.408/dotnet-sdk-5.0.408-win-x86.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.5",
+            "silent_args": "--architecture x86"
         }
     },
     {
@@ -394,9 +398,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/6.0.428/dotnet-sdk-6.0.428-win-x64.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.6",
+            "silent_args": ""
         }
     },
     {
@@ -404,9 +408,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/6.0.428/dotnet-sdk-6.0.428-win-x86.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.6",
+            "silent_args": "--architecture x86"
         }
     },
     {
@@ -414,9 +418,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/7.0.410/dotnet-sdk-7.0.410-win-x64.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.7",
+            "silent_args": ""
         }
     },
     {
@@ -424,9 +428,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/7.0.410/dotnet-sdk-7.0.410-win-x86.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.7",
+            "silent_args": "--architecture x86"
         }
     },
     {
@@ -434,9 +438,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.411/dotnet-sdk-8.0.411-win-x64.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.8",
+            "silent_args": ""
         }
     },
     {
@@ -444,9 +448,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.411/dotnet-sdk-8.0.411-win-x86.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.8",
+            "silent_args": "--architecture x86"
         }
     },
     {
@@ -454,9 +458,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.301/dotnet-sdk-9.0.301-win-x64.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.9",
+            "silent_args": ""
         }
     },
     {
@@ -464,9 +468,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.301/dotnet-sdk-9.0.301-win-x86.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.9",
+            "silent_args": "--architecture x86"
         }
     },
     {
@@ -474,9 +478,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.100-preview.5.25277.114/dotnet-sdk-10.0.100-preview.5.25277.114-win-x64.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.Preview",
+            "silent_args": ""
         }
     },
     {
@@ -484,9 +488,9 @@
         "type": "app",
         "category": ".NET",
         "source": {
-            "type": "Link",
-            "value": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.100-preview.5.25277.114/dotnet-sdk-10.0.100-preview.5.25277.114-win-x86.exe",
-            "silent_args": "/quiet /norestart"
+            "type": "Winget",
+            "value": "Microsoft.DotNet.DesktopRuntime.Preview",
+            "silent_args": "--architecture x86"
         }
     },
     {
@@ -494,9 +498,9 @@
         "type": "app",
         "category": "Games",
         "source": {
-            "type": "Link",
-            "value": "https://cdn.gxx.garenanow.com/gxx/pc/NEX/Garena-v2.0.exe",
-            "silent_args": "/S"
+            "type": "Winget",
+            "value": "Garena.Garena",
+            "silent_args": ""
         }
     },
     {
@@ -504,9 +508,9 @@
         "type": "app",
         "category": "Games",
         "source": {
-            "type": "Link",
-            "value": "https://download.nvidia.com/gfnpc/GeForceNOW-release.exe",
-            "silent_args": "/S"
+            "type": "Winget",
+            "value": "Nvidia.GeForceNow",
+            "silent_args": ""
         }
     },
     {

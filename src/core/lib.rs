@@ -87,6 +87,7 @@ pub fn run() {
     })
     .invoke_handler(tauri::generate_handler![
         CuaSo::DieuKhienCuaSo,
+        CuaSo::MoLienKet,
         CuaSo::LayTrangThaiCuaSo,
         HeThong::LayChuDeHeThong,
         CuaSo::DatLuonTrenCung,
@@ -103,6 +104,8 @@ pub fn run() {
         TrinhCaiDat::TienHanhCaiDat,
         TrinhGoCaiDat::TienHanhGoCaiDat,
         TrinhGoCaiDat::TienHanhCapNhat,
+        TrinhGoCaiDat::QuetTanDuPhanMem,
+        TrinhGoCaiDat::XoaTanDuThucSu,
         TienIch::XoaTanDu,
         HeThong::HuyTienTrinh,
         TienIch::SuaPhanMemKhac,

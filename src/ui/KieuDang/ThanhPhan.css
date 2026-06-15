@@ -265,6 +265,16 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
 #nav-uninstaller.dang-chon::after {
   background-color: var(--nguy-hiem);
 }
+
+#nav-tien-ich.dang-chon {
+  color: var(--mau-tien-ich);
+}
+#nav-tien-ich.dang-chon svg:first-child {
+  color: var(--mau-tien-ich);
+}
+#nav-tien-ich.dang-chon::after {
+  background-color: var(--mau-tien-ich);
+}
 .ThanhBen_DanhSachCon {
   max-height: 0;
   overflow: hidden;
@@ -326,6 +336,14 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
 #ds-uninstaller .ThanhBen_MucCon.dang-chon::before {
   background-color: var(--nguy-hiem-chon);
 }
+
+#ds-tien-ich .ThanhBen_MucCon.dang-chon {
+  background-color: var(--mau-tien-ich-nen);
+  color: var(--mau-tien-ich);
+}
+#ds-tien-ich .ThanhBen_MucCon.dang-chon::before {
+  background-color: var(--mau-tien-ich);
+}
 [data-chu-de="light"] .ThanhBen_MucCon:hover {
   background-color: rgba(0, 0, 0, 0.04);
 }
@@ -367,29 +385,37 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
 .Nut--chinh {
   background-color: var(--mau-nhan);
   color: white;
+  border: none;
+  box-shadow: 0 2px 5px rgba(88, 101, 242, 0.3);
 }
 .Nut--chinh:not(:disabled):hover {
   background-color: var(--mau-nhan-hover);
-  box-shadow: 0 2px 8px rgba(88, 101, 242, 0.4);
+  box-shadow: 0 4px 8px rgba(88, 101, 242, 0.4);
+  transform: translateY(-1px);
 }
 .Nut--phu {
   background-color: var(--nen-tang3);
-  color: var(--chu-phu);
-  border: 1px solid var(--vien-nhat);
+  color: var(--chu-chinh);
+  border: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
 }
 .Nut--phu:not(:disabled):hover {
-  background-color: var(--nen-tang4);
-  color: var(--chu-chinh);
-  border-color: var(--chu-phu);
+  background-color: var(--nen-tang3);
+  filter: brightness(0.85);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transform: translateY(-1px);
 }
 .Nut--nguy-hiem {
-  background-color: transparent;
+  background-color: rgba(237, 66, 69, 0.1);
   color: var(--nguy-hiem);
-  border: 1px solid var(--nguy-hiem);
+  border: none;
+  box-shadow: 0 2px 5px rgba(237, 66, 69, 0.15);
 }
 .Nut--nguy-hiem:not(:disabled):hover {
   background-color: var(--nguy-hiem);
   color: white;
+  box-shadow: 0 4px 8px rgba(237, 66, 69, 0.3);
+  transform: translateY(-1px);
 }
 .Nut:not(:disabled):active {
   transform: scale(0.97);

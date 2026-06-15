@@ -22,6 +22,7 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
         let source_type = source_obj.and_then(|s| s.get("type")).and_then(|v| v.as_str()).unwrap_or("Winget").to_string();
         let source_value = source_obj.and_then(|s| s.get("value")).and_then(|v| v.as_str()).unwrap_or(&name).to_string();
         let silent_args = source_obj.and_then(|s| s.get("silent_args")).and_then(|v| v.as_str()).unwrap_or("").to_string();
+        let post_install_cmd = source_obj.and_then(|s| s.get("post_install_cmd")).and_then(|v| v.as_str()).unwrap_or("").to_string();
         
         if show_progress {
             let _ = AppHandle.emit("tien-trinh-cai-dat", serde_json::json!({
@@ -35,33 +36,32 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
         let mut success = false;
         let mut error_msg = String::new();
 
-        if source_type == "Winget" {
+        let child_res = if source_type == "Winget" {
             let mut cmd = Command::new("winget");
             cmd.args(["install", "--id", &source_value, "--accept-package-agreements", "--accept-source-agreements"]);
             if silent { cmd.arg("--silent"); }
-            cmd.creation_flags(0x08000000);
-            
-            if let Ok(output) = cmd.output() {
-                success = output.status.success() || output.status.code() == Some(-1978334975) || output.status.code() == Some(3010);
-                if !success { error_msg = format!("Winget exit code: {:?}", output.status.code()); }
+            if !silent_args.is_empty() {
+                cmd.args(silent_args.split_whitespace());
             }
+            cmd.creation_flags(0x08000000);
+            cmd.spawn()
         } else if source_type == "Package" {
+            use std::os::windows::process::CommandExt;
             let mut cmd = Command::new("cmd");
-            cmd.args(["/C", &format!("\"{}\" {}", source_value.replace("\"", ""), silent_args)]);
+            cmd.raw_arg("/C");
+            cmd.raw_arg(format!("\"\"{}\" {}\"", source_value.replace("\"", ""), silent_args));
             cmd.creation_flags(0x08000000);
-            
-            if let Ok(output) = cmd.output() {
-                success = output.status.success() || output.status.code() == Some(3010);
-                if !success { error_msg = format!("Package execution failed: {:?}", output.status.code()); }
-            }
+            cmd.spawn()
         } else if source_type == "Link" {
             let ps_script = format!(
                 "$ErrorActionPreference = 'Stop'; \
-                 $temp_file = Join-Path $env:TEMP 'nex_installer_{}.exe'; \
+                 $temp_file = Join-Path $env:TEMP 'nex_installer_{}_{}.exe'; \
                  Invoke-WebRequest -Uri '{}' -OutFile $temp_file; \
-                 $proc = Start-Process -FilePath $temp_file -ArgumentList '{}' -Wait -NoNewWindow -PassThru; \
-                 exit $proc.ExitCode",
+                 $proc = Start-Process -FilePath $temp_file -ArgumentList '{}' -Wait -PassThru -Verb RunAs; \
+                 Remove-Item -Path $temp_file -Force -ErrorAction SilentlyContinue; \
+                 if ($proc) {{ exit $proc.ExitCode }} else {{ exit 1 }}",
                 name.replace(" ", "_").replace(|c: char| !c.is_alphanumeric() && c != '_', ""),
+                std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis(),
                 source_value.replace("'", "''"),
                 silent_args.replace("'", "''")
             );
@@ -69,11 +69,45 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
             let mut cmd = Command::new("powershell");
             cmd.args(["-ExecutionPolicy", "Bypass", "-NoProfile", "-Command", &ps_script]);
             cmd.creation_flags(0x08000000);
-            
-            if let Ok(output) = cmd.output() {
-                success = output.status.success() || output.status.code() == Some(3010);
-                if !success { error_msg = format!("Link installation failed: {:?}", output.status.code()); }
+            cmd.spawn()
+        } else {
+            Err(std::io::Error::new(std::io::ErrorKind::Other, "Unknown source type"))
+        };
+
+        if let Ok(mut child) = child_res {
+            let mut ticks = 0;
+            loop {
+                if HUY_TIEN_TRINH.load(Ordering::Relaxed) {
+                    let _ = child.kill();
+                    error_msg = "Cancelled by user".to_string();
+                    break;
+                }
+                if let Ok(Some(status)) = child.try_wait() {
+                    success = status.success() || status.code() == Some(-1978334975) || status.code() == Some(-1978335189) || status.code() == Some(3010) || status.code() == Some(1638);
+                    if !success { error_msg = format!("Exit code: {:?}", status.code()); }
+                    break;
+                }
+                std::thread::sleep(std::time::Duration::from_millis(500));
+                ticks += 1;
+                if show_progress && ticks % 2 == 0 {
+                    let fake_percent = std::cmp::min(95, 50 + ticks / 4);
+                    let _ = AppHandle.emit("tien-trinh-cai-dat", serde_json::json!({
+                        "name": &name,
+                        "status": "installing",
+                        "percent": fake_percent
+                    }));
+                }
             }
+
+            if success && !post_install_cmd.is_empty() {
+                let _ = Command::new("powershell")
+                    .args(["-ExecutionPolicy", "Bypass", "-NoProfile", "-Command", &post_install_cmd])
+                    .creation_flags(0x08000000)
+                    .spawn()
+                    .and_then(|mut c| c.wait());
+            }
+        } else {
+            error_msg = child_res.err().map(|e| e.to_string()).unwrap_or_else(|| "Unknown start error".to_string());
         }
 
         if show_progress {
@@ -120,7 +154,7 @@ pub async fn TimKiemWinget(TuKhoa: String) -> Vec<serde_json::Value> {
     let lines: Vec<&str> = cleaned.split('\n').filter(|l| !l.trim().is_empty()).collect();
     let mut results = Vec::new();
     let mut start_parsing = false;
-    let mut col_positions: Option<(usize, usize)> = None; // (id_start, ver_start)
+    let mut col_positions: Option<(usize, usize)> = None; 
     
     for line in &lines {
         let trimmed = line.trim();

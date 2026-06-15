@@ -21,7 +21,7 @@
       -webkit-app-region: no-drag;
       width: 100%;
       height: 100%;
-      background: var(--nen, rgba(17, 18, 20, var(--alpha-nen, 1)));
+      background: var(--nen-tang0);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: var(--do-bo-lon, 12px);
@@ -35,21 +35,36 @@
   </style>
 </head>
 <body>
-  <div class="HopThoai_NoiDung" style="text-align: left; padding: 24px; min-width: 320px; width: 100%;">
+  <style>
+    .Nut--Huy { background: var(--nen-tang3); color: var(--chu-chinh); border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.2s; }
+    .Nut--Huy:hover:not(:disabled) { background: var(--nen-tang3); filter: brightness(0.85); box-shadow: 0 4px 8px rgba(0,0,0,0.2); transform: translateY(-1px); }
+  </style>
+  <div class="HopThoai_NoiDung" style="background: var(--nen-tang1); display: flex; flex-direction: column; text-align: left; padding: 24px; min-width: 320px; width: 100%; height: 100vh; box-sizing: border-box;">
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        let t = document.getElementById('tien-trinh-tieu-de');
+        if(t) t.textContent = "ERR: " + msg + " (" + line + ":" + col + ")";
+      };
+      window.addEventListener('unhandledrejection', function(event) {
+        let t = document.getElementById('tien-trinh-tieu-de');
+        if(t) t.textContent = "Promise ERR: " + (event.reason && event.reason.message ? event.reason.message : event.reason);
+      });
+    </script>
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
       <h3 id="tien-trinh-tieu-de" style="margin: 0; font-size: 1.286rem; color: var(--chu-chinh);">Đang xử lý...</h3>
+      <button class="ThanhTieuDe_Nut" id="thu-nho-tien-trinh" style="border: none; cursor: pointer;" title="Thu nhỏ">
+        <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M1 5h10v2H1z" /></svg>
+      </button>
     </div>
-    <div class="TienTrinh_DanhSach" id="tien-trinh-danh-sach" style="margin-bottom: 24px; max-height: 150px; overflow-y: auto;">
+    <div class="TienTrinh_DanhSach" id="tien-trinh-danh-sach" style="flex: 1; margin-bottom: 24px; max-height: 250px; overflow-y: auto; overflow-x: hidden;">
     </div>
-    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: auto;">
-      <div style="width: 100%; height: 32px; background: var(--nen-tang4); border-radius: var(--do-bo); overflow: hidden; position: relative;">
+    <div style="display: flex; align-items: center; gap: 24px; padding-top: 16px; margin-top: auto;">
+      <div id="tien-trinh-wrapper" style="flex: 1; height: 32px; background: rgba(0,0,0,0.15); border-radius: var(--do-bo); overflow: hidden; position: relative; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);">
         <div id="tien-trinh-thanh" style="width: 0%; height: 100%; background: var(--mau-nhan); transition: width 0.3s ease;"></div>
-        <div id="tien-trinh-phan-tram" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">0%</div>
+        <div id="tien-trinh-phan-tram" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: 600; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);">0%</div>
       </div>
-      <div style="display: flex; gap: 12px;">
-        <button class="Nut Nut--nguy-hiem" id="bao-cao-loi" style="padding: 8px 16px; border-radius: var(--do-bo); font-weight: 500; display: none; flex: 1;">Báo cáo lỗi</button>
-        <button class="Nut Nut--chinh" id="dong-tien-trinh" style="padding: 8px 24px; border-radius: var(--do-bo); font-weight: 500; flex: 1;">Hủy</button>
-      </div>
+      <button class="Nut Nut--nguy-hiem" id="bao-cao-loi" style="padding: 8px 16px; border-radius: var(--do-bo); font-weight: 500; display: none;">Báo cáo lỗi</button>
+      <button class="Nut Nut--Huy" id="dong-tien-trinh" data-is-cancel="true" style="padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 120px;">Hủy</button>
     </div>
   </div>
   <div id="lop-phu-modal" class="LopPhu an" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1004;"></div>
@@ -77,3 +92,4 @@
   <script src="TienTrinh.js"></script>
 </body>
 </html>
+

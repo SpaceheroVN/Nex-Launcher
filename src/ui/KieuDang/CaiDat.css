@@ -4,7 +4,7 @@
 }
 .LopPhuModal { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 400; animation: mooDanVao 0.2s ease; border-radius: var(--do-bo-lon); }
 .HopThoai_NoiDung { border-radius: var(--do-bo-lon); padding: 32px; max-width: 420px; width: 90%; box-shadow: var(--bong-lon); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; position: relative; z-index: 1; }
-.HopThoai_NoiDung::before { content: ''; position: absolute; inset: 0; background-color: var(--nen-tang1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: inherit; z-index: -1; }
+.HopThoai_NoiDung::before { content: ''; position: absolute; inset: 0; background-color: var(--nen-tang0); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: inherit; z-index: -1; }
 .HopThoai_NoiDung--rong { max-width: 700px; width: 95%; padding: 0; text-align: left; align-items: stretch; display: flex; flex-direction: row; max-height: 520px; }
 .HopThoai_Logo { width: 72px; height: 72px; border-radius: var(--do-bo-lon); }
 .HopThoai_TieuDe { font-size: 1.571rem; font-weight: 700; color: var(--chu-chinh); }

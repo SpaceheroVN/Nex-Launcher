@@ -832,8 +832,6 @@ pub async fn LayThongTinThem(TenApp: String, ViTriCaiDat: Option<String>, NgayCa
         }
         }
     }
-
-    // Dùng Rust thay vì spawn PowerShell → nhanh hơn ~10x
     let size_str = tinh_dung_luong_thu_muc(path).to_string();
 
     ThongTinThem { date: date_str, size: size_str }
@@ -841,23 +839,27 @@ pub async fn LayThongTinThem(TenApp: String, ViTriCaiDat: Option<String>, NgayCa
 
 fn tinh_dung_luong_thu_muc(dir: &std::path::Path) -> u64 {
     use std::fs;
-    let mut size = 0u64;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::sync::Arc;
+
+    let total = Arc::new(AtomicU64::new(0));
     let mut queue = vec![dir.to_path_buf()];
+
     while let Some(current) = queue.pop() {
         if let Ok(entries) = fs::read_dir(&current) {
             for entry in entries.flatten() {
                 let path = entry.path();
                 if path.is_dir() {
                     queue.push(path);
-                } else if path.is_file() {
-                    if let Ok(meta) = fs::metadata(&path) {
-                        size += meta.len();
+                } else {
+                    if let Ok(meta) = entry.metadata() {
+                        total.fetch_add(meta.len(), Ordering::Relaxed);
                     }
                 }
             }
         }
     }
-    size
+    total.load(Ordering::Relaxed)
 }
 #[tauri::command]
 pub async fn LayIconDebug(TenApp: String) -> serde_json::Value {

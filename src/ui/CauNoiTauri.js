@@ -7,6 +7,7 @@ window.DienTu = {
   PhongTo: () => invoke('DieuKhienCuaSo', { hanhDong: 'phong-to' }),
   DongCuaSo: () => invoke('DieuKhienCuaSo', { hanhDong: 'dong' }),
   HienCuaSo: () => invoke('DieuKhienCuaSo', { hanhDong: 'hien-cua-so' }),
+  MoLienKet: (url) => invoke('MoLienKet', { lienKet: url }),
   LayTrangThaiCuaSo: () => invoke('LayTrangThaiCuaSo'),
   LayChuDeHeThong: () => invoke('LayChuDeHeThong'),
   DatLuonTrenCung: (giaTri) => invoke('DatLuonTrenCung', { giaTri }),
@@ -34,6 +35,8 @@ window.DienTu = {
   KhiTienTrinhCaiDat: (hamXuLy) => listen('tien-trinh-cai-dat', (event) => hamXuLy(event.payload)),
   KhiTienTrinhGoCaiDat: (hamXuLy) => listen('tien-trinh-go-cai-dat', (event) => hamXuLy(event.payload)),
   PhaHuyDuLieu: (duongDanTarget, tuyChon) => invoke('PhaHuyDuLieu', { duongDanTarget, tuyChon }),
+  QuetTanDuPhanMem: (danhSachApp) => invoke('QuetTanDuPhanMem', { danhSachApp }),
+  XoaTanDuThucSu: (danhSachTanDu) => invoke('XoaTanDuThucSu', { danhSachTanDu }),
   KiemTraThuMucNhayCam: (duongDan) => invoke('KiemTraThuMucNhayCam', { duongDan }),
   ChonDuongDanPhaHuy: async (loai) => {
     const { open } = window.__TAURI__.dialog;
@@ -42,7 +45,7 @@ window.DienTu = {
   KhoiPhucDuLieu: (duongDanO, thuMucXuat) => invoke('TienHanhKhoiPhuc', { duongDanO, thuMucXuat }),
   KhiTienTrinhKhoiPhuc: (hamXuLy) => listen('tien-trinh-khoi-phuc', (event) => hamXuLy(event.payload)),
   DatTienTrinh: (phanTram, noiDung) => invoke('DatTienTrinh', { phanTram, noiDung }),
-  MoCuaSoTienTrinh: (tieuDe, danhSachApp) => invoke('MoCuaSoTienTrinh', { tieuDe, danhSachApp }),
+  MoCuaSoTienTrinh: (tieuDe, danhSachApp, chuDe, daLuong) => invoke('MoCuaSoTienTrinh', { tieuDe, danhSachApp, chuDe, daLuong }),
   DongCuaSoTienTrinh: () => invoke('DongCuaSoTienTrinh'),
   CapNhatCuaSoTienTrinh: (duLieu) => invoke('CapNhatCuaSoTienTrinh', { duLieu }),
   HoanTatCuaSoTienTrinh: (ketQua) => invoke('HoanTatCuaSoTienTrinh', { ketQua }),
