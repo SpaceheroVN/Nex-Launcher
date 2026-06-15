@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src-tauri/ui/TaiNguyen/BieuTuong/logo.ico" alt="Nex Launcher" width="96">
+  <img src="src-tauri/icons/128x128.png" alt="Nex Launcher" width="128">
 </p>
 
 <h1 align="center">Nex Launcher</h1>
@@ -16,55 +16,32 @@
 
 ## Giới thiệu
 
-**Nex Launcher** là ứng dụng tiện ích giúp bạn quản lý phần mềm trên Windows một cách nhanh chóng và dễ dàng:
+**Nex Launcher** là ứng dụng tiện ích thế hệ mới giúp bạn quản lý phần mềm trên Windows một cách nhanh chóng, an toàn và dễ dàng. 
 
-- 📦 **Trình Cài Đặt** — Cài đặt hàng loạt phần mềm phổ biến chỉ với vài cú nhấp chuột
-- 🗑️ **Trình Gỡ Cài Đặt** — Quét và gỡ bỏ phần mềm, dọn dẹp tệp rác còn sót lại
-- 🎨 **Giao diện đẹp** — Thiết kế tối giản theo phong cách Discord, hỗ trợ Dark/Light theme
-- 🌐 **Đa ngôn ngữ** — Tiếng Việt & English
+Được xây dựng trên nền tảng **Tauri v2** và **Rust**, Nex Launcher tận dụng sức mạnh của việc quản lý bộ nhớ an toàn (Memory Safety) từ Rust, hạn chế rò rỉ bộ nhớ hay tiêu tốn RAM như các ứng dụng Electron thông thường. Nó cực kì nhẹ, khởi động tức thì và chạy nền mượt mà.
+
+## Tính năng nổi bật
+
+- **Trình Cài Đặt Thông Minh** — Hỗ trợ cài đặt hàng loạt phần mềm phổ biến chỉ với vài cú nhấp chuột. Tích hợp trực tiếp với Windows Package Manager (Winget).
+- **Trình Gỡ Cài Đặt Mạnh Mẽ** — Quét toàn bộ phần mềm trên máy, hỗ trợ gỡ cài đặt ngầm (Silent Uninstall) một cách mượt mà.
+- **Giao diện Đẹp Mắt** — Thiết kế hiện đại, hỗ trợ hiệu ứng bo tròn góc, hình nền mờ (Glassmorphism), chuyển đổi mượt mà giữa Dark & Light theme.
+- **Đa ngôn ngữ** — Hỗ trợ Tiếng Việt & English, cập nhật Real-time toàn bộ ứng dụng kể cả dưới Khay Hệ Thống (System Tray).
 
 ## Ảnh chụp màn hình
 
-> *Sẽ được cập nhật sau*
+> *(Ảnh chụp màn hình giao diện sẽ được cập nhật sau)*
 
-## Cài đặt
+## Tải & Cài Đặt
 
-### Tải về
-
-Tải phiên bản mới nhất tại [**Releases**](https://github.com/SpaceheroVN/Nex-Launcher/releases/).
-
-### Chạy từ mã nguồn
-
-Yêu cầu:
-- [Node.js](https://nodejs.org/) v18 trở lên
-- [Rust](https://www.rust-lang.org/tools/install) v1.77 trở lên
-- [Tauri CLI](https://v2.tauri.app/start/prerequisites/) (`npm install -g @tauri-apps/cli`)
-
-```bash
-git clone https://github.com/SpaceheroVN/Nex-Launcher.git
-cd Nex-Launcher
-npm install
-npm run dev
-```
-
-## Tính năng
-
-| Tính năng | Mô tả |
-|-----------|--------|
-| Cài đặt hàng loạt | Chọn nhiều phần mềm và cài đặt cùng lúc |
-| Hỗ trợ Winget | Tự động tải từ Windows Package Manager |
-| Gỡ cài đặt ngầm | Gỡ phần mềm tự động không cần thao tác |
-| Quét phần mềm | Quét toàn bộ ứng dụng đã cài trên máy |
-| Tùy chỉnh giao diện | Theme, cỡ chữ, bo góc, độ trong suốt |
-| Thu nhỏ xuống khay | Chạy nền trong system tray |
+Tải phiên bản mới nhất (file `.exe`) tại mục [**Releases**](https://github.com/SpaceheroVN/Nex-Launcher/releases/).
 
 ## Đóng góp
 
-Muốn đóng góp? Xem [**Hướng dẫn dành cho lập trình viên**](README_DEV.md) để bắt đầu.
+Bạn muốn tham gia cải thiện Nex Launcher? Vui lòng xem [**Hướng dẫn dành cho lập trình viên**](README_DEV.md) để bắt đầu và hiểu rõ hơn về cấu trúc mã nguồn.
 
 ## Giấy phép
 
-MIT License — Xem file [LICENSE](LICENSE).
+Được phân phối dưới giấy phép MIT — Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
 ## Tác giả
 

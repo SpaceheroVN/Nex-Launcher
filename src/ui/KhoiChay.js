@@ -1813,35 +1813,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     document.getElementById('btn-bat-dau-quet-rac')?.addEventListener('click', async function() {
-        let xacNhan = localStorage.getItem('tienich-xac-nhan-don');
-        if (xacNhan !== 'false') {
-            let msg = t('clean_confirm');
-            let x = await HienHopThoaiXacNhanCustom(msg);
-            if (!x) return;
-        }
-        let cheDo = cheDoQuetHienTai;
-        if (cheDo === 'thong-minh') cheDo = 'thong_minh';
-        if (cheDo === 'toan-bo') cheDo = 'tat_ca';
-        let btn = document.getElementById('btn-bat-dau-quet-rac');
-        let tienTrinh = document.getElementById('tien-trinh-don-dep');
-        let txtTienTrinh = document.getElementById('txt-tien-trinh-don-dep');
-        let thanhTienTrinh = document.getElementById('thanh-tien-trinh-don-dep');
-        if (btn) btn.disabled = true;
-        if (tienTrinh) tienTrinh.style.display = 'block';
-        if (txtTienTrinh) txtTienTrinh.innerText = t('clean_analyzing');
-        if (thanhTienTrinh) thanhTienTrinh.style.width = '50%';
-        try {
-            let res = await window.DienTu.DonDepHeThong(cheDo);
-            if (thanhTienTrinh) thanhTienTrinh.style.width = '100%';
-            if (txtTienTrinh) txtTienTrinh.innerText = t('clean_finished').replace('{0}', res.tongXoa).replace('{1}', res.tongLoi);
-            HienThongBao(t('clean_success'), 'thanh-cong');
-        } catch (e) {
-            if (txtTienTrinh) txtTienTrinh.innerText = t('clean_error_occurred');
-            HienThongBao(t('clean_error'), 'loi');
-        } finally {
-            if (btn) btn.disabled = false;
-            setTimeout(() => { if (tienTrinh) tienTrinh.style.display = 'none'; }, 5000);
-        }
+        let msg = t('feature_dev');
+        HienThongBao(msg, 'canh-bao');
     });
     const btnChonFolderKhoiPhuc = document.getElementById('btn-chon-folder-khoi-phuc');
     const inputThuMucKhoiPhuc = document.getElementById('input-thu-muc-khoi-phuc');
