@@ -35,7 +35,7 @@ pub async fn KiemTraCapNhat() -> Vec<ThongTinCapNhat> {
 fn parse_winget_upgrade_output(stdout: &str) -> Vec<ThongTinCapNhat> {
     let mut results = Vec::new();
     let cleaned = stdout
-        .replace('\r', "")
+        .replace('\r', "\n")
         .chars()
         .map(|c| if c.is_ascii_graphic() || c == ' ' || c == '\n' || c == '\t' { c } else { ' ' })
         .collect::<String>();

@@ -571,7 +571,8 @@ function DangKySuKien() {
       HienThongBao(t('enter_name_keyword') || 'Vui lòng nhập tên ứng dụng hoặc từ khoá', 'canh-bao');
       return;
     }
-    document.getElementById('tim-winget-tieu-de').textContent = 'Tìm kiếm Winget: ' + tuKhoa;
+    let prefix = t('search_winget_title_prefix') || 'Tìm kiếm Winget: ';
+    document.getElementById('tim-winget-tieu-de').textContent = prefix + tuKhoa;
     BatTatHopThoai('hop-thoai-tim-winget', true);
     document.getElementById('hop-thoai-tim-winget').dataset.tuKhoa = tuKhoa;
     ThucHienTimKiemWinget(tuKhoa, false);

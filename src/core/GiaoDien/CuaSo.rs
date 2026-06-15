@@ -125,7 +125,6 @@ pub fn CapNhatTrayMenu(
     go_cai_dat: String,
     thoat: String
 ) {
-    use tauri::Manager;
     if let Some(tray) = app.tray_by_id("main_tray") {
         if let Ok(show_i) = tauri::menu::MenuItem::with_id(&app, "show", &hien_thi, true, None::<&str>) {
         if let Ok(installer_i) = tauri::menu::MenuItem::with_id(&app, "installer", &cai_dat, true, None::<&str>) {

@@ -101,7 +101,7 @@ pub async fn TimKiemWinget(TuKhoa: String) -> Vec<serde_json::Value> {
     use std::os::windows::process::CommandExt;
     
     let output = Command::new("winget")
-        .args(["search", &format!("\"{}\"", TuKhoa.replace('"', "\"\"")), "--source", "winget", "--accept-source-agreements"])
+        .args(["search", &TuKhoa, "--source", "winget", "--accept-source-agreements"])
         .creation_flags(0x08000000)
         .output();
     
@@ -112,7 +112,7 @@ pub async fn TimKiemWinget(TuKhoa: String) -> Vec<serde_json::Value> {
     
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     let cleaned = stdout
-        .replace('\r', "")
+        .replace('\r', "\n")
         .chars()
         .map(|c| if c.is_ascii_graphic() || c == ' ' || c == '\n' || c == '\t' { c } else { ' ' })
         .collect::<String>();

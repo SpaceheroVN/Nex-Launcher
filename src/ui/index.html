@@ -170,7 +170,7 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" id="o-tim-kiem-installer" spellcheck="false" class="OTimKiem_Input"
+              <input type="text" id="o-tim-kiem-installer" spellcheck="false" class="OTimKiem_Input" autocomplete="off"
                 placeholder="Tìm kiếm phần mềm..." data-i18n-placeholder="search_placeholder">
             </div>
           </div>
@@ -240,7 +240,7 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" id="o-tim-kiem-uninstaller" spellcheck="false" class="OTimKiem_Input"
+              <input type="text" id="o-tim-kiem-uninstaller" spellcheck="false" class="OTimKiem_Input" autocomplete="off"
                 placeholder="Tìm kiếm phần mềm..." data-i18n-placeholder="search_placeholder">
             </div>
           </div>
@@ -366,7 +366,7 @@
               <div style="margin-bottom: 16px;">
                 <label style="display: block; margin-bottom: 8px; color: var(--chu-chinh); font-weight: 500;">Chọn Ổ Đĩa
                   Cần Quét:</label>
-                <input type="text" id="input-duong-dan-khoi-phuc" class="OTimKiem_Input"
+                <input type="text" id="input-duong-dan-khoi-phuc" class="OTimKiem_Input" autocomplete="off"
                   style="width: 100%; border: 1px solid var(--vien); border-radius: 4px; padding: 8px;"
                   placeholder="Ví dụ: C:, D:, E: hoặc cắm USB vào và nhập kí tự ổ đĩa...">
               </div>
@@ -375,7 +375,7 @@
                   Lưu Tệp Khôi Phục:</label>
                 <div style="display: flex; gap: 12px;">
                   <button class="Nut Nut--phu" id="btn-chon-folder-khoi-phuc">Chọn Thư Mục</button>
-                  <input type="text" id="input-thu-muc-khoi-phuc" class="OTimKiem_Input"
+                  <input type="text" id="input-thu-muc-khoi-phuc" class="OTimKiem_Input" autocomplete="off"
                     style="width: 100%; border: 1px solid var(--vien); border-radius: 4px; padding: 8px;"
                     placeholder="Chưa chọn..." readonly>
                 </div>
@@ -414,7 +414,7 @@
                   <button class="Nut Nut--phu" id="btn-chon-folder">Chọn Thư Mục</button>
                   <button class="Nut Nut--phu" id="btn-chon-drive">Chọn Ổ Đĩa</button>
                 </div>
-                <input type="text" id="input-duong-dan-pha-huy" class="OTimKiem_Input"
+                <input type="text" id="input-duong-dan-pha-huy" class="OTimKiem_Input" autocomplete="off"
                   style="width: 100%; border: 1px solid var(--vien); border-radius: 4px; padding: 8px;"
                   placeholder="Đường dẫn sẽ được hiển thị ở đây..." readonly>
               </div>
@@ -482,7 +482,7 @@
           <label
             style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);"
             data-i18n="add_app_name">Tên phần mềm</label>
-          <input type="text" id="them-app-ten" spellcheck="false" placeholder="VD: Zalo" data-i18n-ph="add_app_name_ph"
+          <input type="text" id="them-app-ten" spellcheck="false" placeholder="VD: Zalo" data-i18n-placeholder="add_app_name_ph" autocomplete="off"
             style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s;"
             onfocus="this.style.borderColor='var(--mau-chinh)'" onblur="this.style.borderColor='var(--vien)'">
         </div>
@@ -491,7 +491,7 @@
             style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);"
             data-i18n="add_app_category">Thể loại</label>
           <input type="text" id="them-app-loai" spellcheck="false" placeholder="Tự nhập hoặc chọn..."
-            data-i18n-ph="add_app_category_ph" autocomplete="off"
+            data-i18n-placeholder="add_app_category_ph" autocomplete="off"
             style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s;"
             onfocus="this.style.borderColor='var(--mau-chinh)'; document.getElementById('dropdown-loai').classList.remove('an');"
             onblur="this.style.borderColor='var(--vien)'; setTimeout(()=>document.getElementById('dropdown-loai')?.classList.add('an'), 200);">
@@ -546,12 +546,12 @@
                 onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Link'; el.querySelector('.NhanText').textContent='Link (.exe/.msi)'; document.getElementById('them-app-id').placeholder='https://...'; document.getElementById('btn-tim-winget').style.display='none';">
                 Link (.exe/.msi)</div>
               <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 1rem; cursor: pointer;"
-                onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Store'; el.querySelector('.NhanText').textContent='MS Store'; document.getElementById('them-app-id').placeholder='Nhập ID Store'; document.getElementById('btn-tim-winget').style.display='none';">
+                onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Store'; el.querySelector('.NhanText').textContent='MS Store'; document.getElementById('them-app-id').placeholder=t('add_app_store_id_ph') || 'Nhập ID Store'; document.getElementById('btn-tim-winget').style.display='none';">
                 MS Store</div>
             </div>
           </div>
           <input type="text" id="them-app-id" spellcheck="false" placeholder="Nhập ID / Link / Từ khóa tìm kiếm"
-            data-i18n-ph="add_app_id_ph"
+            data-i18n-placeholder="add_app_id_ph" autocomplete="off"
             style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; flex: 1; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s; min-width: 0;"
             onfocus="this.style.borderColor='var(--mau-chinh)'" onblur="this.style.borderColor='var(--vien)'">
           <button id="btn-tim-winget" class="Nut Nut--chinh" data-i18n-title="add_app_search_title"
@@ -568,7 +568,7 @@
             style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);"
             data-i18n="add_app_silent_args">Tham số cài đặt im lặng (Tùy chọn)</label>
           <input type="text" id="them-app-tham-so" spellcheck="false"
-            placeholder="VD: /S /v/qn (Bỏ trống nếu không cần)" data-i18n-ph="add_app_silent_args_ph" autocomplete="off"
+            placeholder="VD: /S /v/qn (Bỏ trống nếu không cần)" data-i18n-placeholder="add_app_silent_args_ph" autocomplete="off"
             style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s;"
             onfocus="this.style.borderColor='var(--mau-chinh)'; document.getElementById('dropdown-tham-so').classList.remove('an');"
             onblur="this.style.borderColor='var(--vien)'; setTimeout(()=>document.getElementById('dropdown-tham-so')?.classList.add('an'), 200);">
@@ -638,7 +638,7 @@
               </path>
             </g>
           </svg>
-          Làm mới
+          <span data-i18n="refresh_btn">Làm mới</span>
         </button>
         <button class="Nut Nut--phu" id="dong-tim-winget" data-i18n="close_btn">Đóng</button>
       </div>
