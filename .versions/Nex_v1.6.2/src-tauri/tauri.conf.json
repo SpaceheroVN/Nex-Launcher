@@ -40,14 +40,6 @@
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
-    },
-    "windows": {
-      "nsis": {
-        "languages": ["vi-VN", "en-US"],
-        "displayLanguageSelector": true,
-        "headerImage": "icons/nsis_header.bmp",
-        "sidebarImage": "icons/nsis_sidebar.bmp"
-      }
     }
   }
 }

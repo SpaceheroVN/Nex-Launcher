@@ -197,4 +197,4 @@ Sau đó dùng `t('my_new_key')` trong JS hoặc `data-i18n="my_new_key"` trong 
 
 ---
 
-*Nex Launcher v1.6.0 — Phát triển bởi SpaceheroVN — Powered by Tauri v2*
+*Nex Launcher v1.6.2 — Phát triển bởi SpaceheroVN — Powered by Tauri v2*

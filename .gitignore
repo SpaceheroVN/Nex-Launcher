@@ -23,8 +23,8 @@ build/
 *.ilk
 
 # Rust / Tauri
-src-tauri/target/
-src-tauri/gen/
+**/target/
+**/gen/
 **/*.rs.bk
 
 # Temp & Log files

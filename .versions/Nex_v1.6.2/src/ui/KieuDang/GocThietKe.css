@@ -1,0 +1,147 @@
+:root {
+  --rgb-nen-tang0: 30, 31, 34;
+  --rgb-nen-tang1: 43, 45, 49;
+  --rgb-nen-tang2: 49, 51, 56;
+  --nen-tang0: rgba(var(--rgb-nen-tang0), var(--alpha-nen, 1));
+  --nen-tang1: rgba(var(--rgb-nen-tang1), var(--alpha-nen, 1));
+  --nen-tang2: rgba(var(--rgb-nen-tang2), var(--alpha-nen, 1));
+  --nen-tang3: #383A40;
+  --nen-tang4: #404249;
+  --chu-chinh: #F2F3F5;
+  --chu-phu: #B5BAC1;
+  --chu-tat: #949BA4;
+  --mau-nhan: #5865F2;
+  --mau-nhan-chon: #8EA1FA;
+  --mau-nhan-hover: #4752C4;
+  --mau-nhan-nhat: rgba(88, 101, 242, 0.15);
+  --mau-uoc-tinh: #fcd34d; 
+  --nguy-hiem: #ED4245;
+  --nguy-hiem-chon: #F27A7C;
+  --nguy-hiem-hover: #D83C3E;
+  --thanh-cong: #57F287;
+  --mau-tien-ich: #57F287;
+  --mau-tien-ich-nen: rgba(87, 242, 135, 0.1);
+  --canh-bao: #FEE75C;
+  --thong-tin: #5865F2;
+  --vien: #3F4147;
+  --vien-nhat: rgba(255, 255, 255, 0.06);
+  --do-bo: 8px;
+  --do-bo-nho: 4px;
+  --do-bo-lon: 12px;
+  --do-bo-tron: 50%;
+  --chuyen-dong: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --chuyen-dong-nhanh: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --chuyen-dong-cham: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --bong: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --bong-lon: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --bong-nang: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --font-chinh: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --thanh-tieu-de-cao: 40px;
+  --thanh-ben-rong: 220px;
+  --thanh-ben-thu-gon: 60px;
+}
+html[data-chu-de="light"] {
+  --rgb-nen-tang0: 227, 229, 232;
+  --rgb-nen-tang1: 242, 243, 245;
+  --rgb-nen-tang2: 255, 255, 255;
+  --nen-tang0: rgba(var(--rgb-nen-tang0), var(--alpha-nen, 1));
+  --nen-tang1: rgba(var(--rgb-nen-tang1), var(--alpha-nen, 1));
+  --nen-tang2: rgba(var(--rgb-nen-tang2), var(--alpha-nen, 1));
+  --nen-tang3: #E9EAED;
+  --nen-tang4: #DCDEE1;
+  --chu-chinh: #060607;
+  --chu-phu: #4E5058;
+  --chu-tat: #80848E;
+  --mau-nhan: #5865F2;
+  --mau-nhan-chon: #4752C4;
+  --mau-nhan-hover: #4752C4;
+  --mau-nhan-nhat: rgba(88, 101, 242, 0.1);
+  --mau-tien-ich: #248046;
+  --mau-tien-ich-nen: rgba(36, 128, 70, 0.1);
+  --mau-uoc-tinh: #d97706; 
+  --nguy-hiem: #DA373C;
+  --nguy-hiem-chon: #A1282D;
+  --nguy-hiem-hover: #C0302E;
+  --thanh-cong: #23A559;
+  --canh-bao: #B48714;
+  --thong-tin: #4752C4;
+  --vien: #D1D3D6;
+  --vien-nhat: rgba(0, 0, 0, 0.06);
+  --bong: 0 2px 10px rgba(0, 0, 0, 0.15);
+  --bong-lon: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --bong-nang: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+html[data-chu-de="nex"] {
+  --rgb-nen-tang0: 15, 23, 42;
+  --rgb-nen-tang1: 30, 41, 59;
+  --rgb-nen-tang2: 51, 65, 85;
+  --nen-tang0: rgba(var(--rgb-nen-tang0), var(--alpha-nen, 1));
+  --nen-tang1: rgba(var(--rgb-nen-tang1), var(--alpha-nen, 1));
+  --nen-tang2: rgba(var(--rgb-nen-tang2), var(--alpha-nen, 1));
+  --nen-tang3: #475569;
+  --nen-tang4: #64748B;
+  --chu-chinh: #F8FAFC;
+  --chu-phu: #94A3B8;
+  --chu-tat: #64748B;
+  --mau-nhan: #3B82F6;
+  --mau-nhan-chon: #60A5FA;
+  --mau-nhan-hover: #2563EB;
+  --mau-nhan-nhat: rgba(59, 130, 246, 0.15);
+  --mau-tien-ich: #57F287;
+  --mau-tien-ich-nen: rgba(87, 242, 135, 0.15);
+  --mau-uoc-tinh: #FBBF24; 
+  --nguy-hiem: #EF4444;
+  --nguy-hiem-chon: #F87171;
+  --nguy-hiem-hover: #DC2626;
+  --thanh-cong: #10B981;
+  --canh-bao: #F59E0B;
+  --thong-tin: #3B82F6;
+  --vien: rgba(255, 255, 255, 0.08);
+  --vien-nhat: rgba(255, 255, 255, 0.04);
+  --bong: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --bong-lon: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --bong-nang: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html {
+  width: 100%; height: 100%; overflow: hidden;
+  font-family: var(--font-chinh); font-size: 1rem;
+  color: var(--chu-chinh); background-color: transparent;
+  -webkit-font-smoothing: antialiased; user-select: none;
+}
+body { 
+  display: flex; flex-direction: column; width: 100%; height: 100%; 
+  background-color: transparent;
+  border-radius: var(--do-bo-lon);
+  overflow: hidden;
+  position: relative;
+}
+body.da-phong-to {
+  border-radius: 0;
+}
+.NenApp {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--nen-tang2);
+  border-radius: inherit;
+  z-index: -1000;
+  pointer-events: none;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.2); }
+html[data-chu-de="light"] ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); }
+html[data-chu-de="light"] ::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.25); }
+::selection { background: var(--mau-nhan); color: white; }
+a { color: var(--mau-nhan); text-decoration: none; transition: color var(--chuyen-dong); }
+a:hover { color: var(--mau-nhan-hover); text-decoration: underline; }
+button { font-family: var(--font-chinh); cursor: pointer; border: none; outline: none; background: none; color: inherit; font-size: inherit; }
+input { font-family: var(--font-chinh); outline: none; border: none; background: none; color: inherit; }
+.an { display: none !important; }
+.mo { display: flex !important; }
+.tat-hieu-ung *, .tat-hieu-ung *::before, .tat-hieu-ung *::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}

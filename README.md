@@ -5,7 +5,7 @@
 <h1 align="center">Nex Launcher</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.6.0-5865F2?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.6.2-5865F2?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/tauri-2.x-FFC131?style=flat-square" alt="Tauri">
