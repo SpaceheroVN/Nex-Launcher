@@ -1,0 +1,45 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Nex Launcher",
+  "version": "1.6.0",
+  "identifier": "com.nexlauncher.desktop",
+  "build": {
+    "frontendDist": "../src/ui",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Nex Launcher",
+        "width": 1100,
+        "height": 750,
+        "minWidth": 1100,
+        "minHeight": 750,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": false,
+        "transparent": true,
+        "center": true
+      }
+    ],
+    "withGlobalTauri": true,
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "resources": [
+      "../Basic.json"
+    ],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ],
+    "android": {
+      "debugApplicationIdSuffix": ".debug"
+    }
+  }
+}

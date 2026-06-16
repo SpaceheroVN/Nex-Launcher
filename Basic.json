@@ -1,546 +1,584 @@
 [
-    {
-        "name": "Brave Browser",
-        "type": "app",
-        "category": "Web Browsers",
-        "source": {
-            "type": "Winget",
-            "value": "Brave.Brave",
-            "silent_args": ""
-        }
+  {
+    "category": "Web Browsers",
+    "name": "Brave Browser",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Brave.Brave"
     },
-    {
-        "name": "Firefox",
-        "type": "app",
-        "category": "Web Browsers",
-        "source": {
-            "type": "Winget",
-            "value": "Mozilla.Firefox",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Web Browsers",
+    "name": "Firefox",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Mozilla.Firefox"
     },
-    {
-        "name": "Google Chrome (x64)",
-        "type": "app",
-        "category": "Web Browsers",
-        "source": {
-            "type": "Winget",
-            "value": "Google.Chrome",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Web Browsers",
+    "name": "Google Chrome (x64)",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Google.Chrome"
     },
-    {
-        "name": "Microsoft Edge",
-        "type": "app",
-        "category": "Web Browsers",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.Edge",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Web Browsers",
+    "name": "Microsoft Edge",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.Edge"
     },
-    {
-        "name": "Opera Browser",
-        "type": "app",
-        "category": "Web Browsers",
-        "source": {
-            "type": "Winget",
-            "value": "Opera.Opera",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Web Browsers",
+    "name": "Opera Browser",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Opera.Opera"
     },
-    {
-        "name": "7-Zip (x64)",
-        "type": "app",
-        "category": "Compression",
-        "source": {
-            "type": "Winget",
-            "value": "7zip.7zip",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Compression",
+    "name": "7-Zip (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "7zip.7zip"
     },
-    {
-        "name": "PeaZip",
-        "type": "app",
-        "category": "Compression",
-        "source": {
-            "type": "Winget",
-            "value": "Giorgiotani.Peazip",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Compression",
+    "name": "PeaZip",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Giorgiotani.Peazip"
     },
-    {
-        "name": "WinRAR (x64)",
-        "type": "app",
-        "category": "Compression",
-        "source": {
-            "type": "Winget",
-            "value": "RARLab.WinRAR",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Compression",
+    "name": "WinRAR (x64)",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "RARLab.WinRAR"
     },
-    {
-        "name": "Cursor",
-        "type": "app",
-        "category": "Developer Tools",
-        "source": {
-            "type": "Winget",
-            "value": "Anysphere.Cursor",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Developer Tools",
+    "name": "Cursor",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Anysphere.Cursor"
     },
-    {
-        "name": "Git (x64)",
-        "type": "app",
-        "category": "Developer Tools",
-        "source": {
-            "type": "Winget",
-            "value": "Git.Git",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Developer Tools",
+    "name": "Git (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Git.Git"
     },
-    {
-        "name": "VS Code",
-        "type": "app",
-        "category": "Developer Tools",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VisualStudioCode",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Developer Tools",
+    "name": "VS Code",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VisualStudioCode"
     },
-    {
-        "name": "Discord",
-        "type": "app",
-        "category": "Messaging",
-        "source": {
-            "type": "Winget",
-            "value": "Discord.Discord",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Messaging",
+    "name": "Discord",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Discord.Discord"
     },
-    {
-        "name": "Microsoft Teams",
-        "type": "app",
-        "category": "Messaging",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.Teams",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Messaging",
+    "name": "Microsoft Teams",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.Teams"
     },
-    {
-        "name": "Zoom (x64)",
-        "type": "app",
-        "category": "Messaging",
-        "source": {
-            "type": "Winget",
-            "value": "Zoom.Zoom",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Messaging",
+    "name": "Zoom (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Zoom.Zoom"
     },
-    {
-        "name": "Audacity",
-        "type": "app",
-        "category": "Media",
-        "source": {
-            "type": "Winget",
-            "value": "Audacity.Audacity",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Media",
+    "name": "Audacity",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Audacity.Audacity"
     },
-    {
-        "name": "K-Lite Codec Pack (Standard)",
-        "type": "app",
-        "category": "Media",
-        "source": {
-            "type": "Winget",
-            "value": "CodecGuide.K-LiteCodecPack.Standard",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Media",
+    "name": "K-Lite Codec Pack (Standard)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "CodecGuide.K-LiteCodecPack.Standard"
     },
-    {
-        "name": "OBS Studio",
-        "type": "app",
-        "category": "Media",
-        "source": {
-            "type": "Winget",
-            "value": "OBSProject.OBSStudio",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Media",
+    "name": "OBS Studio",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "OBSProject.OBSStudio"
     },
-    {
-        "name": "Spotify",
-        "type": "app",
-        "category": "Media",
-        "source": {
-            "type": "Winget",
-            "value": "Spotify.Spotify",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Media",
+    "name": "Spotify",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Spotify.Spotify"
     },
-    {
-        "name": "VLC Media Player",
-        "type": "app",
-        "category": "Media",
-        "source": {
-            "type": "Winget",
-            "value": "VideoLAN.VLC",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Media",
+    "name": "VLC Media Player",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "VideoLAN.VLC"
     },
-    {
-        "name": "AVG AntiVirus Free",
-        "type": "app",
-        "category": "Security",
-        "source": {
-            "type": "Winget",
-            "value": "XP8BX2DWV7TF50",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Security",
+    "name": "AVG AntiVirus Free",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "XP8BX2DWV7TF50"
     },
-    {
-        "name": "Avast Free Antivirus",
-        "type": "app",
-        "category": "Security",
-        "source": {
-            "type": "Winget",
-            "value": "XPDNZJFNCR1B07",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Security",
+    "name": "Avast Free Antivirus",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "XPDNZJFNCR1B07"
     },
-    {
-        "name": "AnyDesk",
-        "type": "app",
-        "category": "Utilities",
-        "source": {
-            "type": "Winget",
-            "value": "AnyDeskSoftwareGmbH.AnyDesk",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Utilities",
+    "name": "AnyDesk",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "AnyDeskSoftwareGmbH.AnyDesk"
     },
-    {
-        "name": "Net Time",
-        "type": "app",
-        "category": "Utilities",
-        "source": {
-            "type": "Link",
-            "value": "https://timesynctool.com/NetTimeSetup-314.exe",
-            "silent_args": "/VERYSILENT"
-        }
+    "type": "app"
+  },
+  {
+    "category": "Utilities",
+    "name": "Net Time",
+    "source": {
+      "silent_args": "/VERYSILENT",
+      "type": "Link",
+      "value": "https://timesynctool.com/NetTimeSetup-314.exe"
     },
-    {
-        "name": "TeamViewer",
-        "type": "app",
-        "category": "Utilities",
-        "source": {
-            "type": "Winget",
-            "value": "TeamViewer.TeamViewer",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Utilities",
+    "name": "TeamViewer",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "TeamViewer.TeamViewer"
     },
-    {
-        "name": "TeamViewer QuickSupport",
-        "type": "app",
-        "category": "Utilities",
-        "source": {
-            "type": "Winget",
-            "value": "TeamViewer.TeamViewer.QuickSupport",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Utilities",
+    "name": "TeamViewer QuickSupport",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "TeamViewer.TeamViewer.QuickSupport"
     },
-    {
-        "name": "Visual C++ Redistributable 2005_x64",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2005.x64",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2005_x64",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2005.x64"
     },
-    {
-        "name": "Visual C++ Redistributable 2005_x32",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2005.x86",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2005_x32",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2005.x86"
     },
-    {
-        "name": "Visual C++ Redistributable 2008_x64",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2008.x64",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2008_x64",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2008.x64"
     },
-    {
-        "name": "Visual C++ Redistributable 2008_x32",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2008.x86",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2008_x32",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2008.x86"
     },
-    {
-        "name": "Visual C++ Redistributable 2010_x64",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2010.x64",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2010_x64",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2010.x64"
     },
-    {
-        "name": "Visual C++ Redistributable 2010_x32",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2010.x86",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2010_x32",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2010.x86"
     },
-    {
-        "name": "Visual C++ Redistributable 2012_x64",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2012.x64",
-            "silent_args": "",
-            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2012_x64",
+    "source": {
+      "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue",
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2012.x64"
     },
-    {
-        "name": "Visual C++ Redistributable 2012_x32",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2012.x86",
-            "silent_args": "",
-            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2012_x32",
+    "source": {
+      "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue",
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2012.x86"
     },
-    {
-        "name": "Visual C++ Redistributable 2013_x64",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2013.x64",
-            "silent_args": "",
-            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2013_x64",
+    "source": {
+      "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue",
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2013.x64"
     },
-    {
-        "name": "Visual C++ Redistributable 2013_x32",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2013.x86",
-            "silent_args": "",
-            "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue"
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2013_x32",
+    "source": {
+      "post_install_cmd": "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue",
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2013.x86"
     },
-    {
-        "name": "Visual C++ Redistributable 2015-2022_x64",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2015+.x64",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2015-2022_x64",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2015+.x64"
     },
-    {
-        "name": "Visual C++ Redistributable 2015-2022_x32",
-        "type": "app",
-        "category": "VC++ Redistributables",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.VCRedist.2015+.x86",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "VC++ Redistributables",
+    "name": "Visual C++ Redistributable 2015-2022_x32",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.VCRedist.2015+.x86"
     },
-    {
-        "name": ".NET 5.0 (x64)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.5",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 5.0 (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.5"
     },
-    {
-        "name": ".NET 5.0 (x86)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.5",
-            "silent_args": "--architecture x86"
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 5.0 (x86)",
+    "source": {
+      "silent_args": "--architecture x86",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.5"
     },
-    {
-        "name": ".NET 6.0 (x64)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.6",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 6.0 (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.6"
     },
-    {
-        "name": ".NET 6.0 (x86)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.6",
-            "silent_args": "--architecture x86"
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 6.0 (x86)",
+    "source": {
+      "silent_args": "--architecture x86",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.6"
     },
-    {
-        "name": ".NET 7.0 (x64)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.7",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 7.0 (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.7"
     },
-    {
-        "name": ".NET 7.0 (x86)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.7",
-            "silent_args": "--architecture x86"
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 7.0 (x86)",
+    "source": {
+      "silent_args": "--architecture x86",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.7"
     },
-    {
-        "name": ".NET 8.0 (x64)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.8",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 8.0 (x64)",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.8"
     },
-    {
-        "name": ".NET 8.0 (x86)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.8",
-            "silent_args": "--architecture x86"
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 8.0 (x86)",
+    "recommended": true,
+    "source": {
+      "silent_args": "--architecture x86",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.8"
     },
-    {
-        "name": ".NET 9.0 (x64)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.9",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 9.0 (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.9"
     },
-    {
-        "name": ".NET 9.0 (x86)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.9",
-            "silent_args": "--architecture x86"
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 9.0 (x86)",
+    "source": {
+      "silent_args": "--architecture x86",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.9"
     },
-    {
-        "name": ".NET 10.0 Preview (x64)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.Preview",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 10.0 Preview (x64)",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.Preview"
     },
-    {
-        "name": ".NET 10.0 Preview (x86)",
-        "type": "app",
-        "category": ".NET",
-        "source": {
-            "type": "Winget",
-            "value": "Microsoft.DotNet.DesktopRuntime.Preview",
-            "silent_args": "--architecture x86"
-        }
+    "type": "app"
+  },
+  {
+    "category": ".NET",
+    "name": ".NET 10.0 Preview (x86)",
+    "source": {
+      "silent_args": "--architecture x86",
+      "type": "Winget",
+      "value": "Microsoft.DotNet.DesktopRuntime.Preview"
     },
-    {
-        "name": "Garena",
-        "type": "app",
-        "category": "Games",
-        "source": {
-            "type": "Winget",
-            "value": "Garena.Garena",
-            "silent_args": ""
-        }
+    "type": "app"
+  },
+  {
+    "category": "Games",
+    "name": "Garena",
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Garena.Garena"
     },
-    {
-        "name": "GeForce NOW",
-        "type": "app",
-        "category": "Games",
-        "source": {
-            "type": "Winget",
-            "value": "Nvidia.GeForceNow",
-            "silent_args": ""
-        }
+    "type": "game"
+  },
+  {
+    "category": "Games",
+    "name": "GeForce NOW",
+    "recommended": true,
+    "source": {
+      "silent_args": "",
+      "type": "Winget",
+      "value": "Nvidia.GeForceNow"
     },
-    {
-        "name": "Lunar Client",
-        "type": "game",
-        "category": "Games",
-        "source": {
-            "type": "Link",
-            "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Games/Lunar%20Client%20-%20NEX.exe",
-            "silent_args": ""
-        }
+    "type": "game"
+  },
+  {
+    "category": "Games",
+    "name": "Lunar Client",
+    "source": {
+      "silent_args": "",
+      "type": "Link",
+      "value": "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic/Games/Lunar%20Client%20-%20NEX.exe"
     },
-    {
-        "name": "Mini World",
-        "type": "game",
-        "category": "Games",
-        "source": {
-            "type": "Link",
-            "value": "https://mwu-cdn2.miniworldgame.com/install/1/410/miniworld_universal_1.2.0_410.exe",
-            "silent_args": ""
-        }
+    "type": "game"
+  },
+  {
+    "category": "Games",
+    "name": "Mini World",
+    "source": {
+      "silent_args": "",
+      "type": "Link",
+      "value": "https://mwu-cdn2.miniworldgame.com/install/1/410/miniworld_universal_1.2.0_410.exe"
     },
-    {
-        "name": "Valorant",
-        "type": "game",
-        "category": "Games",
-        "source": {
-            "type": "Link",
-            "value": "https://valorant.secure.dyn.riotcdn.net/channels/public/x/installer/current/live.exe",
-            "silent_args": ""
-        }
-    }
+    "type": "game"
+  },
+  {
+    "category": "Games",
+    "name": "Valorant",
+    "source": {
+      "silent_args": "",
+      "type": "Link",
+      "value": "https://valorant.secure.dyn.riotcdn.net/channels/public/x/installer/current/live.exe"
+    },
+    "type": "game"
+  },
+  {
+    "category": "Games",
+    "name": "Valorant (Asia-Pacific)",
+    "source": {
+      "type": "Winget",
+      "value": "RiotGames.Valorant.AP"
+    },
+    "type": "game"
+  },
+  {
+    "category": "Games",
+    "name": "Valorant (North America)",
+    "source": {
+      "type": "Winget",
+      "value": "RiotGames.Valorant.NA"
+    },
+    "type": "game"
+  },
+  {
+    "category": "Games",
+    "name": "Valorant (Europe)",
+    "source": {
+      "type": "Winget",
+      "value": "RiotGames.Valorant.EU"
+    },
+    "type": "game"
+  }
 ]

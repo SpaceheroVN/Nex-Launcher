@@ -1,0 +1,11 @@
+pyinstaller --noconfirm --onefile --windowed --name "Installer" --icon "icons/logo.ico" --add-data "icons;icons" --exclude-module QtWebEngineCore --exclude-module QtMultimedia --exclude-module QtWebEngine --exclude-module QtNfc --exclude-module QtPositioning --exclude-module QtQuick --exclude-module QtLocation --exclude-module QtSensors --exclude-module QtTest --upx-dir "C:\Users\Space\OneDrive\Documents\My_Dev\Installer\NEX\upx-5.0.1-win64" Installer.py
+
+git init
+git add .
+git config --global user.email "nhau086645@gmail.com"
+git config --global user.name "SpaceheroVN"
+git commit -m "DONE NP"
+git remote add origin https://github.com/SpaceheroVN/Installer
+git branch -M main
+git pull origin main --rebase
+git push -u origin main

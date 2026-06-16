@@ -1,0 +1,78 @@
+html.dang-chuyen-chu-de,
+html.dang-chuyen-chu-de *,
+html.dang-chuyen-chu-de *::before,
+html.dang-chuyen-chu-de *::after {
+  transition: background-color 0.4s ease,
+              color 0.3s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease !important;
+}
+.HangUngDung {
+  animation: trucXuatHien 0.2s ease backwards;
+}
+@keyframes trucXuatHien {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.HangUngDung:nth-child(1) { animation-delay: 0.02s; }
+.HangUngDung:nth-child(2) { animation-delay: 0.04s; }
+.HangUngDung:nth-child(3) { animation-delay: 0.06s; }
+.HangUngDung:nth-child(4) { animation-delay: 0.08s; }
+.HangUngDung:nth-child(5) { animation-delay: 0.10s; }
+.HangUngDung:nth-child(6) { animation-delay: 0.12s; }
+.HangUngDung:nth-child(7) { animation-delay: 0.14s; }
+.HangUngDung:nth-child(8) { animation-delay: 0.16s; }
+.HangUngDung:nth-child(9) { animation-delay: 0.18s; }
+.HangUngDung:nth-child(10) { animation-delay: 0.20s; }
+.HangUngDung:nth-child(n+11) { animation-delay: 0.22s; }
+.Nut:not(:disabled):active {
+  transform: scale(0.97);
+}
+.ThanhBen_NhomTieuDe:active,
+.ThanhBen_MucCon:active {
+  transform: scale(0.98);
+}
+.Nut--chinh:focus-visible {
+  box-shadow: 0 0 0 3px var(--mau-nhan-nhat);
+}
+.HangUngDung::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10.01%);
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.4s, opacity 0.5s;
+  pointer-events: none;
+}
+.HangUngDung {
+  position: relative;
+  overflow: hidden;
+}
+.ThanhBen_NhomTieuDe::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: var(--mau-nhan);
+  border-radius: 0 2px 2px 0;
+  opacity: 0;
+  transition: opacity var(--chuyen-dong);
+}
+.ThanhBen_NhomTieuDe.dang-chon::after {
+  opacity: 1;
+}

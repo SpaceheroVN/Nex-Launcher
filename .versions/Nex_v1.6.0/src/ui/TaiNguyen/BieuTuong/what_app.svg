@@ -1,0 +1,43 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="windowClip">
+      <!-- Mảnh cắt theo hình dạng của khung cửa sổ để bo góc hoàn hảo -->
+      <rect x="32" y="96" width="448" height="320" rx="20"/>
+    </clipPath>
+  </defs>
+
+  <!-- Nền cửa sổ -->
+  <rect x="32" y="96" width="448" height="320" rx="20" fill="#ffffff"/>
+  
+  <!-- Các thành phần bên trong (bị cắt bởi clip-path để bo góc chuẩn xác) -->
+  <g clip-path="url(#windowClip)">
+    <!-- Thanh tiêu đề (Header) mỏng hơn -->
+    <rect x="32" y="96" width="448" height="32" fill="#8C8684"/>
+    
+    <!-- 3 Dấu chấm -->
+    <circle cx="428" cy="112" r="4" fill="#E0E0E0"/>
+    <circle cx="444" cy="112" r="4" fill="#E0E0E0"/>
+    <circle cx="460" cy="112" r="4" fill="#E0E0E0"/>
+    
+    <!-- Khối xanh trung tâm -->
+    <rect x="168" y="156" width="176" height="232" rx="8" fill="#117EC7"/>
+    
+    <!-- Các dòng kẻ xám bên trái -->
+    <rect x="60" y="176" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="60" y="208" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="60" y="240" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="60" y="272" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="60" y="304" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="60" y="336" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="60" y="368" width="80" height="8" rx="4" fill="#8C8684"/>
+    
+    <!-- Các dòng kẻ xám bên phải -->
+    <rect x="372" y="176" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="372" y="208" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="372" y="240" width="80" height="8" rx="4" fill="#8C8684"/>
+    <rect x="372" y="304" width="80" height="8" rx="4" fill="#8C8684"/>
+  </g>
+
+  <!-- Viền xám ngoài cùng (vẽ cuối để đè lên che lấp mọi khe hở) -->
+  <rect x="32" y="96" width="448" height="320" rx="20" fill="none" stroke="#8C8684" stroke-width="12"/>
+</svg>
