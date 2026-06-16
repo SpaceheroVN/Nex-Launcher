@@ -29,3 +29,4 @@
 - **Cài đặt phân nhóm rõ ràng:** Trang Cài đặt thêm tiêu đề phụ phân nhóm ("Hệ thống & Cửa sổ", "Tiến trình & Thông báo", "Giao diện") giúp tìm tùy chọn dễ hơn.
 - **Bố cục cột cân đối hơn:** Điều chỉnh tỉ lệ flex cột Tên từ `2` xuống `1.5`, cân đối hiển thị khi có thêm cột Phiên bản.
 - **Expose `KiemTraDevMode` ra frontend:** Bridge Tauri bổ sung hàm kiểm tra chế độ dev từ phía giao diện.
+- **Sửa lỗi** nút `kiểm tra cập nhật` không hoạt động.
