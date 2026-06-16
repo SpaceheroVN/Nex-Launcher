@@ -151,3 +151,67 @@ pub fn DatTienTrinh(AppHandle: tauri::AppHandle, PhanTram: f64, _NoiDung: String
 pub fn KiemTraDevMode() -> bool {
     cfg!(debug_assertions)
 }
+
+#[tauri::command]
+pub fn LayPhienBan() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
+#[tauri::command]
+pub async fn TaiVaCaiDatCapNhat(AppHandle: tauri::AppHandle, Url: String, FileName: String) -> Result<bool, String> {
+    use std::io::Write;
+    use std::process::Command;
+    use std::os::windows::process::CommandExt;
+    use tauri::Emitter;
+    use futures_util::StreamExt;
+    
+    let temp_dir = std::env::temp_dir();
+    let file_path = temp_dir.join(&FileName);
+    
+    let response = reqwest::get(&Url).await.map_err(|e| format!("Lỗi kết nối: {}", e))?;
+    
+    if !response.status().is_success() {
+        return Err(format!("Download failed: HTTP {}", response.status()));
+    }
+    
+    let total_size = response.content_length().unwrap_or(0);
+    let mut file = std::fs::File::create(&file_path).map_err(|e| format!("Lỗi tạo file: {}", e))?;
+    
+    let mut downloaded: u64 = 0;
+    let mut stream = response.bytes_stream();
+    let mut last_emit = std::time::Instant::now();
+    
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk.map_err(|e| format!("Lỗi đọc dữ liệu: {}", e))?;
+        file.write_all(&chunk).map_err(|e| format!("Lỗi ghi file: {}", e))?;
+        downloaded += chunk.len() as u64;
+        
+        if total_size > 0 && last_emit.elapsed().as_millis() > 200 {
+            let percent = (downloaded as f64 / total_size as f64) * 100.0;
+            let _ = AppHandle.emit("tien-trinh-cap-nhat-app", serde_json::json!({
+                "percent": percent,
+                "downloaded": downloaded,
+                "total": total_size
+            }));
+            last_emit = std::time::Instant::now();
+        }
+    }
+    
+    file.sync_all().map_err(|e| format!("Lỗi đồng bộ file: {}", e))?;
+    
+    Command::new(&file_path)
+        .arg("/S")
+        .creation_flags(0x08000000)
+        .spawn()
+        .map_err(|e| format!("Lỗi khởi chạy bộ cài: {}", e))?;
+        
+    let _ = AppHandle.emit("tien-trinh-cap-nhat-app", serde_json::json!({
+        "percent": 100.0,
+        "downloaded": total_size,
+        "total": total_size
+    }));
+    
+    std::thread::sleep(std::time::Duration::from_millis(300));
+    std::process::exit(0);
+}
+

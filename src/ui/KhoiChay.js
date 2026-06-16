@@ -837,7 +837,7 @@ function HienThiDanhSachInstaller(TuKhoa, isRefresh) {
   if (nutCaiDatSpan) nutCaiDatSpan.textContent = t('install_btn');
   if (TuKhoa.trim()) { var tk = TuKhoa.toLowerCase(); ds = ds.filter(function (p) { return p.name.toLowerCase().includes(tk) || p.category.toLowerCase().includes(tk); }); }
   ds.sort(function (a, b) { var gA, gB; switch (CotSapXep) { case 'category': gA = a.category; gB = b.category; break; case 'source': gA = a.source.type; gB = b.source.type; break; default: gA = a.name; gB = b.name; } return (HuongSapXep ? 1 : -1) * gA.localeCompare(gB, undefined, { numeric: true }); });
-  if (ds.length === 0) { ct.innerHTML = '<div class="KhongCoKetQua"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><div class="KhongCoKetQua_TieuDe">' + t('software_up_to_date') + '</div><div class="KhongCoKetQua_MoTa">' + t('no_updates_found') + '</div></div>'; CapNhatNutDongGoi(); return; }
+  if (ds.length === 0) { ct.innerHTML = '<div class="KhongCoKetQua"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><div class="KhongCoKetQua_TieuDe">' + t('no_results') + '</div><div class="KhongCoKetQua_MoTa">' + t('no_results_desc') + '</div></div>'; CapNhatNutDongGoi(); return; }
   ds.forEach(function (pm) { ct.appendChild(TaoHangInstaller(pm)); });
   CapNhatNutDongGoi();
 }
@@ -1560,12 +1560,91 @@ function DatLaiCaiDat() {
   HienThongBao(t('settings_reset'), 'thong-tin');
   MoHopThoaiCaiDat();
 }
-function KiemTraCapNhat() {
+function SoSanhPhienBan(a, b) {
+  var pa = a.split('.');
+  var pb = b.split('.');
+  for (var i = 0; i < 3; i++) {
+    var na = Number(pa[i]);
+    var nb = Number(pb[i]);
+    if (na > nb) return 1;
+    if (nb > na) return -1;
+    if (!isNaN(na) && isNaN(nb)) return 1;
+    if (isNaN(na) && !isNaN(nb)) return -1;
+  }
+  return 0;
+}
+
+async function KiemTraCapNhat() {
   HienThongBao(t('update_checking'), 'thong-tin');
-  setTimeout(function () {
-    let msg = t('feature_dev');
-    HienThongBao(msg, 'canh-bao');
-  }, 1500);
+  try {
+    let currentVersion = await window.DienTu.LayPhienBan();
+    let response = await fetch('https://api.github.com/repos/SpaceheroVN/Nex-Launcher/releases/latest');
+    if (!response.ok) throw new Error('Network error');
+    let data = await response.json();
+    let latestVersion = data.tag_name.replace('v', '');
+    
+    let cmp = SoSanhPhienBan(currentVersion, latestVersion);
+    if (cmp >= 0) {
+      HienThongBao(t('update_latest'), 'thanh-cong');
+    } else {
+      let setupAsset = data.assets.find(a => a.name.endsWith('_x64-setup.exe') || a.name.includes('setup.exe'));
+      if (!setupAsset) {
+        HienThongBao(t('update_error') + ': Không tìm thấy file cài đặt trên GitHub', 'canh-bao');
+        return;
+      }
+      
+      let confirmUpdate = await HienHopThoaiXacNhanCustom("Có phiên bản mới: <b>" + data.tag_name + "</b><br>Bạn có muốn tải xuống và cài đặt ngay không?");
+      if (confirmUpdate) {
+        MoHopThoaiTienTrinh("Tải xuống bản cập nhật...", []);
+        
+        let nutHuy = document.getElementById('dong-tien-trinh');
+        if (nutHuy) {
+            nutHuy.disabled = true;
+            nutHuy.style.opacity = '0.5';
+            nutHuy.textContent = 'Đang tải...';
+        }
+
+        let ds = document.getElementById('tien-trinh-danh-sach');
+        if (ds) {
+            ds.innerHTML = '<div class="TienTrinh_Muc"><div class="TienTrinh_Ten">Nex Launcher ' + latestVersion + '</div><div class="TienTrinh_TrangThai">Đang tải... 0%</div></div>';
+        }
+        
+        let unlisten = await window.DienTu.KhiTienTrinhCapNhatApp((payload) => {
+           let percent = Math.round(payload.percent);
+           document.getElementById('tien-trinh-thanh').style.width = percent + '%';
+           document.getElementById('tien-trinh-phan-tram').textContent = percent + '%';
+           
+           let muc = document.querySelector('.TienTrinh_TrangThai');
+           if (muc) {
+               muc.textContent = "Đang tải... " + percent + "%";
+               if (percent >= 100) {
+                   muc.textContent = "Hoàn tất";
+                   muc.className = "TienTrinh_TrangThai thanh-cong";
+                   unlisten();
+               }
+           }
+        });
+        
+        window.DienTu.TaiVaCaiDatCapNhat(setupAsset.browser_download_url, setupAsset.name).catch((e) => {
+           console.error(e);
+           HienThongBao(t('update_error') + ': Lỗi khi tải xuống', 'canh-bao');
+           let muc = document.querySelector('.TienTrinh_TrangThai');
+           if (muc) {
+               muc.textContent = "Lỗi";
+               muc.className = "TienTrinh_TrangThai loi";
+           }
+           if (nutHuy) {
+               nutHuy.disabled = false;
+               nutHuy.style.opacity = '1';
+               nutHuy.textContent = t('cancel_btn') || 'Đóng';
+           }
+        });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    HienThongBao(t('update_error'), 'canh-bao');
+  }
 }
 function HienThongBao(nd, loai) {
   loai = loai || 'thong-tin';

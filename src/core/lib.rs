@@ -122,7 +122,9 @@ pub fn run() {
         CuaSo::DongCuaSoTienTrinh,
         CuaSo::CapNhatCuaSoTienTrinh,
         CuaSo::HoanTatCuaSoTienTrinh,
-        CuaSo::CapNhatTrayMenu
+        CuaSo::CapNhatTrayMenu,
+        HeThong::LayPhienBan,
+        HeThong::TaiVaCaiDatCapNhat
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

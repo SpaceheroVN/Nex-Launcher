@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Nex Launcher",
   "version": "1.6.0",
-  "identifier": "com.nexlauncher.app",
+  "identifier": "com.nexlauncher.desktop",
   "build": {
     "frontendDist": "../src/ui",
     "beforeDevCommand": "",

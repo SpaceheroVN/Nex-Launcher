@@ -51,5 +51,8 @@ window.DienTu = {
   HoanTatCuaSoTienTrinh: (ketQua) => invoke('HoanTatCuaSoTienTrinh', { ketQua }),
   KhiKhoiTaoTienTrinh: (hamXuLy) => listen('khoi-tao-tien-trinh', (event) => hamXuLy(event.payload)),
   KhiCapNhatTienTrinh: (hamXuLy) => listen('cap-nhat-tien-trinh', (event) => hamXuLy(event.payload)),
-  KhiHoanTatTienTrinh: (hamXuLy) => listen('hoan-tat-tien-trinh', (event) => hamXuLy(event.payload))
+  KhiHoanTatTienTrinh: (hamXuLy) => listen('hoan-tat-tien-trinh', (event) => hamXuLy(event.payload)),
+  KhiTienTrinhCapNhatApp: (hamXuLy) => listen('tien-trinh-cap-nhat-app', (event) => hamXuLy(event.payload)),
+  LayPhienBan: () => invoke('LayPhienBan'),
+  TaiVaCaiDatCapNhat: (Url, FileName) => invoke('TaiVaCaiDatCapNhat', { Url, FileName })
 };
