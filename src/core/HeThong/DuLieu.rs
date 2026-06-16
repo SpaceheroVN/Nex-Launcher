@@ -17,13 +17,30 @@ fn basic_json_path(app: &tauri::AppHandle) -> std::path::PathBuf {
 }
 
 #[tauri::command]
-pub fn LayDanhSachUngDung(AppHandle: tauri::AppHandle) -> serde_json::Value {
+pub async fn LayDanhSachUngDung(AppHandle: tauri::AppHandle) -> serde_json::Value {
     let p = basic_json_path(&AppHandle);
+    
+    // Thử tải dữ liệu mới nhất từ GitHub
+    let url = "https://raw.githubusercontent.com/SpaceheroVN/Nex-Launcher/main/Basic.json";
+    if let Ok(response) = reqwest::get(url).await {
+        if response.status().is_success() {
+            if let Ok(text) = response.text().await {
+                if let Ok(data) = serde_json::from_str::<serde_json::Value>(&text) {
+                    // Cập nhật lại file local để dùng khi offline
+                    let _ = std::fs::write(&p, &text);
+                    return data;
+                }
+            }
+        }
+    }
+    
+    // Fallback: Đọc từ file local nếu không có kết nối hoặc lỗi mạng
     if let Ok(content) = std::fs::read_to_string(&p) {
         if let Ok(data) = serde_json::from_str(&content) {
             return data;
         }
     }
+    
     serde_json::json!([])
 }
 
