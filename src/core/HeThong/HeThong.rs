@@ -168,7 +168,12 @@ pub async fn TaiVaCaiDatCapNhat(AppHandle: tauri::AppHandle, Url: String, FileNa
     let temp_dir = std::env::temp_dir();
     let file_path = temp_dir.join(&FileName);
     
-    let response = reqwest::get(&Url).await.map_err(|e| format!("Lỗi kết nối: {}", e))?;
+    let client = reqwest::Client::builder()
+        .user_agent("Nex-Launcher Updater")
+        .build()
+        .map_err(|e| format!("Lỗi tạo client: {}", e))?;
+        
+    let response = client.get(&Url).send().await.map_err(|e| format!("Lỗi kết nối: {}", e))?;
     
     if !response.status().is_success() {
         return Err(format!("Download failed: HTTP {}", response.status()));
@@ -181,7 +186,15 @@ pub async fn TaiVaCaiDatCapNhat(AppHandle: tauri::AppHandle, Url: String, FileNa
     let mut stream = response.bytes_stream();
     let mut last_emit = std::time::Instant::now();
     
+    HUY_TIEN_TRINH.store(false, std::sync::atomic::Ordering::Relaxed);
+    
     while let Some(chunk) = stream.next().await {
+        if lay_trang_thai_huy() {
+            HUY_TIEN_TRINH.store(false, std::sync::atomic::Ordering::Relaxed);
+            let _ = std::fs::remove_file(&file_path);
+            return Err("Đã hủy quá trình tải xuống.".to_string());
+        }
+        
         let chunk = chunk.map_err(|e| format!("Lỗi đọc dữ liệu: {}", e))?;
         file.write_all(&chunk).map_err(|e| format!("Lỗi ghi file: {}", e))?;
         downloaded += chunk.len() as u64;

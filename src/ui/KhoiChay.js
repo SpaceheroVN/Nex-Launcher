@@ -1720,6 +1720,7 @@ async function KiemTraCapNhat() {
                nutHuy.disabled = false;
                nutHuy.style.opacity = '1';
                nutHuy.textContent = t('cancel_btn') || 'Đóng';
+               nutHuy.dataset.isCancel = 'false';
            }
         });
       }
