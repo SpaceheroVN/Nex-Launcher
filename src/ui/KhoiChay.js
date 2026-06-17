@@ -555,9 +555,8 @@ function DangKySuKien() {
             btn.addEventListener('click', handler);
           });
         }
-
         if (allLeftovers.length > 0) {
-          await HienThiHopThoaiTanDu(allLeftovers);
+          await HienThiTanDuTrongTienTrinh(allLeftovers);
         }
 
         if (CauHinh.chungHienThongBao) {
@@ -1758,9 +1757,15 @@ function MoHopThoaiTienTrinh(tieuDe, danhSachApp) {
   var ds = document.getElementById('tien-trinh-danh-sach');
   document.getElementById('tien-trinh-tieu-de').textContent = tieuDe;
   document.getElementById('tien-trinh-thanh').style.width = '0%';
+  document.getElementById('tien-trinh-thanh').style.animation = '';
   document.getElementById('tien-trinh-phan-tram').textContent = '0%';
   var wrapper = document.getElementById('tien-trinh-wrapper');
   if (wrapper) wrapper.style.display = 'block';
+  var dsSum = document.getElementById('tien-trinh-tong-ket-don-dep');
+  if (dsSum) dsSum.style.display = 'none';
+  var btnNext = document.getElementById('tiep-theo-tien-trinh');
+  if (btnNext) btnNext.style.display = 'none';
+  if (ds) ds.style.display = 'block';
   var nutDong = document.getElementById('dong-tien-trinh');
   if (nutDong) {
     nutDong.disabled = false;
@@ -1878,6 +1883,7 @@ function HoanTatHopThoaiTienTrinh(ketQua, hasLeftovers) {
     });
   }
   document.getElementById('tien-trinh-thanh').style.width = '100%';
+  document.getElementById('tien-trinh-thanh').style.animation = 'none';
   document.getElementById('tien-trinh-phan-tram').textContent = '100%';
   var nutDong = document.getElementById('dong-tien-trinh');
   if (nutDong) {
@@ -1886,8 +1892,10 @@ function HoanTatHopThoaiTienTrinh(ketQua, hasLeftovers) {
     nutDong.className = 'Nut Nut--chinh';
     if (hasLeftovers) {
       nutDong.textContent = t('next_btn');
+      nutDong.dataset.isNext = 'true';
     } else {
       nutDong.textContent = t('close_btn');
+      nutDong.dataset.isNext = 'false';
     }
     nutDong.dataset.isCancel = 'false';
   }
@@ -2043,6 +2051,9 @@ function DongHopThoaiTienTrinh() {
     nutDong.disabled = true;
     nutDong.style.opacity = '0.5';
     nutDong.textContent = t('canceling');
+    return;
+  }
+  if (nutDong && nutDong.dataset.isNext === 'true') {
     return;
   }
   BatTatHopThoai('hop-thoai-tien-trinh', false);
@@ -2229,117 +2240,147 @@ document.addEventListener('DOMContentLoaded', () => {
         divTienTrinhKhoiPhuc.style.display = "none";
       }
     } catch (e) {
-      HienThongBao("ÄĂ£ xáº£y ra lá»—i: " + e.message, "loi");
+      HienThongBao("Đã xảy ra lỗi: " + e.message, "loi");
       divTienTrinhKhoiPhuc.style.display = "none";
     }
   });
 });
 
-function HienThiHopThoaiTanDu(leftovers) {
+function HienThiTanDuTrongTienTrinh(leftovers) {
   return new Promise((resolve) => {
-    let hopThoai = document.getElementById('hop-thoai-tan-du');
-    let lp = document.getElementById('lop-phu-modal');
-    let btnXoa = document.getElementById('xoa-tan-du');
-    let btnDong = document.getElementById('dong-tan-du');
-
-    let containerReg = document.getElementById('danh-sach-tan-du-reg');
-    let containerFile = document.getElementById('danh-sach-tan-du-file');
-    let chkAllReg = document.getElementById('chk-chon-tat-ca-reg');
-    let chkAllFile = document.getElementById('chk-chon-tat-ca-file');
-    let txtRegCount = document.getElementById('tan-du-reg-count');
-    let txtFileCount = document.getElementById('tan-du-file-count');
-
-    containerReg.innerHTML = '';
-    containerFile.innerHTML = '';
-
-    let regItems = leftovers.filter(i => i.type === 'registry');
-    let fileItems = leftovers.filter(i => i.type !== 'registry');
-
-    let updateCount = () => {
-      let checkedReg = containerReg.querySelectorAll('.chk-tan-du:checked').length;
-      let checkedFile = containerFile.querySelectorAll('.chk-tan-du:checked').length;
-      txtRegCount.textContent = `${t('registry_entries')} (${checkedReg}/${regItems.length})`;
-      txtFileCount.textContent = `${t('orphan_files')} (${checkedFile}/${fileItems.length})`;
-      chkAllReg.checked = (checkedReg === regItems.length && regItems.length > 0);
-      chkAllFile.checked = (checkedFile === fileItems.length && fileItems.length > 0);
-    };
-    if (regItems.length === 0) {
-      containerReg.innerHTML = '<div style="padding: 16px; color: var(--chu-phu); text-align: center; font-style: italic; font-size: 0.857rem;">' + t('no_registry_leftovers') + '</div>';
-      chkAllReg.disabled = true;
-    }
-    if (fileItems.length === 0) {
-      containerFile.innerHTML = '<div style="padding: 16px; color: var(--chu-phu); text-align: center; font-style: italic; font-size: 0.857rem;">' + t('no_file_leftovers') + '</div>';
-      chkAllFile.disabled = true;
-    }
-    const renderItem = (item, index, container) => {
-      let id = `tan-du-item-${index}`;
-      let row = document.createElement('label');
-      row.className = 'TuyChonCheckbox';
-      row.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; padding: 4px 8px; border-radius: var(--do-bo-nho); border-bottom: 1px solid var(--vien-nhat);';
-      row.onmouseover = () => row.style.backgroundColor = 'var(--nen-tang1)';
-      row.onmouseout = () => row.style.backgroundColor = 'transparent';
-
-      row.innerHTML = `
-                <input type="checkbox" class="OChon chk-tan-du" id="${id}" value="${index}" checked style="margin-top: 0; flex-shrink: 0;">
-                <span style="font-size: 0.857rem; color: var(--chu-chinh); word-break: break-all; font-family: monospace;">${item.path}</span>
-            `;
-      row.querySelector('.chk-tan-du').addEventListener('change', updateCount);
-      container.appendChild(row);
-    };
-
-    leftovers.forEach((item, index) => {
-      if (item.type === 'registry') {
-        renderItem(item, index, containerReg);
-      } else {
-        renderItem(item, index, containerFile);
-      }
-    });
-
-    chkAllReg.onchange = (e) => {
-      let isChecked = e.target.checked;
-      containerReg.querySelectorAll('.chk-tan-du').forEach(chk => chk.checked = isChecked);
-      updateCount();
-    };
-
-    chkAllFile.onchange = (e) => {
-      let isChecked = e.target.checked;
-      containerFile.querySelectorAll('.chk-tan-du').forEach(chk => chk.checked = isChecked);
-      updateCount();
-    };
-
-    updateCount();
-
-    let closeDialog = () => {
-      hopThoai.classList.add('an');
-      if (!document.querySelectorAll('.HopThoai:not(.an)').length) lp.classList.add('an');
-      btnDong.onclick = null;
-      btnXoa.onclick = null;
-      resolve();
-    };
-
-    btnDong.onclick = closeDialog;
-    btnXoa.onclick = async () => {
-      let selectedIndexes = Array.from(document.querySelectorAll('#hop-thoai-tan-du .chk-tan-du:checked')).map(chk => parseInt(chk.value));
-      if (selectedIndexes.length > 0) {
-        let pathsToDelete = selectedIndexes.map(i => leftovers[i]);
-        btnXoa.disabled = true;
-        btnXoa.textContent = 'Äang xĂ³a...';
-        if (window.DienTu && window.DienTu.XoaTanDuThucSu) {
-          await window.DienTu.XoaTanDuThucSu(pathsToDelete);
+    let dsApp = document.getElementById('tien-trinh-danh-sach');
+    let dsSum = document.getElementById('tien-trinh-tong-ket-don-dep');
+    let regSum = document.getElementById('tong-ket-registry');
+    let fileSum = document.getElementById('tong-ket-tep-tin');
+    let btnDong = document.getElementById('dong-tien-trinh');
+    let btnNext = document.getElementById('tiep-theo-tien-trinh');
+    let tieuDe = document.getElementById('tien-trinh-tieu-de');
+    
+    if (tieuDe) tieuDe.textContent = t('cleanup_status') || 'Đang dọn dẹp tàn dư hệ thống...';
+    if (dsApp) dsApp.style.display = 'none';
+    if (dsSum) {
+        dsSum.style.display = 'flex';
+        if (regSum) regSum.innerHTML = '';
+        if (fileSum) fileSum.innerHTML = '';
+        
+        let regItems = leftovers.filter(i => i.type === 'registry');
+        let fileItems = leftovers.filter(i => i.type !== 'registry');
+        
+        if (regItems.length === 0 && regSum) {
+            let d = document.createElement('div'); d.textContent = t('no_registry_leftovers') || 'Không tìm thấy tàn dư Registry nào.'; d.style.fontStyle = 'italic'; d.style.opacity = '0.7'; d.style.fontSize = '0.857rem'; regSum.appendChild(d);
+        } else if (regSum) {
+            regItems.forEach((r, i) => {
+                let d = document.createElement('div');
+                d.className = 'TuyChonCheckbox';
+                d.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; padding: 4px 8px; border-radius: var(--do-bo-nho); border-bottom: 1px solid var(--vien-nhat);';
+                d.innerHTML = `<input type="checkbox" class="OChon chk-tan-du" checked value="${i}" data-type="registry" style="margin-top: 0; flex-shrink: 0;"><span style="font-size: 0.857rem; color: var(--chu-chinh); word-break: break-all; font-family: monospace;">${r.path}</span>`;
+                regSum.appendChild(d);
+            });
         }
-        btnXoa.disabled = false;
-        btnXoa.textContent = t('delete_leftovers');
-      }
-      closeDialog();
+        
+        if (fileItems.length === 0 && fileSum) {
+            let d = document.createElement('div'); d.textContent = t('no_file_leftovers') || 'Không tìm thấy tệp tin tàn dư nào.'; d.style.fontStyle = 'italic'; d.style.opacity = '0.7'; d.style.fontSize = '0.857rem'; fileSum.appendChild(d);
+        } else if (fileSum) {
+            fileItems.forEach((f, i) => {
+                let d = document.createElement('div');
+                d.className = 'TuyChonCheckbox';
+                d.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; padding: 4px 8px; border-radius: var(--do-bo-nho); border-bottom: 1px solid var(--vien-nhat);';
+                d.innerHTML = `<input type="checkbox" class="OChon chk-tan-du" checked value="${i}" data-type="file" style="margin-top: 0; flex-shrink: 0;"><span style="font-size: 0.857rem; color: var(--chu-chinh); word-break: break-all; font-family: monospace;">${f.path}</span>`;
+                fileSum.appendChild(d);
+            });
+        }
+    }
+    
+    if (btnDong) {
+        btnDong.textContent = t('close_btn');
+        btnDong.className = 'Nut Nut--Huy';
+        btnDong.disabled = false;
+        btnDong.style.opacity = '1';
+        btnDong.dataset.isNext = 'false';
+    }
+    if (btnNext) {
+        btnNext.style.display = 'block';
+        btnNext.textContent = t('delete_leftovers') || 'Xóa tàn dư';
+        btnNext.disabled = false;
+        btnNext.className = 'Nut Nut--nguy-hiem';
+    }
+    
+    let btnHuyHandler = () => {
+        cleanup();
+        BatTatHopThoai('hop-thoai-tien-trinh', false);
+        resolve();
     };
-
-    hopThoai.classList.remove('an');
-    lp.classList.remove('an');
+    
+    let btnNextHandler = async () => {
+        if (btnNext) {
+            btnNext.disabled = true;
+            btnNext.textContent = t('processing');
+        }
+        let thanh = document.getElementById('tien-trinh-thanh');
+        if (thanh) {
+            thanh.style.width = '0%';
+            thanh.style.animation = '';
+            thanh.style.backgroundColor = 'var(--nguy-hiem)';
+        }
+        let pt = document.getElementById('tien-trinh-phan-tram');
+        if (pt) pt.textContent = '0%';
+        
+        let selectedLeftovers = [];
+        let regItems = leftovers.filter(i => i.type === 'registry');
+        let fileItems = leftovers.filter(i => i.type !== 'registry');
+        
+        document.querySelectorAll('#tong-ket-registry .chk-tan-du:checked').forEach(c => {
+             selectedLeftovers.push(regItems[parseInt(c.value)]);
+        });
+        document.querySelectorAll('#tong-ket-tep-tin .chk-tan-du:checked').forEach(c => {
+             selectedLeftovers.push(fileItems[parseInt(c.value)]);
+        });
+        
+        if (selectedLeftovers.length > 0 && window.DienTu && window.DienTu.XoaTanDuThucSu) {
+             await window.DienTu.XoaTanDuThucSu(selectedLeftovers);
+        }
+        
+        if (thanh) {
+            thanh.style.width = '100%';
+            thanh.style.animation = 'none';
+            thanh.style.backgroundColor = 'var(--thanh-cong)';
+        }
+        if (pt) pt.textContent = '100%';
+        if (tieuDe) tieuDe.textContent = t('completed');
+        
+        document.querySelectorAll('.chk-tan-du').forEach(c => {
+            let parent = c.parentElement;
+            if (c.checked) {
+                let pathText = c.nextSibling ? c.nextSibling.textContent : '';
+                parent.innerHTML = `<span style="font-size: 0.857rem; color: var(--chu-chinh);"><span style="color:var(--thanh-cong)">✔</span> ${t('deleted') || 'Đã xóa'}: ${pathText}</span>`;
+            } else {
+                parent.style.opacity = '0.5';
+                c.disabled = true;
+            }
+        });
+        
+        if (btnNext) btnNext.style.display = 'none';
+        if (btnDong) {
+            btnDong.textContent = t('close_btn');
+            btnDong.className = 'Nut Nut--chinh';
+        }
+        
+        cleanup();
+        
+        let closeAppHandler = () => {
+            if (btnDong) btnDong.removeEventListener('click', closeAppHandler);
+            BatTatHopThoai('hop-thoai-tien-trinh', false);
+            resolve();
+        };
+        if (btnDong) btnDong.addEventListener('click', closeAppHandler);
+    };
+    
+    function cleanup() {
+        if (btnDong) btnDong.removeEventListener('click', btnHuyHandler);
+        if (btnNext) btnNext.removeEventListener('click', btnNextHandler);
+    }
+    
+    if (btnDong) btnDong.addEventListener('click', btnHuyHandler);
+    if (btnNext) btnNext.addEventListener('click', btnNextHandler);
   });
 }
-
-
-
-
-
-

@@ -92,7 +92,7 @@ pub async fn MoCuaSoTienTrinh(AppHandle: tauri::AppHandle, TieuDe: String, DanhS
         WebviewUrl::App("TienTrinh.html".into()),
     )
     .title("Tiến trình")
-    .inner_size(600.0, 400.0)
+    .inner_size(550.0, 400.0)
     .decorations(false)
     .transparent(true)
     .resizable(false)

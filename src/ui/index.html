@@ -766,39 +766,7 @@
       </div>
     </div>
   </div>
-  <div id="hop-thoai-tan-du" class="HopThoai an" style="z-index: 1002;">
-    <div class="HopThoai_NoiDung" style="text-align: left; padding: 24px; width: 600px; max-width: 95%; border-radius: var(--do-bo-lon); border: 1px solid var(--vien); box-shadow: 0 20px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; max-height: 85vh;">
-      <h3 style="margin: 0 0 8px 0; font-size: 1.286rem; font-weight: 600; color: var(--chu-chinh);">Leftovers found</h3>
-      <p style="margin: 0 0 16px 0; font-size: 0.929rem; color: var(--chu-phu);" id="tan-du-thong-diep">Nex Launcher has found following items still left on your computer</p>
-      
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="font-size: 0.929rem; font-weight: 600; color: var(--chu-chinh);" id="tan-du-reg-count">Registry entries (0)</span>
-        <label class="TuyChonCheckbox" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="checkbox" id="chk-chon-tat-ca-reg" class="OChon" checked>
-          <span style="font-size: 0.857rem; color: var(--chu-phu);">Chọn tất cả</span>
-        </label>
-      </div>
-      <div id="danh-sach-tan-du-reg" style="height: 120px; border: 1px solid var(--vien); border-radius: var(--do-bo); overflow-y: auto; padding: 8px; margin-bottom: 16px; background-color: var(--nen-tang0);">
-      </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="font-size: 0.929rem; font-weight: 600; color: var(--chu-chinh);" id="tan-du-file-count">Orphan files (0)</span>
-        <label class="TuyChonCheckbox" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="checkbox" id="chk-chon-tat-ca-file" class="OChon" checked>
-          <span style="font-size: 0.857rem; color: var(--chu-phu);">Chọn tất cả</span>
-        </label>
-      </div>
-      <div id="danh-sach-tan-du-file" style="height: 120px; border: 1px solid var(--vien); border-radius: var(--do-bo); overflow-y: auto; padding: 8px; margin-bottom: 20px; background-color: var(--nen-tang0);">
-      </div>
-
-      <p style="margin: 0 0 16px 0; font-size: 0.857rem; color: var(--chu-phu);">Kiểm tra danh sách tàn dư bên trên, sau khi bạn chắc chắn muốn xóa những tệp này, hãy bấm "Xóa Tàn Dư".</p>
-
-      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: auto;">
-        <button class="Nut Nut--phu" id="dong-tan-du" style="padding: 8px 24px; border-radius: var(--do-bo);">Bỏ qua</button>
-        <button class="Nut Nut--nguy-hiem" id="xoa-tan-du" style="padding: 8px 24px; border-radius: var(--do-bo);">Xóa Tàn Dư</button>
-      </div>
-    </div>
-  </div>
   <div id="hop-thoai-bao-cao-loi" class="HopThoai an" style="z-index: 1005;">
     <div class="HopThoai_NoiDung"
       style="text-align: left; padding: 24px; min-width: 400px; max-width: 600px; border-radius: var(--do-bo-lon); border: 1px solid var(--vien); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
@@ -839,6 +807,19 @@
     <style>
       .Nut--Huy { background: var(--nen-tang3); color: var(--chu-chinh); border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.2s; }
       .Nut--Huy:hover:not(:disabled) { background: var(--nen-tang3); filter: brightness(0.85); box-shadow: 0 4px 8px rgba(0,0,0,0.2); transform: translateY(-1px); }
+      @keyframes progress-stripes { from { background-position: 40px 0; } to { background-position: 0 0; } }
+      #tien-trinh-thanh {
+        background-image: 
+          linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent),
+          linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.3) 100%);
+        background-size: 40px 40px, 100% 100%;
+        box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), inset 0 -1px 2px rgba(0,0,0,0.4);
+        animation: progress-stripes 1s linear infinite;
+      }
+      .TienTrinh_DanhSach::-webkit-scrollbar, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar { width: 6px; }
+      .TienTrinh_DanhSach::-webkit-scrollbar-track, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar-track, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar-track { background: transparent; }
+      .TienTrinh_DanhSach::-webkit-scrollbar-thumb, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar-thumb, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+      .TienTrinh_DanhSach::-webkit-scrollbar-thumb:hover, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar-thumb:hover, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
     </style>
     <div class="HopThoai_NoiDung"
       style="background: var(--nen-tang0); display: flex; flex-direction: column; text-align: left; padding: 24px; width: 480px; height: auto; max-width: 95%; max-height: 90vh; border-radius: var(--do-bo-lon); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid var(--vien);">
@@ -848,16 +829,38 @@
           <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M1 5h10v2H1z" /></svg>
         </button>
       </div>
+      <div class="GlobalStages_Container" id="tien-trinh-global-stages" style="display: none; gap: 8px; margin-bottom: 16px; width: 100%; padding: 0 16px; box-sizing: border-box;">
+      </div>
       <div id="tien-trinh-danh-sach" class="TienTrinh_DanhSach"
         style="overflow-y: auto; overflow-x: hidden; padding: 0 16px; margin-bottom: 24px; max-height: 250px;">
       </div>
-      <div style="display: flex; align-items: center; gap: 24px; padding: 0 16px;">
+      
+      <div id="tien-trinh-tong-ket-don-dep" style="display: none; flex: 1; flex-direction: column; margin-bottom: 24px; overflow-y: auto; padding-right: 8px; padding-left: 16px;">
+        <div style="font-size: 1.05rem; font-weight: 600; color: var(--chu-chinh); margin-bottom: 8px; flex-shrink: 0;">Registry</div>
+        <div id="tong-ket-registry" style="display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--vien); border-radius: 4px; padding: 12px; max-height: 116px; overflow-y: auto; flex: 0 0 auto; height: fit-content;">
+        </div>
+        
+        <div style="font-size: 1.05rem; font-weight: 600; color: var(--chu-chinh); margin-top: 16px; margin-bottom: 8px; flex-shrink: 0;">Tệp tin / Thư mục</div>
+        <div id="tong-ket-tep-tin" style="display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--vien); border-radius: 4px; padding: 12px; max-height: 116px; overflow-y: auto; flex: 0 0 auto; height: fit-content;">
+        </div>
+      </div>
+      
+      <div id="tien-trinh-diem-khoi-phuc" style="display: none; flex: 1; flex-direction: column; margin-bottom: 24px; max-height: 250px; overflow-y: auto; overflow-x: hidden; padding: 0 16px;">
+         <div id="diem-khoi-phuc-moi" style="margin-bottom: 16px;"></div>
+         <div style="font-size: 0.9rem; font-weight: 600; color: var(--chu-phu); margin-bottom: 8px; display: flex; justify-content: space-between;">
+             <span>Các điểm khôi phục cũ</span>
+             <span id="diem-khoi-phuc-loading" style="display: none; font-size: 0.8rem; font-weight: normal;"><div class="spinner" style="width: 10px; height: 10px; border-width: 1.5px;"></div> Đang tải...</span>
+         </div>
+         <div id="danh-sach-diem-khoi-phuc-cu" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 24px; padding: 0 16px; margin-top: auto;">
         <div id="tien-trinh-wrapper"
-          style="flex: 1; height: 32px; background: rgba(0,0,0,0.15); border-radius: var(--do-bo); overflow: hidden; position: relative; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);">
+          style="flex: 1; height: 32px; background: rgba(0,0,0,0.3); border-radius: var(--do-bo); overflow: hidden; position: relative; box-shadow: inset 0 3px 8px rgba(0,0,0,0.6), inset 0 1px 2px rgba(0,0,0,0.4), 0 1px 1px rgba(255,255,255,0.05); border: 1px solid rgba(0,0,0,0.8); transition: all 0.3s ease;">
           <div id="tien-trinh-thanh"
-            style="width: 0%; height: 100%; background: var(--mau-nhan); transition: width 0.3s ease;"></div>
+            style="width: 0%; height: 100%; background-color: var(--mau-nhan); box-sizing: border-box; transition: width 0.3s ease;"></div>
           <div id="tien-trinh-phan-tram"
-            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: 600; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);">
             0%</div>
         </div>
         <button class="Nut Nut--nguy-hiem" id="bao-cao-loi"
@@ -865,6 +868,7 @@
         <button class="Nut Nut--Huy" id="dong-tien-trinh" data-is-cancel="true"
           style="padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 120px;"
           disabled>Hủy</button>
+        <button class="Nut Nut--chinh" id="tiep-theo-tien-trinh" style="display: none; padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 120px; background: var(--mau-nhan); color: #fff; border: none;">Tiếp theo</button>
       </div>
     </div>
   </div>

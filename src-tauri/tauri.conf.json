@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Nex Launcher",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "identifier": "com.nexlauncher.desktop",
   "build": {
     "frontendDist": "../src/ui",
@@ -43,10 +43,8 @@
     },
     "windows": {
       "nsis": {
-        "languages": ["vi-VN", "en-US"],
-        "displayLanguageSelector": true,
-        "headerImage": "icons/nsis_header.bmp",
-        "sidebarImage": "icons/nsis_sidebar.bmp"
+        "languages": ["Vietnamese", "English"],
+        "displayLanguageSelector": true
       }
     }
   }
