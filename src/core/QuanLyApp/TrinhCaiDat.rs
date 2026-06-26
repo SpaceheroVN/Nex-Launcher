@@ -9,6 +9,7 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
     use std::process::Command;
     use std::os::windows::process::CommandExt;
     
+    let _guard = crate::HeThong::bat_uu_tien_cpu();
     HUY_TIEN_TRINH.store(false, Ordering::Relaxed);
     let mut results = Vec::new();
     let show_progress = TuyChon.get("showProgress").and_then(|v| v.as_bool()).unwrap_or(false);
@@ -33,14 +34,22 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
         }
 
         let silent = TuyChon.get("silent").and_then(|v| v.as_bool()).unwrap_or(true);
-        let mut success = false;
-        let mut error_msg = String::new();
+        let mut force_interactive = false;
+        let mut retry_count = 0;
+        
+        let mut success;
+        let mut error_msg;
+        
+        loop {
+            let current_silent = if force_interactive { false } else { silent };
+            success = false;
+            error_msg = String::new();
 
         let child_res = if source_type == "Winget" {
             let mut cmd = Command::new("winget");
             cmd.args(["install", "--id", &source_value, "--accept-package-agreements", "--accept-source-agreements"]);
-            if silent { cmd.arg("--silent"); }
-            if !silent_args.is_empty() {
+            if current_silent { cmd.arg("--silent"); } else { cmd.arg("--interactive"); }
+            if current_silent && !silent_args.is_empty() {
                 cmd.args(silent_args.split_whitespace());
             }
             cmd.creation_flags(0x08000000);
@@ -49,10 +58,12 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
             use std::os::windows::process::CommandExt;
             let mut cmd = Command::new("cmd");
             cmd.raw_arg("/C");
-            cmd.raw_arg(format!("start /wait \"\" \"{}\" {}", source_value.replace("\"", ""), silent_args));
+            let args_to_use = if current_silent { &silent_args } else { "" };
+            cmd.raw_arg(format!("start /wait \"\" \"{}\" {}", source_value.replace("\"", ""), args_to_use));
             cmd.creation_flags(0x08000000);
             cmd.spawn()
         } else if source_type == "Link" {
+            let args_to_use = if current_silent { &silent_args } else { "" };
             let ps_script = format!(
                 "$ErrorActionPreference = 'Stop'; \
                  $temp_file = Join-Path $env:TEMP 'nex_installer_{}_{}.exe'; \
@@ -63,7 +74,7 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
                 name.replace(" ", "_").replace(|c: char| !c.is_alphanumeric() && c != '_', ""),
                 std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis(),
                 source_value.replace("'", "''"),
-                silent_args.replace("'", "''")
+                args_to_use.replace("'", "''")
             );
             
             let mut cmd = Command::new("powershell");
@@ -71,7 +82,7 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
             cmd.creation_flags(0x08000000);
             cmd.spawn()
         } else {
-            Err(std::io::Error::new(std::io::ErrorKind::Other, "Unknown source type"))
+            Err(std::io::Error::other("Unknown source type"))
         };
 
         if let Ok(mut child) = child_res {
@@ -97,17 +108,25 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
                         "percent": fake_percent
                     }));
                 }
+                }
+            } else {
+                error_msg = child_res.err().map(|e| e.to_string()).unwrap_or_else(|| "Unknown start error".to_string());
             }
+            
+            if !success && current_silent && retry_count < 1 {
+                force_interactive = true;
+                retry_count += 1;
+                continue;
+            }
+            break;
+        }
 
-            if success && !post_install_cmd.is_empty() {
-                let _ = Command::new("powershell")
-                    .args(["-ExecutionPolicy", "Bypass", "-NoProfile", "-Command", &post_install_cmd])
-                    .creation_flags(0x08000000)
-                    .spawn()
-                    .and_then(|mut c| c.wait());
-            }
-        } else {
-            error_msg = child_res.err().map(|e| e.to_string()).unwrap_or_else(|| "Unknown start error".to_string());
+        if success && !post_install_cmd.is_empty() {
+            let _ = Command::new("powershell")
+                .args(["-ExecutionPolicy", "Bypass", "-NoProfile", "-Command", &post_install_cmd])
+                .creation_flags(0x08000000)
+                .spawn()
+                .and_then(|mut c| c.wait());
         }
 
         if show_progress {

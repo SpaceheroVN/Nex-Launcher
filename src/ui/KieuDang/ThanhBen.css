@@ -30,9 +30,8 @@
   width: 0;
   overflow: hidden;
 }
-.ThanhBen.thu-gon .ThanhBen_NhomTieuDe {
-  justify-content: center;
-  padding: 10px 0;
+.ThanhBen.thu-gon .MiniProgress_Text {
+  display: none !important;
 }
 .ThanhBen_Logo {
   display: flex;

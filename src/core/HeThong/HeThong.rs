@@ -229,3 +229,32 @@ pub async fn TaiVaCaiDatCapNhat(AppHandle: tauri::AppHandle, Url: String, FileNa
     std::process::exit(0);
 }
 
+pub fn thiet_lap_uu_tien_cpu(cao: bool) {
+    use windows::Win32::System::Threading::{GetCurrentProcess, SetPriorityClass, HIGH_PRIORITY_CLASS, NORMAL_PRIORITY_CLASS};
+    unsafe {
+        let process = GetCurrentProcess();
+        if cao {
+            let _ = SetPriorityClass(process, HIGH_PRIORITY_CLASS);
+        } else {
+            let _ = SetPriorityClass(process, NORMAL_PRIORITY_CLASS);
+        }
+    }
+}
+
+pub struct UuTienCpuGuard;
+impl Drop for UuTienCpuGuard {
+    fn drop(&mut self) {
+        thiet_lap_uu_tien_cpu(false);
+    }
+}
+
+pub fn bat_uu_tien_cpu() -> UuTienCpuGuard {
+    thiet_lap_uu_tien_cpu(true);
+    UuTienCpuGuard
+}
+
+#[tauri::command]
+pub fn ThayDoiUuTienCPU(Cao: bool) {
+    thiet_lap_uu_tien_cpu(Cao);
+}
+

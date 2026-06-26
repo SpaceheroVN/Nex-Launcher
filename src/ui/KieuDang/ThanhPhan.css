@@ -164,6 +164,10 @@ body.da-phong-to .svg-thu-nho-lai { display: block !important; }
 #nut-thu-gon-menu svg {
   stroke: none !important;
   fill: currentColor;
+  transition: transform var(--chuyen-dong);
+}
+#icon-thu-gon.thu-gon {
+  transform: rotate(-180deg);
 }
 .ThanhBen_Logo {
   display: flex;

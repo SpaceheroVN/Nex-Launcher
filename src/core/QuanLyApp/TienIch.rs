@@ -3,49 +3,6 @@
 
 
 
-#[tauri::command]
-pub async fn XoaTanDu(DanhSachDuongDan: Vec<serde_json::Value>) -> Result<serde_json::Value, String> {
-    use std::fs;
-    use std::process::Command;
-    use std::os::windows::process::CommandExt;
-
-    let mut success_count = 0;
-    let mut failed_count = 0;
-
-    for p in DanhSachDuongDan {
-        let p_type = p.get("type").and_then(|v| v.as_str()).unwrap_or("");
-        let path = p.get("path").and_then(|v| v.as_str()).unwrap_or("");
-
-        if p_type == "folder" {
-            if fs::remove_dir_all(path).is_ok() {
-                success_count += 1;
-            } else {
-                failed_count += 1;
-            }
-        } else if p_type == "registry" {
-            let mut cmd = Command::new("reg");
-            cmd.args(["delete", path, "/f"]);
-            cmd.creation_flags(0x08000000);
-            if let Ok(output) = cmd.output() {
-                if output.status.success() {
-                    success_count += 1;
-                } else {
-                    failed_count += 1;
-                }
-            } else {
-                failed_count += 1;
-            }
-        }
-    }
-
-    Ok(serde_json::json!({
-        "success": success_count,
-        "failed": failed_count
-    }))
-}
-
-#[tauri::command]
-pub fn SuaPhanMemKhac(_ThongTinApp: serde_json::Value) {}
 
 #[tauri::command]
 pub fn PhaHuyDuLieu(DuongDanTarget: String, TuyChon: serde_json::Value) -> serde_json::Value {

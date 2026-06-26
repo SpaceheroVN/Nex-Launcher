@@ -1,4 +1,8 @@
+// ==========================================
+// === [ CONFIGURATION & STATE ] ===
+// ==========================================
 var NgonNguHienTai = 'VN', ChuDeHienTai = 'dark', CaiDatTrangHienTai = 0;
+var TienTrinhSoApp = 0, TienTrinhHienTai = 0, TienTrinhAppTruoc = '';
 function KhoiTaoNgonNgu() {
   var l = localStorage.getItem('nex_ngon_ngu');
   NgonNguHienTai = l || (navigator.language.startsWith('vi') ? 'VN' : 'EN');
@@ -30,7 +34,59 @@ var CacheTimKiemWinget = new Map();
 window.IconCache = {};
 window.SizeCache = {};
 window.DateCache = {};
+
+window.IconDB = null;
+const dbReq = indexedDB.open('NexCache', 2);
+dbReq.onupgradeneeded = function (e) {
+  let db = e.target.result;
+  if (!db.objectStoreNames.contains('icons')) {
+    db.createObjectStore('icons');
+  }
+  if (!db.objectStoreNames.contains('dates')) {
+    db.createObjectStore('dates');
+  }
+};
+dbReq.onsuccess = function (e) { window.IconDB = e.target.result; };
+
+// ==========================================
+// === [ CACHE & STORAGE (IndexedDB) ] ===
+// ==========================================
+function SaveIconDB(name, b64) {
+  if (CauHinh.uninstallerGhiNhoDuLieu === false) return;
+  if (!window.IconDB || !b64) return;
+  try { window.IconDB.transaction('icons', 'readwrite').objectStore('icons').put(b64, name); } catch (e) { }
+}
+function GetIconDB(name) {
+  return new Promise(function (res) {
+    if (CauHinh.uninstallerGhiNhoDuLieu === false) return res(null);
+    if (!window.IconDB) return res(null);
+    try {
+      const req = window.IconDB.transaction('icons', 'readonly').objectStore('icons').get(name);
+      req.onsuccess = function () { res(req.result || null); };
+      req.onerror = function () { res(null); };
+    } catch (e) { res(null); }
+  });
+}
+function SaveDateDB(name, dateStr) {
+  if (CauHinh.uninstallerGhiNhoDuLieu === false) return;
+  if (!window.IconDB || !dateStr) return;
+  try { window.IconDB.transaction('dates', 'readwrite').objectStore('dates').put(dateStr, name); } catch (e) { }
+}
+function GetDateDB(name) {
+  return new Promise(function (res) {
+    if (CauHinh.uninstallerGhiNhoDuLieu === false) return res(null);
+    if (!window.IconDB) return res(null);
+    try {
+      const req = window.IconDB.transaction('dates', 'readonly').objectStore('dates').get(name);
+      req.onsuccess = function () { res(req.result || null); };
+      req.onerror = function () { res(null); };
+    } catch (e) { res(null); }
+  });
+}
 var _renderVersion = 0;
+// ==========================================
+// === [ DATA FETCHING & RENDERING ] ===
+// ==========================================
 function renderDanhSachChunk(ds, ct, taoHang) {
   var CHUNK = 25, idx = 0, ver = ++_renderVersion;
   function doChunk() {
@@ -45,20 +101,28 @@ function renderDanhSachChunk(ds, ct, taoHang) {
 }
 window.IconFetchQueue = [];
 window.IconFetchActive = 0;
+window.IconFetchDeepActive = 0;
+
+window.PushIconQueue = function (name, iconId, priority, isDeep) {
+  let idx = window.IconFetchQueue.findIndex(i => i.name === name);
+  if (idx !== -1) {
+    if (priority < window.IconFetchQueue[idx].priority) {
+      window.IconFetchQueue[idx].priority = priority;
+      if (isDeep) window.IconFetchQueue[idx].isDeep = true;
+      window.IconFetchQueue.sort((a, b) => a.priority - b.priority);
+    }
+    return;
+  }
+  window.IconFetchQueue.push({ name, iconId, priority, isDeep: isDeep || false });
+  window.IconFetchQueue.sort((a, b) => a.priority - b.priority);
+  IconFetchDrain();
+};
 window.InfoFetchQueue = [];
 window.InfoFetchActive = 0;
 
 function InfoFetchDrain() {
-  while (window.InfoFetchActive < 3 && window.InfoFetchQueue.length > 0) {
+  while (window.InfoFetchActive < 2 && window.InfoFetchQueue.length > 0) {
     var item = window.InfoFetchQueue.shift();
-    var appName = item.appName;
-
-    var alreadyHaveSize = !item.needSize || window.SizeCache[appName];
-    var alreadyHaveDate = !item.needDate || window.DateCache[appName];
-    if (alreadyHaveSize && alreadyHaveDate) {
-      continue;
-    }
-
     window.InfoFetchActive++;
     (function (it) {
       window.DienTu.LayThongTinThem(it.appName, it.installLocation, it.installDate || null)
@@ -67,7 +131,11 @@ function InfoFetchDrain() {
           if (info) {
             var pmObj = DanhSachDaCaiDat.find(p => p.name === it.appName);
             if (info.size) { if (pmObj) pmObj.cachedSize = info.size; window.SizeCache[it.appName] = info.size; }
-            if (info.date) { if (pmObj) pmObj.cachedDate = info.date; window.DateCache[it.appName] = info.date; }
+            if (info.date) {
+              if (pmObj) pmObj.cachedDate = info.date;
+              window.DateCache[it.appName] = info.date;
+              SaveDateDB(it.appName, info.date);
+            }
             var el = document.querySelector(`[data-app-name="${CSS.escape(it.appName)}"]`);
             if (el) CapNhatThongTinApp(el, it.appName, info);
           }
@@ -105,9 +173,19 @@ function CapNhatThongTinApp(el, appName, info) {
   }
 }
 
-function IconFetchDrain() {
-  while (window.IconFetchActive < 4 && window.IconFetchQueue.length > 0) {
-    var item = window.IconFetchQueue.shift();
+async function IconFetchDrain() {
+  while (window.IconFetchQueue.length > 0) {
+    let nextIdx = -1;
+    if (window.IconFetchActive < 5) {
+      nextIdx = window.IconFetchQueue.findIndex(i => !i.isDeep);
+    }
+    if (nextIdx === -1 && window.IconFetchDeepActive < 1) {
+      nextIdx = window.IconFetchQueue.findIndex(i => i.isDeep);
+    }
+
+    if (nextIdx === -1) break;
+    var item = window.IconFetchQueue.splice(nextIdx, 1)[0];
+
     if (window.IconCache[item.name]) {
       var img = document.getElementById(item.iconId);
       if (img && img.src.includes('what_app')) img.src = window.IconCache[item.name];
@@ -115,22 +193,55 @@ function IconFetchDrain() {
       if (spin) spin.style.display = 'none';
       continue;
     }
+
+    var dbIcon = await GetIconDB(item.name);
+    if (dbIcon) {
+      window.IconCache[item.name] = dbIcon;
+      var img = document.getElementById(item.iconId);
+      if (img && img.src.includes('what_app')) img.src = dbIcon;
+      var spin = document.getElementById(item.iconId + '-spinner');
+      if (spin) spin.style.display = 'none';
+      continue;
+    }
+
     window.IconFetchActive++;
+    if (item.isDeep) window.IconFetchDeepActive++;
+
     (function (it) {
-      window.DienTu.LayIconApp(it.name).then(function (b64) {
+      window.DienTu.LayIconApp(it.name, it.isDeep).then(function (b64) {
         window.IconFetchActive--;
-        if (b64) window.IconCache[it.name] = b64;
+        if (it.isDeep) window.IconFetchDeepActive--;
+
         var img = document.getElementById(it.iconId);
-        if (img) img.src = b64 || 'TaiNguyen/BieuTuong/what_app.svg';
         var spin = document.getElementById(it.iconId + '-spinner');
-        if (spin) spin.style.display = 'none';
+
+        if (b64) {
+          window.IconCache[it.name] = b64;
+          SaveIconDB(it.name, b64);
+          if (img) img.src = b64;
+          if (spin) spin.style.display = 'none';
+        } else {
+          // Quick scan failed, schedule deep scan
+          if (!it.isDeep) {
+            window.PushIconQueue(it.name, it.iconId, 2, true); // priority 2, isDeep true
+          } else {
+            if (img) img.src = 'TaiNguyen/BieuTuong/what_app.svg';
+            if (spin) spin.style.display = 'none';
+          }
+        }
         IconFetchDrain();
       }).catch(function () {
         window.IconFetchActive--;
-        var img = document.getElementById(it.iconId);
-        if (img) img.src = 'TaiNguyen/BieuTuong/what_app.svg';
-        var spin = document.getElementById(it.iconId + '-spinner');
-        if (spin) spin.style.display = 'none';
+        if (it.isDeep) window.IconFetchDeepActive--;
+
+        if (!it.isDeep) {
+          window.PushIconQueue(it.name, it.iconId, 2, true);
+        } else {
+          var img = document.getElementById(it.iconId);
+          if (img) img.src = 'TaiNguyen/BieuTuong/what_app.svg';
+          var spin = document.getElementById(it.iconId + '-spinner');
+          if (spin) spin.style.display = 'none';
+        }
         IconFetchDrain();
       });
     })(item);
@@ -146,7 +257,15 @@ function IconFetchDrain() {
     '@keyframes icon-dash { 0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; } 50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; } 100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; } }';
   document.head.appendChild(s);
 })();
+var DanhSachBatBuoc = [
+  { "category": ".NET", "name": ".NET 8.0 (x64)", "source": { "type": "Winget", "value": "Microsoft.DotNet.DesktopRuntime.8" }, "type": "app", "khongSuaXoa": true },
+  { "category": ".NET", "name": ".NET 8.0 (x86)", "source": { "silent_args": "--architecture x86", "type": "Winget", "value": "Microsoft.DotNet.DesktopRuntime.8" }, "type": "app", "khongSuaXoa": true },
+  { "category": "VC++ Redistributables", "name": "All Visual C++ 2005-2022 Redistributable", "source": { "type": "Winget", "value": "abbodi1406.vcredist" }, "type": "app", "khongSuaXoa": true }
+];
 var DanhSachPhanMem = [], DanhSachDaCaiDat = [], TrangHienTai = 'installer', BoLocHienTai = 'rec', CotSapXep = 'name', HuongSapXep = true;
+// ==========================================
+// === [ CORE INITIALIZATION ] ===
+// ==========================================
 document.addEventListener('DOMContentLoaded', async function () {
   KhoiTaoChuDe(); KhoiTaoNgonNgu(); CapNhatBanDich(); DangKySuKien();
   if (window.DienTu && window.DienTu.KiemTraDevMode) {
@@ -183,11 +302,33 @@ document.addEventListener('DOMContentLoaded', async function () {
       }
     } catch (e) { }
   }
+  if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) {
+    window.DienTu.ThayDoiUuTienCPU(true);
+  }
   DanhSachPhanMem = await window.DienTu.LayDanhSachUngDung();
   HienThiDanhSachInstaller();
   DanhSachDaCaiDat = await window.DienTu.LayPhanMemDaCai();
+  if (CauHinh.uninstallerGhiNhoDuLieu !== false) {
+    for (let pm of DanhSachDaCaiDat) {
+      if (!pm.installDate || pm.installDate === '-') {
+        let cachedDate = await GetDateDB(pm.name);
+        if (cachedDate) {
+          pm.cachedDate = cachedDate;
+          window.DateCache[pm.name] = cachedDate;
+        }
+      }
+    }
+  } else {
+    // Clear in-memory caches if disabled
+    window.IconCache = {};
+    window.DateCache = {};
+    window.SizeCache = {};
+  }
   HienThiDanhSachUninstaller();
-  var TienTrinhSoApp = 0, TienTrinhHienTai = 0, TienTrinhAppTruoc = '';
+  if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) {
+    window.DienTu.ThayDoiUuTienCPU(false);
+  }
+  TienTrinhSoApp = 0; TienTrinhHienTai = 0; TienTrinhAppTruoc = '';
   if (window.DienTu.KhiTienTrinhCaiDat) {
     window.DienTu.KhiTienTrinhCaiDat((dl) => {
       if (dl.name !== TienTrinhAppTruoc) {
@@ -206,14 +347,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       else if (dl.status === 'error') { mauChu = 'var(--nguy-hiem)'; rutGon = t('error_status'); }
       else { mauChu = 'var(--nguy-hiem)'; rutGon = phanTram + '%'; }
 
-      if (CauHinh.installerThuNho && window.DienTu.CapNhatCuaSoTienTrinh) {
-        dl.short_status = rutGon;
-        dl.status_color = mauChu;
-        dl.full_status = demText;
-        window.DienTu.CapNhatCuaSoTienTrinh(dl);
-      } else {
-        CapNhatHopThoaiTienTrinh(dl.name, phanTram, rutGon, mauChu, demText);
-      }
+      CapNhatHopThoaiTienTrinh(dl.name, phanTram, rutGon, mauChu, demText, dl.status);
     });
   }
   if (window.DienTu.KhiTienTrinhGoCaiDat) {
@@ -232,17 +366,13 @@ document.addEventListener('DOMContentLoaded', async function () {
       else if (dl.status === 'error') { mauChu = 'var(--nguy-hiem)'; rutGon = t('error_status'); }
       else { mauChu = 'var(--nguy-hiem)'; rutGon = phanTram + '%'; }
 
-      if (CauHinh.uninstallerThuNho && window.DienTu.CapNhatCuaSoTienTrinh) {
-        dl.short_status = rutGon;
-        dl.status_color = mauChu;
-        dl.full_status = demText;
-        window.DienTu.CapNhatCuaSoTienTrinh(dl);
-      } else {
-        CapNhatHopThoaiTienTrinh(dl.name, phanTram, rutGon, mauChu, demText);
-      }
+      CapNhatHopThoaiTienTrinh(dl.name, phanTram, rutGon, mauChu, demText, dl.status);
     });
   }
 });
+// ==========================================
+// === [ EVENT LISTENERS & INTERACTION ] ===
+// ==========================================
 function DangKySuKien() {
   document.getElementById('nut-thu-nho')?.addEventListener('click', function () { window.DienTu?.ThuNho(); });
   document.getElementById('nut-phong-to')?.addEventListener('click', function () { window.DienTu?.PhongTo(); });
@@ -259,19 +389,25 @@ function DangKySuKien() {
     if (typeof CapNhatBoTron === 'function') CapNhatBoTron(dl.DaPhongTo);
   });
   if (window.DienTu?.KhiChuyenTrang) window.DienTu.KhiChuyenTrang(function (trang) { ChuyenTrang(trang); });
+  var iconRot = 0;
   document.getElementById('nut-thu-gon-menu')?.addEventListener('click', function () {
     var tb = document.getElementById('thanh-ben');
     if (!tb) return;
     tb.classList.toggle('thu-gon');
     var icon = document.getElementById('icon-thu-gon');
     if (icon) {
-      if (tb.classList.contains('thu-gon')) {
-        icon.innerHTML = '<path d="M4.13 3.05a4.264 4.264 0 0 0-1.08 1.08A6.143 6.143 0 0 0 2 7.81v8.38C2 19.83 4.17 22 7.81 22h7.47V2H7.81a6.143 6.143 0 0 0-3.68 1.05zM8.5 9.971A.75.75 0 1 1 9.556 8.91l2.56 2.56a.749.749 0 0 1 0 1.06l-2.56 2.56A.75.75 0 0 1 8.5 14.029L10.525 12zM22 7.81v8.38a6.143 6.143 0 0 1-1.05 3.68 4.264 4.264 0 0 1-1.08 1.08 5.779 5.779 0 0 1-3.09 1.03V2.03C20.06 2.24 22 4.37 22 7.81z"></path>';
-      } else {
-        icon.innerHTML = '<path d="M2 7.81v8.38c0 1.49.36 2.73 1.05 3.68.29.42.66.79 1.08 1.08.82.6 1.86.95 3.09 1.03V2.03C3.94 2.24 2 4.37 2 7.81zM20.95 4.13c-.29-.42-.66-.79-1.08-1.08C18.92 2.36 17.68 2 16.19 2H8.72v20h7.47c3.64 0 5.81-2.17 5.81-5.81V7.81c0-1.49-.36-2.73-1.05-3.68zm-5.45 9.9c.29.29.29.77 0 1.06-.15.15-.34.22-.53.22s-.38-.07-.53-.22l-2.56-2.56a.754.754 0 0 1 0-1.06l2.56-2.56c.29-.29.77-.29 1.06 0s.29.77 0 1.06L13.48 12z"></path>';
-      }
+      iconRot -= 180;
+      icon.style.transform = 'rotate(' + iconRot + 'deg)';
     }
   });
+  var tbInit = document.getElementById('thanh-ben');
+  var iconInit = document.getElementById('icon-thu-gon');
+  if (tbInit && iconInit) {
+    if (tbInit.classList.contains('thu-gon')) {
+      iconRot = -180;
+      iconInit.style.transform = 'rotate(' + iconRot + 'deg)';
+    }
+  }
   var NutMenu = document.getElementById('nut-menu-chinh'), MenuDD = document.getElementById('menu-dropdown');
   if (NutMenu && MenuDD) {
     NutMenu.addEventListener('click', function (e) { e.stopPropagation(); MenuDD.classList.toggle('an'); });
@@ -373,48 +509,48 @@ function DangKySuKien() {
     } else {
       dc.forEach(function (cb) {
         var ten = cb.closest('.HangUngDung')?.querySelector('.HangUngDung_Ten')?.textContent;
-        var pm = DanhSachPhanMem.find(p => p.name === ten);
+        var pm = DanhSachPhanMem.find(p => p.name === ten) || DanhSachBatBuoc.find(p => p.name === ten);
         if (pm) danhSachChon.push(pm);
       });
     }
     if (danhSachChon.length === 0) return;
     let expandedDanhSach = [];
     for (let p of danhSachChon) {
-        if (p.name === "All Visual C++ Redistributable") {
-            expandedDanhSach.push(
-                { name: "Visual C++ 2005_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2005.x86", silent_args: "" } },
-                { name: "Visual C++ 2005_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2005.x64", silent_args: "" } },
-                { name: "Visual C++ 2008_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2008.x86", silent_args: "" } },
-                { name: "Visual C++ 2008_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2008.x64", silent_args: "" } },
-                { name: "Visual C++ 2010_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2010.x86", silent_args: "" } },
-                { name: "Visual C++ 2010_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2010.x64", silent_args: "" } },
-                { name: "Visual C++ 2012_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2012.x86", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
-                { name: "Visual C++ 2012_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2012.x64", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
-                { name: "Visual C++ 2013_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2013.x86", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
-                { name: "Visual C++ 2013_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2013.x64", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
-                { name: "Visual C++ 2015-2022_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2015+.x86", silent_args: "" } },
-                { name: "Visual C++ 2015-2022_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2015+.x64", silent_args: "" } }
-            );
-        } else {
-            expandedDanhSach.push(p);
-        }
+      if (p.name.includes("All Visual C++") && p.name.includes("Redistributable")) {
+        expandedDanhSach.push(
+          { name: "Visual C++ 2005_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2005.x86", silent_args: "" } },
+          { name: "Visual C++ 2005_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2005.x64", silent_args: "" } },
+          { name: "Visual C++ 2008_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2008.x86", silent_args: "" } },
+          { name: "Visual C++ 2008_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2008.x64", silent_args: "" } },
+          { name: "Visual C++ 2010_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2010.x86", silent_args: "" } },
+          { name: "Visual C++ 2010_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2010.x64", silent_args: "" } },
+          { name: "Visual C++ 2012_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2012.x86", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
+          { name: "Visual C++ 2012_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2012.x64", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2012' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
+          { name: "Visual C++ 2013_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2013.x86", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
+          { name: "Visual C++ 2013_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2013.x64", silent_args: "", post_install_cmd: "Get-ItemProperty 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match 'Visual C\\+\\+ 2013' } | Remove-ItemProperty -Name SystemComponent -ErrorAction SilentlyContinue" } },
+          { name: "Visual C++ 2015-2022_x86", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2015+.x86", silent_args: "" } },
+          { name: "Visual C++ 2015-2022_x64", type: "app", source: { type: "Winget", value: "Microsoft.VCRedist.2015+.x64", silent_args: "" } }
+        );
+      } else {
+        expandedDanhSach.push(p);
+      }
     }
     danhSachChon = expandedDanhSach;
-    DangXuLyCaiDat = true;
-    if (CauHinh.installerThuNho && window.DienTu && window.DienTu.AnCuaSo) {
-      window.DienTu.AnCuaSo();
+    let isCfm = true;
+    if (CauHinh.installerHoiXacNhan !== false) {
+      let cfmMsg = t('confirm_install_apps') ? t('confirm_install_apps').replace('{0}', danhSachChon.length) : "Bạn có chắc chắn muốn bắt đầu cài đặt " + danhSachChon.length + " phần mềm đã chọn không?";
+      isCfm = await HienHopThoaiXacNhanCustom(cfmMsg, t('install_btn') || 'Cài đặt', danhSachChon);
     }
+    if (!isCfm) return;
+    if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) {
+      window.DienTu.ThayDoiUuTienCPU(true);
+    }
+    DangXuLyCaiDat = true;
+    TienTrinhSoApp = danhSachChon.length;
+    TienTrinhHienTai = 0;
+    TienTrinhAppTruoc = '';
     if (CauHinh.chungHienTienTrinh) {
-      if (CauHinh.installerThuNho && window.DienTu && window.DienTu.MoCuaSoTienTrinh) {
-        try {
-          await window.DienTu.MoCuaSoTienTrinh(t('installing') + '...', danhSachChon, ChuDeHienTai, CauHinh.chungDaLuong);
-        } catch (e) {
-          console.error(e);
-          MoHopThoaiTienTrinh(t('installing') + '...', danhSachChon);
-        }
-      } else {
-        MoHopThoaiTienTrinh(t('installing') + '...', danhSachChon);
-      }
+      MoHopThoaiTienTrinh(t('installing') + '...', danhSachChon);
     }
     try {
       var ketQua = await window.DienTu.TienHanhCaiDat(danhSachChon, {
@@ -428,14 +564,10 @@ function DangKySuKien() {
         if (thanhCong > 0) window.YeuCauLamMoiUninstaller = true;
       }
     } finally {
-      if (CauHinh.installerThuNho && window.DienTu && window.DienTu.HoanTatCuaSoTienTrinh) {
-        window.DienTu.HoanTatCuaSoTienTrinh(ketQua);
-      } else {
-        HoanTatHopThoaiTienTrinh(ketQua);
-      }
+      HoanTatHopThoaiTienTrinh(ketQua);
       DangXuLyCaiDat = false;
-      if (CauHinh.installerThuNho && window.DienTu && window.DienTu.HienCuaSo) {
-        window.DienTu.HienCuaSo();
+      if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) {
+        window.DienTu.ThayDoiUuTienCPU(false);
       }
     }
   });
@@ -503,25 +635,48 @@ function DangKySuKien() {
         goCaiDatOptions.loaiBoFileThua = true;
       }
     }
+
+    if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) {
+      window.DienTu.ThayDoiUuTienCPU(true);
+    }
     DangXuLyGoCaiDat = true;
     TienTrinhSoApp = danhSachChon.length;
     TienTrinhHienTai = 0;
     TienTrinhAppTruoc = '';
-    if (CauHinh.uninstallerThuNho && window.DienTu && window.DienTu.AnCuaSo) {
-      window.DienTu.AnCuaSo();
-    }
+    localStorage.setItem('uninstall_opts', JSON.stringify({
+      taoDiemLuu: goCaiDatOptions.taoDiemKhoiPhuc || false,
+      xoaTanDu: goCaiDatOptions.loaiBoFileThua || false,
+      tenDiemLuu: goCaiDatOptions.tenDiemKhoiPhuc || null
+    }));
     if (CauHinh.chungHienTienTrinh) {
-      if (CauHinh.uninstallerThuNho && window.DienTu && window.DienTu.MoCuaSoTienTrinh) {
-        try {
-          await window.DienTu.MoCuaSoTienTrinh(t('uninstalling'), danhSachChon, ChuDeHienTai, CauHinh.chungDaLuong);
-        } catch (e) {
-          console.error(e);
-          MoHopThoaiTienTrinh(t('uninstalling'), danhSachChon);
-        }
-      } else {
-        MoHopThoaiTienTrinh(t('uninstalling'), danhSachChon);
-      }
+      MoHopThoaiTienTrinh(t('uninstalling'), danhSachChon);
     }
+    if (goCaiDatOptions.taoDiemKhoiPhuc && window.DienTu && window.DienTu.TaoDiemKhoiPhuc) {
+      window.CurrentGlobalStage = 'rs';
+
+      let newRpContainer = document.getElementById('diem-khoi-phuc-moi');
+      if (newRpContainer) {
+        let rpName = goCaiDatOptions.tenDiemKhoiPhuc || "Nex Launcher Restore Point";
+        newRpContainer.innerHTML = `
+              <div style="padding: 16px; background: var(--nen-tang2); border: 1px solid var(--vien); border-radius: var(--do-bo); display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-weight: 600; font-size: 1.05rem; color: var(--chu-chinh);">${rpName}</span>
+                      <span style="font-size: 0.85rem; color: var(--chu-phu);">Đang tiến hành tạo điểm khôi phục...</span>
+                  </div>
+                  <button id="btn-skip-rs" class="Nut Nut--Huy" style="padding: 6px 12px; font-size: 0.9rem;">Bỏ qua</button>
+              </div>
+          `;
+        document.getElementById('btn-skip-rs').addEventListener('click', () => {
+          if (window.ResolveSkipRS) window.ResolveSkipRS();
+        });
+      }
+
+      let rsPromise = window.DienTu.TaoDiemKhoiPhuc(goCaiDatOptions.tenDiemKhoiPhuc || "Nex Launcher Restore Point");
+      TaiDanhSachDiemKhoiPhucCu(); // Fetch old ones in background
+      await Promise.race([rsPromise, new Promise(r => window.ResolveSkipRS = r)]);
+    }
+    window.CurrentGlobalStage = 'un';
+
     try {
       var ketQua = await window.DienTu.TienHanhGoCaiDat(danhSachChon, goCaiDatOptions);
       if (ketQua) {
@@ -531,20 +686,13 @@ function DangKySuKien() {
         if (goCaiDatOptions.loaiBoFileThua && window.DienTu && window.DienTu.QuetTanDuPhanMem) {
           let dsThanhCong = ketQua.filter(k => k.success).map(k => danhSachChon.find(d => d.name === k.name)).filter(Boolean);
           if (dsThanhCong.length > 0) {
-            window.__TAURI__.event.emit('tien-trinh-stage-update', { stage: 3, status: t('completed'), color: 'var(--thanh-cong)' });
-            window.__TAURI__.event.emit('tien-trinh-stage-update', { stage: 4, status: t('scanning_status'), color: 'var(--chu-chinh)' });
+            window.CurrentGlobalStage = 'cl';
             allLeftovers = await window.DienTu.QuetTanDuPhanMem(dsThanhCong);
           }
         }
 
-        if (CauHinh.uninstallerThuNho && window.DienTu && window.DienTu.HoanTatCuaSoTienTrinh) {
-          if (allLeftovers.length > 0) {
-            if (window.DienTu.DongCuaSoTienTrinh) window.DienTu.DongCuaSoTienTrinh();
-          } else {
-            window.DienTu.HoanTatCuaSoTienTrinh(ketQua);
-          }
-        } else {
-          HoanTatHopThoaiTienTrinh(ketQua, allLeftovers.length > 0);
+        HoanTatHopThoaiTienTrinh(ketQua, allLeftovers.length > 0);
+        if (!allLeftovers.length) {
           await new Promise(resolve => {
             let btn = document.getElementById('dong-tien-trinh');
             if (!btn) { resolve(); return; }
@@ -568,6 +716,10 @@ function DangKySuKien() {
       }
     } finally {
       DangXuLyGoCaiDat = false;
+      localStorage.removeItem('uninstall_opts');
+      if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) {
+        window.DienTu.ThayDoiUuTienCPU(false);
+      }
     }
   });
   window.MoHopThoaiSuaPhanMem = function (tenPm) {
@@ -753,7 +905,7 @@ function DangKySuKien() {
       if (selected) {
         document.getElementById('them-app-id').value = selected;
       }
-    } catch(e) {
+    } catch (e) {
       console.error(e);
     }
   });
@@ -804,9 +956,12 @@ function ChuyenTrang(trang) {
     if (m && !du.querySelector('.dang-chon')) m.classList.add('dang-chon');
     if (typeof YeuCauLamMoiUninstaller !== 'undefined' && YeuCauLamMoiUninstaller) {
       YeuCauLamMoiUninstaller = false;
+      if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) window.DienTu.ThayDoiUuTienCPU(true);
       window.DienTu.LayPhanMemDaCai().then(dsMoi => {
         DanhSachDaCaiDat = dsMoi;
         HienThiDanhSachUninstaller(document.getElementById('o-tim-kiem-uninstaller')?.value || '');
+      }).finally(() => {
+        if (window.DienTu && window.DienTu.ThayDoiUuTienCPU) window.DienTu.ThayDoiUuTienCPU(false);
       });
     }
   }
@@ -835,15 +990,10 @@ function HienThiDanhSachInstaller(TuKhoa, isRefresh) {
   if (BoLocHienTai === 'apps') ds = ds.filter(function (p) { return p.type === 'app'; });
   else if (BoLocHienTai === 'games') ds = ds.filter(function (p) { return p.type === 'game'; });
   else if (BoLocHienTai === 'rec') {
-    let danhSachBatBuoc = [
-      { "category": ".NET", "name": ".NET 8.0 (x64)", "source": { "type": "Winget", "value": "Microsoft.DotNet.DesktopRuntime.8" }, "type": "app", "khongSuaXoa": true },
-      { "category": ".NET", "name": ".NET 8.0 (x86)", "source": { "silent_args": "--architecture x86", "type": "Winget", "value": "Microsoft.DotNet.DesktopRuntime.8" }, "type": "app", "khongSuaXoa": true },
-      { "category": "VC++ Redistributables", "name": "All Visual C++ 2005-2022 Redistributable", "source": { "type": "Winget", "value": "abbodi1406.vcredist" }, "type": "app", "khongSuaXoa": true }
-    ];
-    let danhSachDeXuat = ds.filter(function (p) { 
-      return p.recommended === true && p.category !== '.NET' && p.category !== 'VC++ Redistributables'; 
+    let danhSachDeXuat = ds.filter(function (p) {
+      return p.recommended === true && p.category !== '.NET' && p.category !== 'VC++ Redistributables';
     });
-    ds = danhSachBatBuoc.concat(danhSachDeXuat);
+    ds = DanhSachBatBuoc.concat(danhSachDeXuat);
   }
   const cotPhienBan = document.getElementById('cot-phien-ban');
   const lblCategory = document.getElementById('lbl-header-category');
@@ -971,12 +1121,11 @@ function CapNhatNutDongGoi() {
 function HienThiDanhSachUninstaller(TuKhoa) {
   TuKhoa = TuKhoa || '';
   var ct = document.getElementById('danh-sach-uninstaller'); if (!ct) return;
-  CotSapXep = 'name'; HuongSapXep = true;
   document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function (c) {
     c.classList.remove('bi-khoa', 'tang', 'giam');
   });
-  document.querySelectorAll('.TieuDeCot_Cot[data-sap-xep="name"]').forEach(function (c) {
-    c.classList.add('tang');
+  document.querySelectorAll('.TieuDeCot_Cot[data-sap-xep="' + CotSapXep + '"]').forEach(function (c) {
+    c.classList.add(HuongSapXep ? 'tang' : 'giam');
   });
   var ds = DanhSachDaCaiDat.slice();
   if (TuKhoa.trim()) { var tk = TuKhoa.toLowerCase(); ds = ds.filter(function (p) { return p.name.toLowerCase().includes(tk) || p.publisher.toLowerCase().includes(tk); }); }
@@ -1043,8 +1192,31 @@ function TaoHangUninstaller(pm) {
     '</div>' +
     '</div>' +
     '<div class="HangUngDung_Ten">' + pm.name + '</div><div class="HangUngDung_NhaPhatHanh">' + (pm.publisher || '-') + '</div><div class="HangUngDung_Ngay">' + formattedDate + '</div><div class="HangUngDung_DungLuong">' + displaySize + '</div>';
-  d.addEventListener('click', function (e) { if (e.target.type === 'checkbox') return; var cb = d.querySelector('.OChon'); if (cb) { cb.checked = !cb.checked; d.classList.toggle('da-chon', cb.checked); CapNhatSoLuongDaChon(); } });
-  d.querySelector('.OChon')?.addEventListener('change', function () { d.classList.toggle('da-chon', this.checked); CapNhatSoLuongDaChon(); });
+  d.addEventListener('click', function (e) {
+    if (e.target.type === 'checkbox') return;
+    var cb = d.querySelector('.OChon');
+    if (cb) {
+      cb.checked = !cb.checked;
+      d.classList.toggle('da-chon', cb.checked);
+      CapNhatSoLuongDaChon();
+      if (cb.checked && pm.name && idIcon && !window.IconCache[pm.name]) {
+        window.PushIconQueue(pm.name, idIcon, -1, true);
+      }
+    }
+  });
+  d.querySelector('.OChon')?.addEventListener('change', function () {
+    d.classList.toggle('da-chon', this.checked);
+    CapNhatSoLuongDaChon();
+    if (this.checked && pm.name && idIcon && !window.IconCache[pm.name]) {
+      window.PushIconQueue(pm.name, idIcon, -1, true);
+    }
+  });
+  d.addEventListener('mouseenter', function () {
+    if (pm.name && idIcon && !window.IconCache[pm.name]) {
+      // Hovering triggers deep scan with high priority if not cached
+      window.PushIconQueue(pm.name, idIcon, 0, true);
+    }
+  });
   if (!window.ObserverIcon) {
     window.ObserverIcon = new IntersectionObserver(async (entries, obs) => {
       var sorted = [...entries].filter(e => e.isIntersecting)
@@ -1056,8 +1228,15 @@ function TaoHangUninstaller(pm) {
           let appName = el.dataset.appName;
           let iconId = el.dataset.iconId;
           if (appName && window.DienTu) {
-            window.IconFetchQueue.push({ name: appName, iconId: iconId });
-            IconFetchDrain();
+            let pmObj = DanhSachDaCaiDat.find(p => p.name === appName);
+            let iconPrio = 1;
+            if (pmObj && pmObj.displayIcon && pmObj.displayIcon.toLowerCase().includes('.ico')) {
+              iconPrio = 0; // Lighter processing
+            } else if (!pmObj || !pmObj.displayIcon) {
+              iconPrio = 2; // Heavy/Likely to fail
+            }
+            window.PushIconQueue(appName, iconId, iconPrio, false);
+
             let needFetch = (el.dataset.needDate === 'true' && !window.DateCache[appName])
               || (el.dataset.needSize === 'true' && !window.SizeCache[appName]);
 
@@ -1201,15 +1380,6 @@ function LocDanhSachUninstaller(bl) {
       return huongMacDinh ? dA.localeCompare(dB) : dB.localeCompare(dA);
     });
   } else {
-    if (CotSapXep === 'size' || CotSapXep === 'date') {
-      CotSapXep = 'name'; HuongSapXep = true;
-      document.querySelectorAll('.TieuDeCot_Cot.sap-xep').forEach(function (c) {
-        c.classList.remove('tang', 'giam');
-      });
-      document.querySelectorAll('.TieuDeCot_Cot[data-sap-xep="name"]').forEach(function (c) {
-        c.classList.add('tang');
-      });
-    }
     var mul = HuongSapXep ? 1 : -1;
     ds.sort(function (a, b) {
       switch (CotSapXep) {
@@ -1267,6 +1437,9 @@ function CapNhatSoLuongDaChon() {
     }
   }
 }
+// ==========================================
+// === [ UI COMPONENTS & DIALOGS ] ===
+// ==========================================
 function BatTatHopThoai(id, ht) {
   var h = document.getElementById(id), lp = document.getElementById('lop-phu-modal');
   if (ht) { h?.classList.remove('an'); lp?.classList.remove('an'); }
@@ -1279,13 +1452,25 @@ function BatTatHopThoai(id, ht) {
     if (!document.querySelectorAll('.HopThoai:not(.an)').length) lp?.classList.add('an');
   }
 }
-function HienHopThoaiXacNhanCustom(noiDung) {
+function HienHopThoaiXacNhanCustom(noiDung, btnOkText, danhSachApp) {
   return new Promise((resolve) => {
-    document.getElementById('xac-nhan-noi-dung').innerHTML = noiDung;
+    let fullHtml = noiDung;
+    if (danhSachApp && danhSachApp.length > 0) {
+      let listHtml = '<div style="margin: 20px auto 0; width: 450px; max-width: 100%; box-sizing: border-box; max-height: 140px; overflow-y: auto; background: var(--nen-nhap); padding: 16px; border-radius: var(--do-bo-nho); text-align: left; border: 1px solid var(--vien); font-size: 1.05rem; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">';
+      danhSachApp.forEach(app => {
+        let appName = typeof app === 'string' ? app : app.name;
+        listHtml += `<div style="display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0;"><div style="width: 5px; height: 5px; border-radius: 50%; background: var(--chu-phu); flex-shrink: 0;"></div><div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--chu); flex: 1; min-width: 0;">${appName}</div></div>`;
+      });
+      listHtml += '</div>';
+      fullHtml += listHtml;
+    }
+    document.getElementById('xac-nhan-noi-dung').innerHTML = fullHtml;
     BatTatHopThoai('hop-thoai-xac-nhan', true);
     const dongBtn = document.getElementById('xacnhan-dong-btn');
     const huyBtn = document.getElementById('xacnhan-huy-btn');
     const okBtn = document.getElementById('xacnhan-ok-btn');
+    if (btnOkText) okBtn.textContent = btnOkText;
+    else okBtn.textContent = 'OK';
     const lopPhu = document.getElementById('lop-phu-modal');
     let resolved = false;
     function dong(kq) {
@@ -1341,7 +1526,7 @@ function MoHopThoaiCaiDat() {
     if (i === 2) helpText = t('help_text_installer');
     if (i === 3) helpText = t('help_text_uninstaller');
     if (i === 4) helpText = t('help_text_utilities');
-    var helpSvg = '<svg width="18" height="18" viewBox="-2 -2 104 104" fill="none" style="opacity:0.6; cursor:pointer; margin-left:8px;" title="' + t(tab) + ' (' + t('settings_help') + ')" onclick="HienHopThoaiTroGiup(\'' + t(tab) + '\', decodeURIComponent(\'' + encodeURIComponent(helpText) + '\'))"><circle cx="50" cy="50" r="50" stroke="currentColor" stroke-width="8"></circle><g transform="matrix(0.7,0,0,0.7,15,15)"><path d="M47.633 2.5c-2.126.242-4.603.367-7.017.829-5.655 1.08-10.71 3.485-14.87 7.529a10.294 10.294 0 0 0-.55 14.227c2.948 3.352 7.325 3.341 11.986-.031.32-.233.647-.458.962-.697 3.48-2.64 7.466-3.674 11.727-3.249 3.515.352 6.526 1.861 7.782 5.494 1.213 3.506-.484 6.153-2.95 8.393-1.237 1.125-2.663 2.046-4.011 3.049-8.1 6.019-11.618 15.485-9.127 24.568 1.185 4.322 3.199 6.59 5.846 6.586 2.59-.003 4.563-2.035 5.716-6.333 1.198-4.461 3.49-8.197 7.013-11.104 2.819-2.325 5.902-4.325 8.742-6.623 8.88-7.187 11.038-18.305 5.399-28.203C68.49 6.772 59.069 3.132 47.633 2.5zM49.12 76.368c-6.542.01-10.696 4.033-10.682 10.346.014 6.241 4.46 10.807 10.502 10.786 6.34-.022 10.896-4.534 10.865-10.76-.03-6.339-4.197-10.383-10.685-10.372z" fill="currentColor"></path></g></svg>';
+    var helpSvg = '<svg width="18" height="18" viewBox="-2 -2 104 104" fill="none" style="opacity:0.6; cursor:pointer; margin-left:8px;" title="' + t(tab) + ' (' + t('settings_help') + ')" onclick="HienHopThoaiTroGiup(\'' + t(tab) + '\', decodeURIComponent(\'' + encodeURIComponent(helpText).replace(/'/g, "%27") + '\'))"><circle cx="50" cy="50" r="50" stroke="currentColor" stroke-width="8"></circle><g transform="matrix(0.7,0,0,0.7,15,15)"><path d="M47.633 2.5c-2.126.242-4.603.367-7.017.829-5.655 1.08-10.71 3.485-14.87 7.529a10.294 10.294 0 0 0-.55 14.227c2.948 3.352 7.325 3.341 11.986-.031.32-.233.647-.458.962-.697 3.48-2.64 7.466-3.674 11.727-3.249 3.515.352 6.526 1.861 7.782 5.494 1.213 3.506-.484 6.153-2.95 8.393-1.237 1.125-2.663 2.046-4.011 3.049-8.1 6.019-11.618 15.485-9.127 24.568 1.185 4.322 3.199 6.59 5.846 6.586 2.59-.003 4.563-2.035 5.716-6.333 1.198-4.461 3.49-8.197 7.013-11.104 2.819-2.325 5.902-4.325 8.742-6.623 8.88-7.187 11.038-18.305 5.399-28.203C68.49 6.772 59.069 3.132 47.633 2.5zM49.12 76.368c-6.542.01-10.696 4.033-10.682 10.346.014 6.241 4.46 10.807 10.502 10.786 6.34-.022 10.896-4.534 10.865-10.76-.03-6.339-4.197-10.383-10.685-10.372z" fill="currentColor"></path></g></svg>';
     sec.innerHTML = '<div class="CaiDat_TieuDePhan" style="display:flex; align-items:center;">' + t(tab) + helpSvg + '</div>' + LayHTMLCaiDatTrang(i, ChuDeHT, NgonNguHT);
     nd.appendChild(sec);
   });
@@ -1384,6 +1569,40 @@ function MoHopThoaiCaiDat() {
   });
   document.getElementById('caidat-co-chu')?.addEventListener('input', function () { document.getElementById('caidat-co-chu-gt').textContent = this.value + ' px'; });
   document.getElementById('caidat-trong-suot')?.addEventListener('input', function () { document.getElementById('caidat-trong-suot-gt').textContent = this.value + '%'; });
+
+  let btnCapNhatBasic = document.getElementById('btn-cap-nhat-basic');
+  if (btnCapNhatBasic) {
+    btnCapNhatBasic.onclick = async function () {
+      if (!window.DienTu || !window.DienTu.KiemTraCapNhatBasic) return;
+      try {
+        btnCapNhatBasic.disabled = true;
+        btnCapNhatBasic.innerText = 'Đang kiểm tra...';
+        let res = await window.DienTu.KiemTraCapNhatBasic();
+        if (res.status === 'same') {
+          HienThongBao('Dữ liệu hiện tại đã là mới nhất, không có thay đổi.', 'thong-tin');
+        } else if (res.status === 'different') {
+          let xacNhan = await HienHopThoaiXacNhanCustom('Có bản cập nhật dữ liệu Basic mới. Bạn có chắc chắn muốn thay thế toàn bộ dữ liệu hiện tại bằng bản cập nhật mới nhất từ Github không? Mọi chỉnh sửa cá nhân trước đó sẽ bị xóa sạch và không thể hoàn tác.');
+          if (xacNhan) {
+            btnCapNhatBasic.innerText = 'Đang cập nhật...';
+            let success = await window.DienTu.ThucHienCapNhatBasic();
+            if (success) {
+              HienThongBao('Cập nhật dữ liệu Basic thành công!', 'thanh-cong');
+              if (typeof TaiDanhSachApp === 'function') TaiDanhSachApp(true);
+            } else {
+              HienThongBao('Có lỗi xảy ra khi cập nhật.', 'loi');
+            }
+          }
+        } else {
+          HienThongBao('Lỗi kiểm tra dữ liệu từ Github hoặc định dạng không hợp lệ.', 'loi');
+        }
+      } catch (e) {
+        HienThongBao('Lỗi kết nối.', 'loi');
+      } finally {
+        btnCapNhatBasic.disabled = false;
+        btnCapNhatBasic.innerText = 'Cập nhật dữ liệu từ Github';
+      }
+    };
+  }
   var BtnLuu = document.getElementById('caidat-luu'); if (BtnLuu) BtnLuu.onclick = LuuCaiDat;
   var BtnDatLai = document.getElementById('caidat-dat-lai'); if (BtnDatLai) BtnDatLai.onclick = DatLaiCaiDat;
   BatTatHopThoai('hop-thoai-cai-dat', true);
@@ -1395,18 +1614,18 @@ let CauHinh = {
   trongSuot: localStorage.getItem('caidat-trong-suot') || 0,
   chungDaLuong: localStorage.getItem('caidat-chung-da-luong') !== 'false',
   chungHienTienTrinh: localStorage.getItem('caidat-chung-hien-tien-trinh') !== 'false',
-  chungAnKhongHoTro: localStorage.getItem('caidat-chung-an-khong-ho-tro') === 'true',
+  chungHienThongBao: localStorage.getItem('caidat-chung-hien-thong-bao') !== 'false',
   chungHienThongBao: localStorage.getItem('caidat-chung-hien-thong-bao') !== 'false',
   installerTaiDaLuong: localStorage.getItem('caidat-installer-tai-da-luong') !== 'false',
   installerTuDongChon: localStorage.getItem('caidat-installer-tu-dong-chon') === 'true',
-  installerThuNho: localStorage.getItem('caidat-installer-thu-nho') !== 'false',
   installerHienTienTrinh: localStorage.getItem('caidat-installer-hien-tien-trinh') !== 'false',
   installerHienThongBao: localStorage.getItem('caidat-installer-hien-thong-bao') !== 'false',
+  installerHoiXacNhan: localStorage.getItem('caidat-installer-hoi-xac-nhan') !== 'false',
   uninstallerGoNgam: localStorage.getItem('caidat-uninstaller-go-ngam') !== 'false',
   uninstallerHoiXacNhan: localStorage.getItem('caidat-uninstaller-hoi-xac-nhan') !== 'false',
   uninstallerHienTienTrinh: localStorage.getItem('caidat-uninstaller-hien-tien-trinh') !== 'false',
   uninstallerHienThongBao: localStorage.getItem('caidat-uninstaller-hien-thong-bao') === 'true',
-  uninstallerThuNho: localStorage.getItem('caidat-uninstaller-thu-nho') === 'true'
+  uninstallerGhiNhoDuLieu: localStorage.getItem('caidat-uninstaller-ghi-nho-du-lieu') !== 'false'
 };
 function CapNhatBoTron(isMaximized = document.body.classList.contains('da-phong-to')) {
   if (isMaximized) {
@@ -1473,11 +1692,11 @@ function LayHTMLCaiDatTrang(i, ChuDeHT, NgonNguHT) {
   } else if (i === 1) {
     let aot = localStorage.getItem('caidat-luon-tren') === 'true';
     let mtt = localStorage.getItem('caidat-thu-nho-khay') !== 'false';
-    let ttDaLuong = t('multithread_desc');
-    let ttDanhMuc = t('under_dev');
-    let ttTienTrinh = t('show_progress');
-    let ttAn = t('hide_incompatible');
-    let ttThongBao = t('show_toast');
+    let ttDaLuong = t('multithread_desc') || 'Multi-thread processing';
+    let ttDanhMuc = t('under_dev') || 'Under development';
+    let ttTienTrinh = t('show_progress') || 'Show progress dialog';
+    let ttAn = t('hide_incompatible') || 'Hide unsupported apps';
+    let ttThongBao = t('show_complete') || 'Show completion dialog';
     return '<div class="NhomCaiDat">' +
       '<div class="MucCaiDat_TieuDePhu">' + (t('general_system') || 'Hệ thống & Cửa sổ') + '</div>' +
       '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan">' + t('always_on_top') + '</div></div><label class="CongTac"><input type="checkbox" id="caidat-luon-tren" ' + (aot ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
@@ -1485,22 +1704,23 @@ function LayHTMLCaiDatTrang(i, ChuDeHT, NgonNguHT) {
       '<div class="MucCaiDat_TieuDePhu">' + (t('general_process') || 'Tiến trình & Thông báo') + '</div>' +
       '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttDaLuong + '">' + t('multithread_processing') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-chung-da-luong" ' + (CauHinh.chungDaLuong ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
       '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttTienTrinh + '">' + t('show_progress') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-chung-hien-tien-trinh" ' + (CauHinh.chungHienTienTrinh ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
-      '<div class="MucCaiDat" onclick="if(document.getElementById(\'cd-chung-danh-muc\').disabled) HienThongBao(\'' + ttDanhMuc + '\', \'thong-tin\')"><div><div class="MucCaiDat_Nhan" title="' + ttDanhMuc + '">' + t('detailed_categories') + '</div></div><label class="CongTac" style="opacity:0.5"><input type="checkbox" id="cd-chung-danh-muc" disabled><span class="CongTac_Thanh"></span></label></div>' +
       '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttThongBao + '">' + t('show_complete') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-chung-hien-thong-bao" ' + (CauHinh.chungHienThongBao ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
+      '<div class="MucCaiDat" onclick="if(document.getElementById(\'cd-chung-danh-muc\').disabled) HienThongBao(\'' + ttDanhMuc + '\', \'thong-tin\')"><div><div class="MucCaiDat_Nhan" title="' + ttDanhMuc + '">' + t('detailed_categories') + '</div></div><label class="CongTac" style="opacity:0.5"><input type="checkbox" id="cd-chung-danh-muc" disabled><span class="CongTac_Thanh"></span></label></div>' +
       '<div class="MucCaiDat_TieuDePhu">' + (t('general_ui') || 'Giao diện') + '</div>' +
-      '<div class="MucCaiDat" onclick="if(document.getElementById(\'cd-chung-an-khong-ho-tro\').disabled) HienThongBao(\'' + ttDanhMuc + '\', \'thong-tin\')"><div><div class="MucCaiDat_Nhan" title="' + ttAn + '">' + t('hide_unsupported') + '</div></div><label class="CongTac" style="opacity:0.5"><input type="checkbox" id="cd-chung-an-khong-ho-tro" disabled><span class="CongTac_Thanh"></span></label></div>' +
       '</div>';
   } else if (i === 2) {
-    let ttThuNhoCaiDat = t('minimize_tray_install');
+    let ttXacNhan = t('show_confirmation') || 'Show confirmation dialog';
     return '<div class="NhomCaiDat">' +
-      '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttThuNhoCaiDat + '">' + t('minimize_install') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-installer-thu-nho" ' + (CauHinh.installerThuNho ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
-      '</div>';
+      '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttXacNhan + '">' + t('show_confirmation') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-installer-hoi-xac-nhan" ' + (CauHinh.installerHoiXacNhan !== false ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
+      '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan">Cập nhật dữ liệu cơ bản</div></div>' +
+      '<button id="btn-cap-nhat-basic" class="Nut Nut--phu" style="padding: 6px 16px; font-size: 0.9em; min-height: 32px; border-radius: 8px;">Cập nhật từ Github</button>' +
+      '</div></div>';
   } else if (i === 3) {
-    let ttXacNhan = t('confirm_uninstall');
-    let ttThuNhoCaiDat = t('minimize_tray_uninstall');
+    let ttXacNhan = t('show_confirmation') || 'Show confirmation dialog';
+    let ttGhiNho = t('remember_scan_data') || 'Remember scan data';
     return '<div class="NhomCaiDat">' +
       '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttXacNhan + '">' + t('show_confirmation') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-uninstaller-hoi-xac-nhan" ' + (CauHinh.uninstallerHoiXacNhan ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
-      '<div class="MucCaiDat"><div><div class="MucCaiDat_Nhan" title="' + ttThuNhoCaiDat + '">' + t('minimize_tray_uninst_label') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-uninstaller-thu-nho" ' + (CauHinh.uninstallerThuNho ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
+      '<div class="MucCaiDat" style="border-bottom:none;"><div><div class="MucCaiDat_Nhan" title="' + ttGhiNho + '">' + t('remember_scan_data') + '</div></div><label class="CongTac"><input type="checkbox" id="cd-uninstaller-ghi-nho-du-lieu" ' + (CauHinh.uninstallerGhiNhoDuLieu !== false ? 'checked' : '') + '><span class="CongTac_Thanh"></span></label></div>' +
       '</div>';
   } else if (i === 4) {
     let mode = localStorage.getItem('tienich-che-do') || 'thong_minh';
@@ -1579,11 +1799,10 @@ async function LuuCaiDat() {
   const idsToSave = [
     { id: 'cd-chung-da-luong', key: 'caidat-chung-da-luong', cauHinhKey: 'chungDaLuong' },
     { id: 'cd-chung-hien-tien-trinh', key: 'caidat-chung-hien-tien-trinh', cauHinhKey: 'chungHienTienTrinh' },
-    { id: 'cd-chung-an-khong-ho-tro', key: 'caidat-chung-an-khong-ho-tro', cauHinhKey: 'chungAnKhongHoTro' },
     { id: 'cd-chung-hien-thong-bao', key: 'caidat-chung-hien-thong-bao', cauHinhKey: 'chungHienThongBao' },
-    { id: 'cd-installer-thu-nho', key: 'caidat-installer-thu-nho', cauHinhKey: 'installerThuNho' },
+    { id: 'cd-installer-hoi-xac-nhan', key: 'caidat-installer-hoi-xac-nhan', cauHinhKey: 'installerHoiXacNhan' },
     { id: 'cd-uninstaller-hoi-xac-nhan', key: 'caidat-uninstaller-hoi-xac-nhan', cauHinhKey: 'uninstallerHoiXacNhan' },
-    { id: 'cd-uninstaller-thu-nho', key: 'caidat-uninstaller-thu-nho', cauHinhKey: 'uninstallerThuNho' }
+    { id: 'cd-uninstaller-ghi-nho-du-lieu', key: 'caidat-uninstaller-ghi-nho-du-lieu', cauHinhKey: 'uninstallerGhiNhoDuLieu' }
   ];
   idsToSave.forEach(item => {
     let el = document.getElementById(item.id);
@@ -1623,19 +1842,20 @@ function DatLaiCaiDat() {
       });
     });
   }
-  const chungKeys = ['caidat-chung-da-luong', 'caidat-chung-hien-tien-trinh', 'caidat-chung-an-khong-ho-tro', 'caidat-chung-hien-thong-bao'];
+  const chungKeys = ['caidat-chung-da-luong', 'caidat-chung-hien-tien-trinh', 'caidat-chung-hien-thong-bao'];
   const oldKeys = ['caidat-installer-tai-da-luong', 'caidat-installer-tu-dong-chon', 'caidat-installer-thu-nho', 'caidat-installer-hien-tien-trinh', 'caidat-installer-hien-thong-bao', 'caidat-uninstaller-go-ngam', 'caidat-uninstaller-hoi-xac-nhan', 'caidat-uninstaller-hien-tien-trinh', 'caidat-uninstaller-hien-thong-bao', 'caidat-uninstaller-thu-nho'];
   const tienIchKeys = ['tienich-canh-bao-odia', 'tienich-chi-pho-bien', 'tienich-xac-nhan-don', 'tienich-so-lan', 'tienich-che-do'];
   chungKeys.concat(oldKeys).concat(tienIchKeys).forEach(k => localStorage.removeItem(k));
   CauHinh.boTron = true;
   CauHinh.tatAnim = false;
+  CauHinh.uninstallerGhiNhoDuLieu = true;
+  CauHinh.uninstallerGhiNhoNgay = true;
   CauHinh.coChu = 14;
   CauHinh.trongSuot = 0;
   CauHinh.chungDaLuong = true;
   CauHinh.chungHienTienTrinh = true;
   CauHinh.chungAnKhongHoTro = false;
   CauHinh.chungHienThongBao = true;
-  CauHinh.installerThuNho = true;
   CauHinh.uninstallerHoiXacNhan = true;
   if (window.DienTu?.DatLuonTrenCung) window.DienTu.DatLuonTrenCung(false);
   if (window.DienTu?.DatThuNhoKhay) window.DienTu.DatThuNhoKhay(true);
@@ -1666,7 +1886,7 @@ async function KiemTraCapNhat(tuDong = false) {
     if (!response.ok) throw new Error('Network error');
     let data = await response.json();
     let latestVersion = data.tag_name.replace('v', '');
-    
+
     let cmp = SoSanhPhienBan(currentVersion, latestVersion);
     if (cmp >= 0) {
       if (!tuDong) HienThongBao(t('update_latest'), 'thanh-cong');
@@ -1675,62 +1895,66 @@ async function KiemTraCapNhat(tuDong = false) {
       if (cham) cham.classList.remove('an');
       let nutNhanh = document.getElementById('nut-cap-nhat-nhanh');
       if (nutNhanh) nutNhanh.classList.remove('an');
-      
+
       let setupAsset = data.assets.find(a => a.name.endsWith('_x64-setup.exe') || a.name.includes('setup.exe'));
       if (!setupAsset) {
         if (!tuDong) HienThongBao(t('update_error') + ': Không tìm thấy file cài đặt trên GitHub', 'canh-bao');
         return;
       }
-      
+
       if (!tuDong) {
         let confirmUpdate = await HienHopThoaiXacNhanCustom("Có phiên bản mới: <b>" + data.tag_name + "</b><br>Bạn có muốn tải xuống và cài đặt ngay không?");
         if (confirmUpdate) {
-        MoHopThoaiTienTrinh("Tải xuống bản cập nhật...", []);
-        
-        let nutHuy = document.getElementById('dong-tien-trinh');
-        if (nutHuy) {
+          MoHopThoaiTienTrinh("Tải xuống bản cập nhật...", []);
+
+          let nutHuy = document.getElementById('dong-tien-trinh');
+          if (nutHuy) {
             nutHuy.disabled = true;
             nutHuy.style.opacity = '0.5';
             nutHuy.textContent = 'Đang tải...';
-        }
+          }
 
-        let ds = document.getElementById('tien-trinh-danh-sach');
-        if (ds) {
+          let ds = document.getElementById('tien-trinh-danh-sach');
+          if (ds) {
             ds.innerHTML = '<div class="TienTrinh_Muc"><div class="TienTrinh_Ten">Nex Launcher ' + latestVersion + '</div><div class="TienTrinh_TrangThai">Đang tải... 0%</div></div>';
+          }
+
+          let unlisten = await window.DienTu.KhiTienTrinhCapNhatApp((payload) => {
+            let percent = Math.round(payload.percent);
+            document.getElementById('tien-trinh-thanh').style.width = percent + '%';
+            document.getElementById('tien-trinh-phan-tram').textContent = percent + '%';
+            let mb = document.getElementById('mini-progress-bar');
+            if (mb) mb.style.width = percent + '%';
+            let mt = document.getElementById('mini-progress-percent');
+            if (mt) mt.textContent = percent + '%';
+
+            let muc = document.querySelector('.TienTrinh_TrangThai');
+            if (muc) {
+              muc.textContent = "Đang tải... " + percent + "%";
+              if (percent >= 100) {
+                muc.textContent = "Hoàn tất";
+                muc.className = "TienTrinh_TrangThai thanh-cong";
+                unlisten();
+              }
+            }
+          });
+
+          window.DienTu.TaiVaCaiDatCapNhat(setupAsset.browser_download_url, setupAsset.name).catch((e) => {
+            console.error(e);
+            HienThongBao(t('update_error') + ': Lỗi khi tải xuống', 'canh-bao');
+            let muc = document.querySelector('.TienTrinh_TrangThai');
+            if (muc) {
+              muc.textContent = "Lỗi";
+              muc.className = "TienTrinh_TrangThai loi";
+            }
+            if (nutHuy) {
+              nutHuy.disabled = false;
+              nutHuy.style.opacity = '1';
+              nutHuy.textContent = t('cancel_btn') || 'Đóng';
+              nutHuy.dataset.isCancel = 'false';
+            }
+          });
         }
-        
-        let unlisten = await window.DienTu.KhiTienTrinhCapNhatApp((payload) => {
-           let percent = Math.round(payload.percent);
-           document.getElementById('tien-trinh-thanh').style.width = percent + '%';
-           document.getElementById('tien-trinh-phan-tram').textContent = percent + '%';
-           
-           let muc = document.querySelector('.TienTrinh_TrangThai');
-           if (muc) {
-               muc.textContent = "Đang tải... " + percent + "%";
-               if (percent >= 100) {
-                   muc.textContent = "Hoàn tất";
-                   muc.className = "TienTrinh_TrangThai thanh-cong";
-                   unlisten();
-               }
-           }
-        });
-        
-        window.DienTu.TaiVaCaiDatCapNhat(setupAsset.browser_download_url, setupAsset.name).catch((e) => {
-           console.error(e);
-           HienThongBao(t('update_error') + ': Lỗi khi tải xuống', 'canh-bao');
-           let muc = document.querySelector('.TienTrinh_TrangThai');
-           if (muc) {
-               muc.textContent = "Lỗi";
-               muc.className = "TienTrinh_TrangThai loi";
-           }
-           if (nutHuy) {
-               nutHuy.disabled = false;
-               nutHuy.style.opacity = '1';
-               nutHuy.textContent = t('cancel_btn') || 'Đóng';
-               nutHuy.dataset.isCancel = 'false';
-           }
-        });
-      }
       }
     }
   } catch (error) {
@@ -1751,6 +1975,10 @@ function HienThongBao(nd, loai) {
   var tb = document.createElement('div'); tb.className = 'ThongBao ThongBao--' + loai; tb.textContent = nd;
   vung.appendChild(tb); setTimeout(function () { if (tb.parentNode) tb.remove(); }, 4000);
 }
+
+// ==========================================
+// === [ PROCESS & PROGRESS MANAGEMENT ] ===
+// ==========================================
 function MoHopThoaiTienTrinh(tieuDe, danhSachApp) {
   var h = document.getElementById('hop-thoai-tien-trinh');
   var lp = document.getElementById('lop-phu-modal');
@@ -1758,14 +1986,49 @@ function MoHopThoaiTienTrinh(tieuDe, danhSachApp) {
   document.getElementById('tien-trinh-tieu-de').textContent = tieuDe;
   document.getElementById('tien-trinh-thanh').style.width = '0%';
   document.getElementById('tien-trinh-thanh').style.animation = '';
+  document.getElementById('tien-trinh-thanh').classList.remove('hoan-tat');
   document.getElementById('tien-trinh-phan-tram').textContent = '0%';
+
+  let miniProgInit = document.getElementById('sidebar-mini-progress');
+  if (miniProgInit) {
+    miniProgInit.style.display = 'none';
+    let mt = document.getElementById('mini-progress-title');
+    if (mt) { mt.textContent = tieuDe; mt.style.color = 'var(--chu-chinh)'; }
+    let mp = document.getElementById('mini-progress-percent');
+    if (mp) { mp.textContent = '0%'; mp.style.color = 'var(--mau-nhan)'; }
+    let mb = document.getElementById('mini-progress-bar');
+    if (mb) { mb.style.width = '0%'; mb.style.backgroundColor = tieuDe.toLowerCase().includes('gỡ') || tieuDe.toLowerCase().includes('uninstall') ? 'var(--nguy-hiem)' : 'var(--mau-nhan)'; }
+  }
+
+  window.isProgressAnimating = false;
+  window.currentProgress = 0;
+  window.targetProgress = 0;
+  window.FakeInstallProgress = {};
+  window.AppStatuses = {};
+  window.AppErrorDetails = {};
+  window.AppErrorStage = null;
+  window.LastStatusApp = {};
+
+  let isUninstall = tieuDe.toLowerCase().includes('gỡ') || tieuDe.toLowerCase().includes('uninstall');
+  window.danhSachAppTienTrinh = danhSachApp;
+  window.phanTramTungApp = {};
+  window.isUninstallMode = isUninstall;
+  window.CurrentGlobalStage = null;
+
   var wrapper = document.getElementById('tien-trinh-wrapper');
-  if (wrapper) wrapper.style.display = 'block';
   var dsSum = document.getElementById('tien-trinh-tong-ket-don-dep');
   if (dsSum) dsSum.style.display = 'none';
+  var dsRp = document.getElementById('tien-trinh-diem-khoi-phuc');
+  if (dsRp) dsRp.style.display = 'none';
   var btnNext = document.getElementById('tiep-theo-tien-trinh');
   if (btnNext) btnNext.style.display = 'none';
-  if (ds) ds.style.display = 'block';
+  if (ds) {
+    ds.style.display = 'block';
+    ds.innerHTML = '';
+  }
+
+  document.getElementById('tien-trinh-thanh').style.backgroundColor = isUninstall ? 'var(--nguy-hiem)' : 'var(--mau-nhan)';
+
   var nutDong = document.getElementById('dong-tien-trinh');
   if (nutDong) {
     nutDong.disabled = false;
@@ -1783,91 +2046,416 @@ function MoHopThoaiTienTrinh(tieuDe, danhSachApp) {
     btnAn.addEventListener('click', () => {
       document.getElementById('hop-thoai-tien-trinh').classList.add('an');
       document.getElementById('lop-phu-modal').classList.add('an');
+      let mini = document.getElementById('sidebar-mini-progress');
+      if (mini) mini.style.display = 'flex';
     });
   }
 
-  ds.innerHTML = '';
+  let miniProgClick = document.getElementById('sidebar-mini-progress');
+  if (miniProgClick && !miniProgClick.dataset.hasListener) {
+    miniProgClick.dataset.hasListener = 'true';
+    miniProgClick.addEventListener('click', () => {
+      miniProgClick.style.display = 'none';
+      document.getElementById('hop-thoai-tien-trinh').classList.remove('an');
+      document.getElementById('lop-phu-modal').classList.remove('an');
+    });
+  }
+
+  let globalStages = document.getElementById('tien-trinh-global-stages');
+  if (globalStages) {
+    globalStages.innerHTML = '';
+    let stagesData = [];
+
+    if (isUninstall) {
+      let opts = {};
+      try {
+        opts = JSON.parse(localStorage.getItem('uninstall_opts') || '{}');
+      } catch (e) { }
+
+      if (opts.taoDiemLuu || opts.xoaTanDu) {
+        if (opts.taoDiemLuu) stagesData.push({ id: 'rs', name: 'Điểm lưu' });
+        stagesData.push({ id: 'un', name: 'Gỡ cài đặt' });
+        if (opts.xoaTanDu) stagesData.push({ id: 'cl', name: 'Xóa tàn dư' });
+      }
+    } else {
+      let isAllDownloadable = danhSachApp.every(app => {
+        let isFileOrGop = typeof app === 'object' && ((app.source && app.source.type === 'File') || app.isFile || app.isGop || app.isMsStore);
+        return !isFileOrGop;
+      });
+      if (isAllDownloadable) {
+        stagesData.push({ id: 'dl', name: 'Tải xuống' });
+        stagesData.push({ id: 'in', name: 'Cài đặt' });
+      }
+    }
+
+    if (stagesData.length > 0) {
+      stagesData.forEach((st) => {
+        let item = document.createElement('div');
+        item.className = 'GlobalStage_Item';
+        item.id = 'global-stage-' + st.id;
+        item.style.cssText = 'flex: 1; height: 6px; border-radius: var(--do-bo-nho); background: var(--nen-tang3); transition: all 0.3s; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); position: relative;';
+        let tooltip = document.createElement('div');
+        tooltip.style.cssText = 'position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: var(--chu-phu); white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none;';
+        tooltip.textContent = st.name;
+        tooltip.className = 'stage-tooltip';
+        item.appendChild(tooltip);
+        item.addEventListener('mouseenter', () => tooltip.style.opacity = '1');
+        item.addEventListener('mouseleave', () => tooltip.style.opacity = '0');
+        globalStages.appendChild(item);
+      });
+      globalStages.style.display = 'flex';
+    } else {
+      globalStages.style.display = 'none';
+    }
+  }
+
+  window.GlobalAppList = danhSachApp.map(app => {
+    let name = typeof app === 'string' ? app : (app.name || app.id || 'Unknown App');
+    let isFileOrGop = typeof app === 'object' && ((app.source && app.source.type === 'File') || app.isFile || app.isGop || app.isMsStore);
+    return { name: name, isFile: isFileOrGop };
+  });
+
   danhSachApp.forEach(app => {
-    var hang = document.createElement('div');
+    let hang = document.createElement('div');
     hang.className = 'TienTrinh_Muc';
     hang.style.display = 'flex';
     hang.style.alignItems = 'center';
     hang.style.justifyContent = 'space-between';
+    hang.style.padding = '8px 0';
+    hang.style.borderBottom = '1px solid var(--vien)';
 
-    var ten = document.createElement('div');
-    ten.className = 'TienTrinh_Ten';
-    ten.style.flex = '1';
-    ten.style.minWidth = '0';
-    ten.style.fontWeight = '500';
-    ten.style.whiteSpace = 'nowrap';
-    ten.style.overflow = 'hidden';
-    ten.style.textOverflow = 'ellipsis';
-    ten.style.paddingRight = '12px';
-    ten.style.paddingLeft = '12px';
-    ten.textContent = app.name;
-    ten.title = app.name;
+    let tenApp = typeof app === 'string' ? app : (app.name || app.id || 'Unknown App');
+    let tenWrap = document.createElement('div');
+    tenWrap.className = 'TienTrinh_TenWrap';
+    tenWrap.style.display = 'flex';
+    tenWrap.style.flexDirection = 'column';
+    tenWrap.style.flex = '1';
+    tenWrap.style.minWidth = '0';
 
-    var luong = document.createElement('div');
-    luong.className = 'TienTrinh_Luong';
-    luong.style.width = '80px';
-    luong.style.flexShrink = '0';
-    luong.style.textAlign = 'center';
-    luong.style.color = 'var(--chu-phu)';
-    luong.style.fontSize = '0.85em';
-    luong.textContent = t('single_thread');
+    let appMode = typeof app === 'object' && app.mode ? app.mode : (isUninstall ? 'Đơn luồng' : 'Đơn luồng');
+    let theLoaiHtml = `<span class="app-thread-mode" id="thread-mode-${encodeURIComponent(tenApp).replace(/%/g, '_')}" style="opacity: 0.6; font-size: 0.9em; margin-right: 20px; display: inline-block; width: 75px; text-align: left;">${appMode}</span>`;
 
-    var tt = document.createElement('div');
+    let topRow = document.createElement('div');
+    topRow.style.display = 'flex';
+    topRow.style.alignItems = 'center';
+    topRow.innerHTML = `
+<div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 16px; min-width: 0;" title="${tenApp}">${tenApp}</div>
+${theLoaiHtml}
+`;
+    tenWrap.appendChild(topRow);
+
+    let tt = document.createElement('div');
     tt.className = 'TienTrinh_TrangThai';
-    tt.style.width = '70px';
+    tt.style.width = '130px';
     tt.style.flexShrink = '0';
-    tt.style.textAlign = 'right';
+    tt.style.display = 'flex';
+    tt.style.alignItems = 'center';
+    tt.style.justifyContent = 'flex-end';
     tt.style.fontSize = '0.9em';
     tt.style.paddingRight = '12px';
-    tt.id = 'tien-trinh-tt-' + encodeURIComponent(app.name).replace(/%/g, '_');
-    tt.textContent = '0%';
-    tt.style.color = 'var(--nguy-hiem)';
-    tt.style.textShadow = '0 1px 2px rgba(0,0,0,0.3)';
-    tt.title = t('processing');
-    hang.appendChild(ten);
-    hang.appendChild(luong);
+    tt.id = 'tien-trinh-tt-' + encodeURIComponent(tenApp).replace(/%/g, '_');
+    tt.innerHTML = '<span class="status-text" style="display: inline-block; width: 105px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px;">Đang chờ...</span><span class="spinner" id="spinner-' + encodeURIComponent(tenApp).replace(/%/g, '_') + '" style="display: none; flex-shrink: 0;"></span>';
+    tt.style.color = 'var(--chu-phu)';
+
+    hang.appendChild(tenWrap);
     hang.appendChild(tt);
     ds.appendChild(hang);
   });
+  if (ds.lastChild) {
+    ds.lastChild.style.borderBottom = 'none';
+  }
   h?.classList.remove('an');
   lp?.classList.remove('an');
   ds.scrollTop = 0;
 }
-function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatus) {
+function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatus, rawStatus) {
   var h = document.getElementById('hop-thoai-tien-trinh');
   if (!h || h.classList.contains('an')) return;
+
+  // --- Per-app progress tracking ---
+  if (!window.phanTramTungApp) window.phanTramTungApp = {};
+  if (!window.AppStatuses) window.AppStatuses = {};
+  if (!window.AppErrorDetails) window.AppErrorDetails = {};
+  if (!window.FakeInstallProgress) window.FakeInstallProgress = {};
+  if (!window.LastStatusApp) window.LastStatusApp = {};
+
+  // Fake install progress for "installing" status (no real progress updates)
+  if (rawStatus === 'installing') {
+    if (!window.FakeInstallProgress[tenApp]) {
+      let intervalId = null;
+      window.FakeInstallProgress[tenApp] = { pct: phanTram || 0 };
+      intervalId = setInterval(() => {
+        if (!window.AppStatuses || window.AppStatuses[tenApp] !== 'installing' || !window.FakeInstallProgress[tenApp]) {
+          clearInterval(intervalId);
+          return;
+        }
+        let obj = window.FakeInstallProgress[tenApp];
+        if (obj.pct < 99) {
+          obj.pct += Math.floor(Math.random() * 3) + 1;
+          if (obj.pct > 99) obj.pct = 99;
+          let ttEl_local = document.getElementById('tien-trinh-tt-' + encodeURIComponent(tenApp).replace(/%/g, '_'));
+          if (ttEl_local) {
+            let txt = ttEl_local.querySelector('.status-text');
+            if (txt) txt.textContent = obj.pct + '%';
+          }
+          if (window.phanTramTungApp) {
+            window.phanTramTungApp[tenApp] = obj.pct;
+          }
+        }
+      }, 800);
+    }
+    trangThai = window.FakeInstallProgress[tenApp].pct + '%';
+    phanTram = window.FakeInstallProgress[tenApp].pct;
+  } else {
+    if (window.FakeInstallProgress && window.FakeInstallProgress[tenApp]) {
+      delete window.FakeInstallProgress[tenApp];
+    }
+  }
+
+  // Update per-app progress
+  window.phanTramTungApp[tenApp] = phanTram;
+  if (rawStatus === 'done' || rawStatus === 'error') {
+    window.phanTramTungApp[tenApp] = 100;
+  }
+  window.AppStatuses[tenApp] = rawStatus;
+
+  if (rawStatus === 'error') {
+    if (!window.AppErrorDetails) window.AppErrorDetails = {};
+    window.AppErrorDetails[tenApp] = fullStatus || "Lỗi không xác định";
+  }
+
+  // Calculate total progress from all apps
+  let tongPhanTram = 0;
+  if (TienTrinhSoApp > 0 && window.danhSachAppTienTrinh) {
+    let tongDiem = 0;
+    for (let app of window.danhSachAppTienTrinh) {
+      let appName = typeof app === 'string' ? app : (app.name || app.id || 'Unknown App');
+      let t_val = window.phanTramTungApp[appName] || 0;
+      tongDiem += t_val;
+    }
+    tongPhanTram = Math.min(100, tongDiem / TienTrinhSoApp);
+  }
+
+  // --- Update status element ---
   var idTt = 'tien-trinh-tt-' + encodeURIComponent(tenApp).replace(/%/g, '_');
   var ttEl = document.getElementById(idTt);
   if (ttEl) {
-    ttEl.textContent = trangThai;
+    let spanText = ttEl.querySelector('.status-text');
+    let spanSpin = ttEl.querySelector('.spinner');
+    let displayTrangThai = trangThai;
+    if (displayTrangThai === t('error_status') || displayTrangThai === 'Lỗi') displayTrangThai = 'Lỗi - Bỏ qua';
+    if (spanText) spanText.textContent = displayTrangThai;
+    else ttEl.textContent = displayTrangThai;
+
     if (mauChu) ttEl.style.color = mauChu;
     ttEl.style.textShadow = '0 1px 2px rgba(0,0,0,0.3)';
     if (fullStatus) ttEl.title = fullStatus;
-  }
-  if (ttEl && ttEl.parentElement) {
-    var ds = document.getElementById('tien-trinh-danh-sach');
-    var offsetTop = ttEl.parentElement.offsetTop;
-    if (offsetTop > ds.scrollTop + ds.clientHeight - 50 || offsetTop < ds.scrollTop) {
-      ds.scrollTop = offsetTop - ds.clientHeight / 2;
+
+    if (rawStatus === 'done' || rawStatus === 'error') {
+      if (spanSpin) spanSpin.style.display = 'none';
+      ttEl.className = 'TienTrinh_TrangThai ' + (rawStatus === 'done' ? 'thanh-cong' : 'loi');
+      if (rawStatus === 'done') ttEl.style.color = 'var(--thanh-cong)';
+    } else {
+      if (spanSpin) spanSpin.style.display = 'inline-block';
     }
   }
-  let tongPhanTram = Math.min(100, ((Math.max(0, TienTrinhHienTai - 1) * 100 + phanTram) / TienTrinhSoApp));
-  document.getElementById('tien-trinh-thanh').style.width = tongPhanTram + '%';
 
-  let mauThanh = 'var(--nguy-hiem)';
-  if (tongPhanTram >= 75) mauThanh = 'var(--thanh-cong)';
+  // --- Auto-scroll to active item ---
+  if (ttEl && ttEl.parentElement) {
+    if (!window.LastStatusApp) window.LastStatusApp = {};
+    if (window.LastStatusApp[tenApp] !== rawStatus) {
+      window.LastStatusApp[tenApp] = rawStatus;
+      if (rawStatus === 'installing' || rawStatus === 'downloading' || rawStatus === 'uninstalling') {
+        let ds = document.getElementById('tien-trinh-danh-sach');
+        if (ds) {
+          let offsetTop = ttEl.parentElement.offsetTop;
+          if (offsetTop > ds.scrollTop + ds.clientHeight - 50 || offsetTop < ds.scrollTop) {
+            ds.scrollTo({ top: offsetTop - 50, behavior: 'smooth' });
+          }
+        }
+      }
+    }
+
+    // Update thread mode display
+    let threadModeEl = document.getElementById('thread-mode-' + encodeURIComponent(tenApp).replace(/%/g, '_'));
+    if (threadModeEl && rawStatus === 'downloading') {
+      threadModeEl.textContent = 'Đa luồng';
+      threadModeEl.style.color = 'var(--mau-nhan)';
+      threadModeEl.style.opacity = '1';
+    }
+  }
+
+  // --- Global stage management ---
+  if (window.GlobalAppList) {
+    let hasDownloading = false;
+    let allDoneOrError = true;
+    let hasError = false;
+    for (let app of window.GlobalAppList) {
+      let st = window.AppStatuses[app.name] || 'waiting';
+      if (st !== 'done' && st !== 'error') allDoneOrError = false;
+      if (st === 'error') hasError = true;
+      if (st === 'downloading' || (!app.isFile && st === 'waiting')) hasDownloading = true;
+    }
+    if (window.isUninstallMode) hasError = false;
+
+    let tieuDe = document.getElementById('tien-trinh-tieu-de');
+    let isProcessFinished = allDoneOrError;
+
+    if (!window.isUninstallMode) {
+      let dlStage = document.getElementById('global-stage-dl');
+      let inStage = document.getElementById('global-stage-in');
+      if (dlStage && inStage) {
+        if (allDoneOrError) {
+          if (hasError) {
+            dlStage.style.background = 'var(--thanh-cong)';
+            inStage.style.background = 'var(--nguy-hiem)';
+          } else {
+            dlStage.style.background = 'var(--thanh-cong)';
+            inStage.style.background = 'var(--thanh-cong)';
+          }
+          if (tieuDe) tieuDe.textContent = hasError ? 'Tiến trình kết thúc (Có lỗi nghiêm trọng)' : 'Hoàn tất tiến trình';
+        } else if (hasDownloading) {
+          dlStage.style.background = 'var(--canh-bao)';
+          inStage.style.background = 'var(--nen-tang3)';
+          if (tieuDe) tieuDe.textContent = 'Đang tải xuống dữ liệu...';
+        } else {
+          dlStage.style.background = 'var(--thanh-cong)';
+          inStage.style.background = 'var(--canh-bao)';
+          if (tieuDe) tieuDe.textContent = 'Đang tiến hành cài đặt...';
+        }
+      }
+    } else {
+      // Uninstall mode stage management
+      let globalItems = document.querySelectorAll('.GlobalStage_Item');
+      let targetStage = window.CurrentGlobalStage || 'un';
+
+      let dsRs = document.getElementById('tien-trinh-diem-khoi-phuc');
+      let dsLs = document.getElementById('tien-trinh-danh-sach');
+      let dsSum = document.getElementById('tien-trinh-tong-ket-don-dep');
+
+      if (targetStage === 'rs') {
+        if (dsRs) dsRs.style.display = 'flex';
+        if (dsLs) dsLs.style.display = 'none';
+      } else if (targetStage === 'un') {
+        if (dsRs) dsRs.style.display = 'none';
+        if (dsLs && dsSum && dsSum.style.display === 'none') dsLs.style.display = 'block';
+      }
+
+      if (globalItems.length > 0) {
+        let foundActive = false;
+        globalItems.forEach(item => {
+          if (item.id === 'global-stage-' + targetStage) {
+            if (allDoneOrError && hasError) item.style.background = 'var(--nguy-hiem)';
+            else if (allDoneOrError) item.style.background = 'var(--thanh-cong)';
+            else item.style.background = 'var(--canh-bao)';
+            foundActive = true;
+          } else if (!foundActive) {
+            item.style.background = 'var(--thanh-cong)';
+          } else {
+            item.style.background = 'var(--nen-tang3)';
+          }
+        });
+      }
+      if (tieuDe) {
+        if (allDoneOrError) tieuDe.textContent = hasError ? 'Tiến trình kết thúc (Có lỗi)' : 'Hoàn tất tiến trình';
+        else if (targetStage === 'rs') tieuDe.textContent = 'Đang tạo điểm khôi phục...';
+        else if (targetStage === 'cl') tieuDe.textContent = 'Đang quét dữ liệu thừa...';
+        else tieuDe.textContent = 'Đang tiến hành gỡ cài đặt...';
+      }
+    }
+
+    // --- Button state management on completion ---
+    if (isProcessFinished) {
+      let btnHuy = document.getElementById('dong-tien-trinh');
+      let btnBaoCao = document.getElementById('bao-cao-loi');
+      let btnNext = document.getElementById('tiep-theo-tien-trinh');
+      if (btnNext) btnNext.style.display = 'none';
+      if (btnHuy) {
+        btnHuy.textContent = t('close_btn') || 'Đóng';
+        btnHuy.dataset.isCancel = 'false';
+        if (hasError) {
+          btnHuy.style.background = '';
+          btnHuy.style.color = '';
+          btnHuy.style.border = '';
+          if (btnBaoCao) {
+            btnBaoCao.style.display = 'block';
+            btnBaoCao.onclick = () => {
+              let details = "=== BÁO CÁO LỖI HỆ THỐNG ===\nThời gian: " + new Date().toLocaleString() + "\n\nDanh sách các tiến trình thất bại:\n";
+              if (window.AppErrorDetails) {
+                for (let app in window.AppErrorDetails) {
+                  details += "- [" + app + "]: " + window.AppErrorDetails[app] + "\n";
+                }
+              }
+              document.getElementById('chi-tiet-bao-cao-loi').value = details;
+              document.getElementById('lop-phu-modal').classList.remove('an');
+              document.getElementById('hop-thoai-bao-cao-loi').classList.remove('an');
+            };
+          }
+        } else {
+          btnHuy.style.background = 'var(--mau-nhan)';
+          btnHuy.style.color = '#fff';
+          btnHuy.style.border = 'none';
+          if (btnBaoCao) btnBaoCao.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  // --- Smooth animated progress bar ---
+  let isUninstall = window.isUninstallMode;
+  let mauThanh = isUninstall ? 'var(--canh-bao)' : 'var(--mau-nhan)';
+  if (tongPhanTram >= 100) mauThanh = 'var(--thanh-cong)';
+  else if (tongPhanTram >= 75) mauThanh = 'var(--thanh-cong)';
   else if (tongPhanTram >= 50) mauThanh = 'var(--canh-bao)';
   else if (tongPhanTram >= 25) mauThanh = 'var(--mau-uoc-tinh)';
   document.getElementById('tien-trinh-thanh').style.backgroundColor = mauThanh;
-  document.getElementById('tien-trinh-thanh').style.transition = 'width 0.3s ease, background-color 0.5s ease';
 
-  let phanTramText = document.getElementById('tien-trinh-phan-tram');
-  phanTramText.textContent = Math.round(tongPhanTram) + '%';
-  phanTramText.style.textShadow = '0 1px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)';
+  window.targetProgress = tongPhanTram;
+
+  if (window.targetProgress === 0) {
+    window.currentProgress = 0;
+    document.getElementById('tien-trinh-thanh').style.width = '0%';
+    let ptText = document.getElementById('tien-trinh-phan-tram');
+    if (ptText) ptText.textContent = '0%';
+  } else if (!window.isProgressAnimating) {
+    if (typeof window.currentProgress !== 'number') {
+      window.currentProgress = parseFloat(document.getElementById('tien-trinh-thanh').style.width) || 0;
+    }
+    window.isProgressAnimating = true;
+
+    let animate = () => {
+      let pBar = document.getElementById('tien-trinh-thanh');
+      if (!pBar) { window.isProgressAnimating = false; return; }
+
+      let diff = window.targetProgress - window.currentProgress;
+      if (diff < 0) { window.targetProgress = window.currentProgress; diff = 0; }
+
+      if (diff > 0) {
+        let step = Math.max(0.5, diff * 0.1);
+        if (step > diff) step = diff;
+        window.currentProgress += step;
+      }
+
+      pBar.style.width = window.currentProgress + '%';
+      let ptText = document.getElementById('tien-trinh-phan-tram');
+      if (ptText) {
+        ptText.textContent = Math.round(window.currentProgress) + '%';
+        ptText.style.textShadow = '0 1px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)';
+      }
+      let mb = document.getElementById('mini-progress-bar');
+      if (mb) mb.style.width = window.currentProgress + '%';
+      let mt = document.getElementById('mini-progress-percent');
+      if (mt) mt.textContent = Math.round(window.currentProgress) + '%';
+
+      if (window.currentProgress >= window.targetProgress) {
+        window.currentProgress = window.targetProgress;
+        window.isProgressAnimating = false;
+      } else {
+        requestAnimationFrame(animate);
+      }
+    };
+    requestAnimationFrame(animate);
+  }
 }
 function HoanTatHopThoaiTienTrinh(ketQua, hasLeftovers) {
   let coLoi = false;
@@ -1882,9 +2470,53 @@ function HoanTatHopThoaiTienTrinh(ketQua, hasLeftovers) {
       if (!k.success) coLoi = true;
     });
   }
+  let tieuDe = document.getElementById('tien-trinh-tieu-de');
+  if (tieuDe) tieuDe.textContent = coLoi ? (t('error_status') ? 'Tiến trình kết thúc (Có lỗi)' : 'Hoàn tất tiến trình (Có lỗi)') : (t('completed') || 'Hoàn tất');
+
+  let globalStages = document.getElementById('tien-trinh-global-stages');
+  if (globalStages) {
+    let dlStage = document.getElementById('global-stage-dl');
+    let inStage = document.getElementById('global-stage-in');
+    if (dlStage && inStage && !window.isUninstallMode) {
+      if (coLoi) {
+        dlStage.style.background = 'var(--thanh-cong)';
+        inStage.style.background = 'var(--nguy-hiem)';
+      } else {
+        dlStage.style.background = 'var(--thanh-cong)';
+        inStage.style.background = 'var(--thanh-cong)';
+      }
+    } else {
+      Array.from(globalStages.children).forEach(child => {
+        child.style.background = coLoi ? 'var(--nguy-hiem)' : 'var(--thanh-cong)';
+      });
+    }
+  }
+
+  // Sync animation state
+  window.currentProgress = 100;
+  window.targetProgress = 100;
+  window.isProgressAnimating = false;
+  // Clean up fake progress intervals
+  if (window.FakeInstallProgress) {
+    for (let key in window.FakeInstallProgress) delete window.FakeInstallProgress[key];
+  }
+
   document.getElementById('tien-trinh-thanh').style.width = '100%';
   document.getElementById('tien-trinh-thanh').style.animation = 'none';
+  document.getElementById('tien-trinh-thanh').classList.add('hoan-tat');
+  document.getElementById('tien-trinh-thanh').style.backgroundColor = coLoi ? 'var(--nguy-hiem)' : 'var(--thanh-cong)';
   document.getElementById('tien-trinh-phan-tram').textContent = '100%';
+
+  let miniProgEnd = document.getElementById('sidebar-mini-progress');
+  if (miniProgEnd) {
+    let mt = document.getElementById('mini-progress-title');
+    if (mt) { mt.textContent = coLoi ? 'Tiến trình kết thúc (Có lỗi)' : 'Hoàn tất'; mt.style.color = coLoi ? 'var(--nguy-hiem)' : 'var(--thanh-cong)'; }
+    let mp = document.getElementById('mini-progress-percent');
+    if (mp) { mp.textContent = '100%'; mp.style.color = coLoi ? 'var(--nguy-hiem)' : 'var(--thanh-cong)'; }
+    let mb = document.getElementById('mini-progress-bar');
+    if (mb) { mb.style.width = '100%'; mb.style.backgroundColor = coLoi ? 'var(--nguy-hiem)' : 'var(--thanh-cong)'; }
+  }
+
   var nutDong = document.getElementById('dong-tien-trinh');
   if (nutDong) {
     nutDong.disabled = false;
@@ -2057,6 +2689,8 @@ function DongHopThoaiTienTrinh() {
     return;
   }
   BatTatHopThoai('hop-thoai-tien-trinh', false);
+  let mini = document.getElementById('sidebar-mini-progress');
+  if (mini) mini.style.display = 'none';
 }
 let duongDanPhaHuy = "";
 let laPhaHuyODia = false;
@@ -2255,132 +2889,201 @@ function HienThiTanDuTrongTienTrinh(leftovers) {
     let btnDong = document.getElementById('dong-tien-trinh');
     let btnNext = document.getElementById('tiep-theo-tien-trinh');
     let tieuDe = document.getElementById('tien-trinh-tieu-de');
-    
+
     if (tieuDe) tieuDe.textContent = t('cleanup_status') || 'Đang dọn dẹp tàn dư hệ thống...';
     if (dsApp) dsApp.style.display = 'none';
     if (dsSum) {
-        dsSum.style.display = 'flex';
-        if (regSum) regSum.innerHTML = '';
-        if (fileSum) fileSum.innerHTML = '';
-        
-        let regItems = leftovers.filter(i => i.type === 'registry');
-        let fileItems = leftovers.filter(i => i.type !== 'registry');
-        
-        if (regItems.length === 0 && regSum) {
-            let d = document.createElement('div'); d.textContent = t('no_registry_leftovers') || 'Không tìm thấy tàn dư Registry nào.'; d.style.fontStyle = 'italic'; d.style.opacity = '0.7'; d.style.fontSize = '0.857rem'; regSum.appendChild(d);
-        } else if (regSum) {
-            regItems.forEach((r, i) => {
-                let d = document.createElement('div');
-                d.className = 'TuyChonCheckbox';
-                d.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; padding: 4px 8px; border-radius: var(--do-bo-nho); border-bottom: 1px solid var(--vien-nhat);';
-                d.innerHTML = `<input type="checkbox" class="OChon chk-tan-du" checked value="${i}" data-type="registry" style="margin-top: 0; flex-shrink: 0;"><span style="font-size: 0.857rem; color: var(--chu-chinh); word-break: break-all; font-family: monospace;">${r.path}</span>`;
-                regSum.appendChild(d);
-            });
-        }
-        
-        if (fileItems.length === 0 && fileSum) {
-            let d = document.createElement('div'); d.textContent = t('no_file_leftovers') || 'Không tìm thấy tệp tin tàn dư nào.'; d.style.fontStyle = 'italic'; d.style.opacity = '0.7'; d.style.fontSize = '0.857rem'; fileSum.appendChild(d);
-        } else if (fileSum) {
-            fileItems.forEach((f, i) => {
-                let d = document.createElement('div');
-                d.className = 'TuyChonCheckbox';
-                d.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; padding: 4px 8px; border-radius: var(--do-bo-nho); border-bottom: 1px solid var(--vien-nhat);';
-                d.innerHTML = `<input type="checkbox" class="OChon chk-tan-du" checked value="${i}" data-type="file" style="margin-top: 0; flex-shrink: 0;"><span style="font-size: 0.857rem; color: var(--chu-chinh); word-break: break-all; font-family: monospace;">${f.path}</span>`;
-                fileSum.appendChild(d);
-            });
-        }
+      dsSum.style.display = 'flex';
+      if (regSum) regSum.innerHTML = '';
+      if (fileSum) fileSum.innerHTML = '';
+
+      let regItems = leftovers.filter(i => i.type === 'registry');
+      let fileItems = leftovers.filter(i => i.type !== 'registry');
+
+      if (regItems.length === 0 && regSum) {
+        let d = document.createElement('div'); d.textContent = t('no_registry_leftovers') || 'Không tìm thấy tàn dư Registry nào.'; d.style.fontStyle = 'italic'; d.style.opacity = '0.7'; d.style.fontSize = '0.857rem'; regSum.appendChild(d);
+      } else if (regSum) {
+        regItems.forEach((r, i) => {
+          let d = document.createElement('div');
+          d.className = 'TuyChonCheckbox';
+          d.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; padding: 4px 8px; border-radius: var(--do-bo-nho); border-bottom: 1px solid var(--vien-nhat);';
+          d.innerHTML = `<input type="checkbox" class="OChon chk-tan-du" checked value="${i}" data-type="registry" style="margin-top: 0; flex-shrink: 0;"><span style="font-size: 0.857rem; color: var(--chu-chinh); word-break: break-all; font-family: monospace;">${r.path}</span>`;
+          regSum.appendChild(d);
+        });
+      }
+
+      if (fileItems.length === 0 && fileSum) {
+        let d = document.createElement('div'); d.textContent = t('no_file_leftovers') || 'Không tìm thấy tệp tin tàn dư nào.'; d.style.fontStyle = 'italic'; d.style.opacity = '0.7'; d.style.fontSize = '0.857rem'; fileSum.appendChild(d);
+      } else if (fileSum) {
+        fileItems.forEach((f, i) => {
+          let d = document.createElement('div');
+          d.className = 'TuyChonCheckbox';
+          d.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; padding: 4px 8px; border-radius: var(--do-bo-nho); border-bottom: 1px solid var(--vien-nhat);';
+          d.innerHTML = `<input type="checkbox" class="OChon chk-tan-du" checked value="${i}" data-type="file" style="margin-top: 0; flex-shrink: 0;"><span style="font-size: 0.857rem; color: var(--chu-chinh); word-break: break-all; font-family: monospace;">${f.path}</span>`;
+          fileSum.appendChild(d);
+        });
+      }
     }
-    
+
     if (btnDong) {
-        btnDong.textContent = t('close_btn');
-        btnDong.className = 'Nut Nut--Huy';
-        btnDong.disabled = false;
-        btnDong.style.opacity = '1';
-        btnDong.dataset.isNext = 'false';
+      btnDong.textContent = t('close_btn');
+      btnDong.className = 'Nut Nut--Huy';
+      btnDong.disabled = false;
+      btnDong.style.opacity = '1';
+      btnDong.dataset.isNext = 'false';
     }
     if (btnNext) {
-        btnNext.style.display = 'block';
-        btnNext.textContent = t('delete_leftovers') || 'Xóa tàn dư';
-        btnNext.disabled = false;
-        btnNext.className = 'Nut Nut--nguy-hiem';
+      btnNext.style.display = 'block';
+      btnNext.textContent = t('delete_leftovers') || 'Xóa tàn dư';
+      btnNext.disabled = false;
+      btnNext.className = 'Nut Nut--nguy-hiem';
     }
-    
+
     let btnHuyHandler = () => {
-        cleanup();
-        BatTatHopThoai('hop-thoai-tien-trinh', false);
-        resolve();
+      cleanup();
+      BatTatHopThoai('hop-thoai-tien-trinh', false);
+      let mini = document.getElementById('sidebar-mini-progress');
+      if (mini) mini.style.display = 'none';
+      resolve();
     };
-    
+
     let btnNextHandler = async () => {
-        if (btnNext) {
-            btnNext.disabled = true;
-            btnNext.textContent = t('processing');
+      if (btnNext) {
+        btnNext.disabled = true;
+        btnNext.textContent = t('processing');
+      }
+      let thanh = document.getElementById('tien-trinh-thanh');
+      if (thanh) {
+        thanh.style.width = '0%';
+        thanh.style.animation = '';
+        thanh.style.backgroundColor = 'var(--nguy-hiem)';
+      }
+      let pt = document.getElementById('tien-trinh-phan-tram');
+      if (pt) pt.textContent = '0%';
+
+      let selectedLeftovers = [];
+      let regItems = leftovers.filter(i => i.type === 'registry');
+      let fileItems = leftovers.filter(i => i.type !== 'registry');
+
+      document.querySelectorAll('#tong-ket-registry .chk-tan-du:checked').forEach(c => {
+        selectedLeftovers.push(regItems[parseInt(c.value)]);
+      });
+      document.querySelectorAll('#tong-ket-tep-tin .chk-tan-du:checked').forEach(c => {
+        selectedLeftovers.push(fileItems[parseInt(c.value)]);
+      });
+
+      if (selectedLeftovers.length > 0 && window.DienTu && window.DienTu.XoaTanDuThucSu) {
+        await window.DienTu.XoaTanDuThucSu(selectedLeftovers);
+      }
+
+      if (thanh) {
+        thanh.style.width = '100%';
+        thanh.style.animation = 'none';
+        thanh.style.backgroundColor = 'var(--thanh-cong)';
+      }
+      if (pt) pt.textContent = '100%';
+      if (tieuDe) tieuDe.textContent = t('completed');
+
+      document.querySelectorAll('.chk-tan-du').forEach(c => {
+        let parent = c.parentElement;
+        if (c.checked) {
+          let pathText = c.nextSibling ? c.nextSibling.textContent : '';
+          parent.innerHTML = `<span style="font-size: 0.857rem; color: var(--chu-chinh);"><span style="color:var(--thanh-cong)">✔</span> ${t('deleted') || 'Đã xóa'}: ${pathText}</span>`;
+        } else {
+          parent.style.opacity = '0.5';
+          c.disabled = true;
         }
-        let thanh = document.getElementById('tien-trinh-thanh');
-        if (thanh) {
-            thanh.style.width = '0%';
-            thanh.style.animation = '';
-            thanh.style.backgroundColor = 'var(--nguy-hiem)';
-        }
-        let pt = document.getElementById('tien-trinh-phan-tram');
-        if (pt) pt.textContent = '0%';
-        
-        let selectedLeftovers = [];
-        let regItems = leftovers.filter(i => i.type === 'registry');
-        let fileItems = leftovers.filter(i => i.type !== 'registry');
-        
-        document.querySelectorAll('#tong-ket-registry .chk-tan-du:checked').forEach(c => {
-             selectedLeftovers.push(regItems[parseInt(c.value)]);
-        });
-        document.querySelectorAll('#tong-ket-tep-tin .chk-tan-du:checked').forEach(c => {
-             selectedLeftovers.push(fileItems[parseInt(c.value)]);
-        });
-        
-        if (selectedLeftovers.length > 0 && window.DienTu && window.DienTu.XoaTanDuThucSu) {
-             await window.DienTu.XoaTanDuThucSu(selectedLeftovers);
-        }
-        
-        if (thanh) {
-            thanh.style.width = '100%';
-            thanh.style.animation = 'none';
-            thanh.style.backgroundColor = 'var(--thanh-cong)';
-        }
-        if (pt) pt.textContent = '100%';
-        if (tieuDe) tieuDe.textContent = t('completed');
-        
-        document.querySelectorAll('.chk-tan-du').forEach(c => {
-            let parent = c.parentElement;
-            if (c.checked) {
-                let pathText = c.nextSibling ? c.nextSibling.textContent : '';
-                parent.innerHTML = `<span style="font-size: 0.857rem; color: var(--chu-chinh);"><span style="color:var(--thanh-cong)">✔</span> ${t('deleted') || 'Đã xóa'}: ${pathText}</span>`;
-            } else {
-                parent.style.opacity = '0.5';
-                c.disabled = true;
-            }
-        });
-        
-        if (btnNext) btnNext.style.display = 'none';
-        if (btnDong) {
-            btnDong.textContent = t('close_btn');
-            btnDong.className = 'Nut Nut--chinh';
-        }
-        
-        cleanup();
-        
-        let closeAppHandler = () => {
-            if (btnDong) btnDong.removeEventListener('click', closeAppHandler);
-            BatTatHopThoai('hop-thoai-tien-trinh', false);
-            resolve();
-        };
-        if (btnDong) btnDong.addEventListener('click', closeAppHandler);
+      });
+
+      if (btnNext) btnNext.style.display = 'none';
+      if (btnDong) {
+        btnDong.textContent = t('close_btn');
+        btnDong.className = 'Nut Nut--chinh';
+      }
+
+      cleanup();
+
+      let closeAppHandler = () => {
+        if (btnDong) btnDong.removeEventListener('click', closeAppHandler);
+        BatTatHopThoai('hop-thoai-tien-trinh', false);
+        let mini = document.getElementById('sidebar-mini-progress');
+        if (mini) mini.style.display = 'none';
+        resolve();
+      };
+      if (btnDong) btnDong.addEventListener('click', closeAppHandler);
     };
-    
+
     function cleanup() {
-        if (btnDong) btnDong.removeEventListener('click', btnHuyHandler);
-        if (btnNext) btnNext.removeEventListener('click', btnNextHandler);
+      if (btnDong) btnDong.removeEventListener('click', btnHuyHandler);
+      if (btnNext) btnNext.removeEventListener('click', btnNextHandler);
     }
-    
+
     if (btnDong) btnDong.addEventListener('click', btnHuyHandler);
     if (btnNext) btnNext.addEventListener('click', btnNextHandler);
   });
 }
+
+
+async function TaiDanhSachDiemKhoiPhucCu() {
+  let oldContainer = document.getElementById('danh-sach-diem-khoi-phuc-cu');
+  let loading = document.getElementById('diem-khoi-phuc-loading');
+  if (!oldContainer || !loading) return;
+
+  loading.style.display = 'inline-flex';
+  oldContainer.innerHTML = '';
+
+  try {
+    if (window.DienTu && window.DienTu.LayDanhSachDiemKhoiPhuc) {
+      let rpList = await window.DienTu.LayDanhSachDiemKhoiPhuc();
+      loading.style.display = 'none';
+
+      if (rpList && rpList.length > 0) {
+        // reverse to show newest first
+        rpList.reverse().forEach(rp => {
+          let dateStr = "Unknown Date";
+          if (rp.CreationTime) {
+            if (typeof rp.CreationTime === 'string' && rp.CreationTime.includes('/Date(')) {
+              let msMatch = rp.CreationTime.match(/\d+/);
+              if (msMatch) dateStr = new Date(parseInt(msMatch[0])).toLocaleString();
+            } else {
+              dateStr = new Date(rp.CreationTime).toLocaleString();
+            }
+          }
+
+          let el = document.createElement('div');
+          el.style.cssText = 'padding: 12px; background: var(--nen-tang); border: 1px solid var(--vien); border-radius: var(--do-bo); display: flex; align-items: center; justify-content: space-between; transition: background 0.2s;';
+          el.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 4px; overflow: hidden;">
+                            <span style="font-weight: 600; font-size: 0.95rem; color: var(--chu-chinh); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${rp.Description || 'System Restore Point'}">${rp.Description || 'System Restore Point'}</span>
+                            <span style="font-size: 0.8rem; color: var(--chu-phu);">${dateStr}</span>
+                        </div>
+                        <button class="Nut Nut--Huy btn-delete-rp" data-seq="${rp.SequenceNumber}" style="padding: 6px 10px; font-size: 0.85rem; margin-left: 12px;">Xóa</button>
+                    `;
+          oldContainer.appendChild(el);
+        });
+
+        document.querySelectorAll('.btn-delete-rp').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            let btnEl = e.currentTarget;
+            let seq = btnEl.getAttribute('data-seq');
+            btnEl.disabled = true;
+            btnEl.textContent = 'Đang xóa...';
+            try {
+              await window.DienTu.XoaDiemKhoiPhuc(parseInt(seq));
+              btnEl.closest('div').remove();
+            } catch (err) {
+              btnEl.disabled = false;
+              btnEl.textContent = 'Lỗi';
+            }
+          });
+        });
+      } else {
+        oldContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: var(--chu-phu); font-size: 0.9rem;">Không có điểm khôi phục nào trên máy.</div>';
+      }
+    }
+  } catch (e) {
+    loading.style.display = 'none';
+    oldContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: var(--nguy-hiem); font-size: 0.9rem;">Lỗi khi tải danh sách điểm khôi phục. (Yêu cầu quyền Admin)</div>';
+  }
+}
+

@@ -3,7 +3,7 @@
 use serde::Serialize;
 use crate::HeThong::HUY_TIEN_TRINH;
 use std::sync::atomic::Ordering;
-use crate::LayThongTin::encode_ps_command;
+
 
 #[derive(Serialize, Clone)]
 pub struct ThongTinCapNhat {
@@ -86,95 +86,140 @@ fn parse_winget_upgrade_output(stdout: &str) -> Vec<ThongTinCapNhat> {
 
 #[tauri::command]
 pub async fn LayPhanMemDaCai() -> Result<serde_json::Value, String> {
-    use std::os::windows::process::CommandExt;
+    let _guard = crate::HeThong::bat_uu_tien_cpu();
     
-    let PsScript = r#"
-        $ErrorActionPreference = 'SilentlyContinue'
-        $apps = @()
+    use winreg::enums::*;
+    use winreg::RegKey;
+    use std::os::windows::process::CommandExt;
 
-        $paths = @(
-            "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
-            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
-            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
-        )
-        Get-ItemProperty $paths | Where-Object { $_.DisplayName -and $_.SystemComponent -ne 1 -and $_.ParentKeyName -eq $null } | ForEach-Object {
-            $apps += [PSCustomObject]@{
-                name = $_.DisplayName
-                version = $_.DisplayVersion
-                publisher = $_.Publisher
-                installDate = $_.InstallDate
-                size = [int]$_.EstimatedSize
-                installLocation = $_.InstallLocation
-                uninstallString = $_.UninstallString
-                quietUninstallString = $_.QuietUninstallString
-                registryKey = $_.PSPath
-                appType = "win32"
+    let mut apps = Vec::new();
+
+    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+
+    let reg_paths = vec![
+        (&hklm, r"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+        (&hklm, r"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+        (&hkcu, r"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+    ];
+
+    for (root_key, path) in reg_paths {
+        if let Ok(uninstall_key) = root_key.open_subkey(path) {
+            for key_name in uninstall_key.enum_keys().filter_map(|k| k.ok()) {
+                if let Ok(app_key) = uninstall_key.open_subkey(&key_name) {
+                    let display_name: String = app_key.get_value("DisplayName").unwrap_or_default();
+                    if display_name.is_empty() { continue; }
+
+                    let system_component: u32 = app_key.get_value("SystemComponent").unwrap_or(0);
+                    if system_component == 1 { continue; }
+
+                    let parent_key: String = app_key.get_value("ParentKeyName").unwrap_or_default();
+                    if !parent_key.is_empty() { continue; }
+
+                    let version: String = app_key.get_value("DisplayVersion").unwrap_or_default();
+                    let publisher: String = app_key.get_value("Publisher").unwrap_or_default();
+                    let install_date: String = app_key.get_value("InstallDate").unwrap_or_default();
+                    let size: u32 = app_key.get_value("EstimatedSize").unwrap_or(0);
+                    let install_location: String = app_key.get_value("InstallLocation").unwrap_or_default();
+                    let uninstall_string: String = app_key.get_value("UninstallString").unwrap_or_default();
+                    let quiet_uninstall_string: String = app_key.get_value("QuietUninstallString").unwrap_or_default();
+                    let display_icon: String = app_key.get_value("DisplayIcon").unwrap_or_default();
+                    
+                    let mut registry_key = String::new();
+                    if root_key.raw_handle() == HKEY_LOCAL_MACHINE {
+                        registry_key = format!(r"HKLM\{}\{}", path, key_name);
+                    } else if root_key.raw_handle() == HKEY_CURRENT_USER {
+                        registry_key = format!(r"HKCU\{}\{}", path, key_name);
+                    }
+
+                    apps.push(serde_json::json!({
+                        "name": display_name,
+                        "version": version,
+                        "publisher": publisher,
+                        "installDate": install_date,
+                        "size": (size as u64) * 1024,
+                        "installLocation": install_location,
+                        "uninstallString": uninstall_string,
+                        "quietUninstallString": quiet_uninstall_string,
+                        "registryKey": registry_key,
+                        "displayIcon": display_icon,
+                        "appType": "win32"
+                    }));
+                }
             }
         }
+    }
 
+    // Fetch UWP apps (still via powershell, but only Appx, much faster)
+    let ps_script = r#"
+        $ErrorActionPreference = 'SilentlyContinue'
+        $apps = @()
         Get-AppxPackage -AllUsers | Where-Object { $_.SignatureKind -ne 'System' -and $_.IsFramework -eq $false } | ForEach-Object {
             $apps += [PSCustomObject]@{
                 name = $_.Name
                 version = $_.Version
                 publisher = $_.Publisher
-                installDate = ""
-                size = 0
                 installLocation = $_.InstallLocation
                 uninstallString = $_.PackageFullName
-                quietUninstallString = ""
-                registryKey = ""
-                appType = "uwp"
             }
         }
-
-        $apps | ConvertTo-Json -Compress -Depth 2
+        $apps | ConvertTo-Json -Compress
     "#;
-    let EncodedScript = encode_ps_command(PsScript);
-
-    let Output = std::process::Command::new("powershell")
-        .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &EncodedScript])
+    let encoded_script = crate::LayThongTin::encode_ps_command(ps_script);
+    if let Ok(output) = std::process::Command::new("powershell")
+        .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &encoded_script])
         .creation_flags(0x08000000)
-        .output()
-        .map_err(|e| e.to_string())?;
+        .output() {
+        if output.status.success() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            if let Ok(json_data) = serde_json::from_str::<serde_json::Value>(&stdout) {
+                if let Some(arr) = json_data.as_array() {
+                    for app in arr {
+                        let ten = app.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown");
+                        let phien_ban = app.get("version").and_then(|v| v.as_str()).unwrap_or("");
+                        let nha_phat_hanh = app.get("publisher").and_then(|v| v.as_str()).unwrap_or("");
+                        let vi_tri = app.get("installLocation").and_then(|v| v.as_str()).unwrap_or("");
+                        let uninstall_str = app.get("uninstallString").and_then(|v| v.as_str()).unwrap_or("");
 
-    if Output.status.success() {
-        let Stdout = String::from_utf8_lossy(&Output.stdout);
-        if let Ok(mut JsonData) = serde_json::from_str::<serde_json::Value>(&Stdout) {
-            if let Some(MangUngDung) = JsonData.as_array_mut() {
-                let mut KetQua = Vec::new();
-                for UngDung in MangUngDung.iter() {
-                    let Ten = UngDung.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                    let PhienBan = UngDung.get("version").and_then(|v| v.as_str()).unwrap_or("");
-                    let NhaPhatHanh = UngDung.get("publisher").and_then(|v| v.as_str()).unwrap_or("");
-                    let NgayCai = UngDung.get("installDate").and_then(|v| v.as_str()).unwrap_or("");
-                    let DungLuongKB = UngDung.get("size").and_then(|v| v.as_i64()).unwrap_or(0);
-                    let ViTri = UngDung.get("installLocation").and_then(|v| v.as_str()).unwrap_or("");
-                    
-                    let UninstallStr = UngDung.get("uninstallString").and_then(|v| v.as_str()).unwrap_or("");
-                    let QuietUninstallStr = UngDung.get("quietUninstallString").and_then(|v| v.as_str()).unwrap_or("");
-                    let RegistryKey = UngDung.get("registryKey").and_then(|v| v.as_str()).unwrap_or("");
-                    let AppType = UngDung.get("appType").and_then(|v| v.as_str()).unwrap_or("win32");
+                        apps.push(serde_json::json!({
+                            "name": ten,
+                            "version": phien_ban,
+                            "publisher": nha_phat_hanh,
+                            "installDate": "",
+                            "size": 0,
+                            "installLocation": vi_tri,
+                            "uninstallString": uninstall_str,
+                            "quietUninstallString": "",
+                            "registryKey": "",
+                            "appType": "uwp"
+                        }));
+                    }
+                } else if json_data.is_object() {
+                    // In case there's only 1 app, ConvertTo-Json might return an object instead of array
+                    let ten = json_data.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown");
+                    let phien_ban = json_data.get("version").and_then(|v| v.as_str()).unwrap_or("");
+                    let nha_phat_hanh = json_data.get("publisher").and_then(|v| v.as_str()).unwrap_or("");
+                    let vi_tri = json_data.get("installLocation").and_then(|v| v.as_str()).unwrap_or("");
+                    let uninstall_str = json_data.get("uninstallString").and_then(|v| v.as_str()).unwrap_or("");
 
-                    KetQua.push(serde_json::json!({
-                        "name": Ten,
-                        "version": PhienBan,
-                        "publisher": NhaPhatHanh,
-                        "installDate": NgayCai,
-                        "size": DungLuongKB * 1024,
-                        "installLocation": ViTri,
-                        "uninstallString": UninstallStr,
-                        "quietUninstallString": QuietUninstallStr,
-                        "registryKey": RegistryKey,
-                        "appType": AppType
+                    apps.push(serde_json::json!({
+                        "name": ten,
+                        "version": phien_ban,
+                        "publisher": nha_phat_hanh,
+                        "installDate": "",
+                        "size": 0,
+                        "installLocation": vi_tri,
+                        "uninstallString": uninstall_str,
+                        "quietUninstallString": "",
+                        "registryKey": "",
+                        "appType": "uwp"
                     }));
                 }
-                return Ok(serde_json::Value::Array(KetQua));
-            } else {
-                return Ok(serde_json::json!([]));
             }
         }
     }
-    Ok(serde_json::json!([]))
+
+    Ok(serde_json::Value::Array(apps))
 }
 
 #[tauri::command]
@@ -183,6 +228,7 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
     use std::process::Command;
     use std::os::windows::process::CommandExt;
     
+    let _guard = crate::HeThong::bat_uu_tien_cpu();
     HUY_TIEN_TRINH.store(false, Ordering::Relaxed);
     let mut results = Vec::new();
     let show_progress = TuyChon.get("showProgress").and_then(|v| v.as_bool()).unwrap_or(false);
@@ -205,9 +251,18 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
             }));
         }
 
-        let mut success = false;
-        let mut error_msg = String::new();
-        let mut is_missing = false;
+        let mut success;
+        let mut error_msg;
+        let mut is_missing;
+        
+        let mut force_interactive = false;
+        let mut retry_count = 0;
+        
+        loop {
+            let current_silent = if force_interactive { false } else { silent };
+            is_missing = false;
+            success = false;
+            error_msg = String::new();
 
         let child_res = if app_type == "uwp" {
             let mut cmd = Command::new("powershell");
@@ -216,7 +271,7 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
             cmd.spawn()
         } else {
             let mut final_cmd = String::new();
-            if silent && !quiet_uninstall_string.is_empty() {
+            if current_silent && !quiet_uninstall_string.is_empty() {
                 if quiet_uninstall_string.to_lowercase().contains(".exe") {
                     let mut parts = quiet_uninstall_string.split(".exe");
                     let base = format!("{}.exe", parts.next().unwrap_or("")).replace("\"", "");
@@ -228,7 +283,7 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
             } else if !uninstall_string.is_empty() {
                 let u_lower = uninstall_string.to_lowercase();
                 if u_lower.contains("msiexec") {
-                    if silent {
+                    if current_silent {
                         final_cmd = format!("{} /qn /norestart", uninstall_string);
                     } else {
                         final_cmd = uninstall_string.clone();
@@ -247,7 +302,7 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
                         (uninstall_string.replace("\"", ""), String::new())
                     };
                     
-                    if silent {
+                    if current_silent {
                         final_cmd = format!("\"{}\" /S /silent /verysilent /quiet /norestart {}", base_cmd_clean, args);
                     } else {
                         final_cmd = format!("\"{}\" {}", base_cmd_clean, args);
@@ -272,7 +327,7 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
             } else {
                 let mut cmd = Command::new("winget");
                 cmd.args(["uninstall", "--name", &app_name, "--accept-source-agreements", "--disable-interactivity"]);
-                if silent { cmd.arg("--silent"); } else { cmd.arg("--interactive"); }
+                if current_silent { cmd.arg("--silent"); } else { cmd.arg("--interactive"); }
                 cmd.creation_flags(0x08000000);
                 cmd.spawn()
             }
@@ -360,9 +415,17 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
                         "percent": fake_percent
                     }));
                 }
+                }
+            } else {
+                error_msg = format!("Failed to start uninstaller: {:?}", child_res.err());
             }
-        } else {
-            error_msg = format!("Failed to start uninstaller: {:?}", child_res.err());
+        
+            if !success && current_silent && retry_count < 1 {
+                force_interactive = true;
+                retry_count += 1;
+                continue;
+            }
+            break;
         }
 
         if show_progress {
@@ -384,126 +447,10 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
     Ok(results)
 }
 
-#[tauri::command]
-pub async fn TienHanhCapNhat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_json::Value>, TuyChon: serde_json::Value) -> Result<Vec<serde_json::Value>, String> {
-    use tauri::Emitter;
-    use std::process::Command;
-    use std::os::windows::process::CommandExt;
-    
-    HUY_TIEN_TRINH.store(false, Ordering::Relaxed);
-    let mut results = Vec::new();
-    let show_progress = TuyChon.get("showProgress").and_then(|v| v.as_bool()).unwrap_or(false);
-
-    for app in DanhSachApp {
-        if HUY_TIEN_TRINH.load(Ordering::Relaxed) { break; }
-        
-        let name = app.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown").to_string();
-        let id = app.get("id").and_then(|v| v.as_str()).unwrap_or(&name);
-
-        if show_progress {
-            let _ = AppHandle.emit("tien-trinh-cai-dat", serde_json::json!({
-                "name": name,
-                "status": "downloading",
-                "percent": 50
-            }));
-        }
-
-        let mut cmd = Command::new("winget");
-        cmd.args(["upgrade", "--id", id, "--accept-package-agreements", "--accept-source-agreements"]);
-        
-        let silent = TuyChon.get("silent").and_then(|v| v.as_bool()).unwrap_or(true);
-        if silent {
-            cmd.args(["--silent", "--disable-interactivity"]);
-        }
-
-        cmd.creation_flags(0x08000000);
-        let child_res = cmd.spawn();
-        
-        let mut success = false;
-        let mut error_msg = String::new();
-
-        if let Ok(mut child) = child_res {
-            let mut ticks = 0;
-            loop {
-                if HUY_TIEN_TRINH.load(Ordering::Relaxed) {
-                    let _ = child.kill();
-                    error_msg = "Cancelled by user".to_string();
-                    break;
-                }
-                if let Ok(Some(status)) = child.try_wait() {
-                    if status.code() == Some(-1978335212) {
-                        let mut fb_cmd = Command::new("winget");
-                        fb_cmd.args(["install", "--id", id, "--accept-package-agreements", "--accept-source-agreements", "--force"]);
-                        if silent { fb_cmd.args(["--silent", "--disable-interactivity"]); }
-                        fb_cmd.creation_flags(0x08000000);
-                        if let Ok(mut fb_child) = fb_cmd.spawn() {
-                            loop {
-                                if HUY_TIEN_TRINH.load(Ordering::Relaxed) {
-                                    let _ = fb_child.kill();
-                                    error_msg = "Cancelled by user".to_string();
-                                    break;
-                                }
-                                if let Ok(Some(fb_status)) = fb_child.try_wait() {
-                                    success = fb_status.success() || fb_status.code() == Some(-1978334975) || fb_status.code() == Some(3010);
-                                    if !success { error_msg = format!("Exit code: {:?}", fb_status.code()); }
-                                    break;
-                                }
-                                std::thread::sleep(std::time::Duration::from_millis(500));
-                                ticks += 1;
-                                if show_progress && ticks % 2 == 0 {
-                                    let fake_percent = std::cmp::min(95, 50 + ticks / 4);
-                                    let _ = AppHandle.emit("tien-trinh-cai-dat", serde_json::json!({
-                                        "name": &name,
-                                        "status": "installing (fallback)",
-                                        "percent": fake_percent
-                                    }));
-                                }
-                            }
-                        } else {
-                            error_msg = "Fallback start failed".to_string();
-                        }
-                    } else {
-                        success = status.success() || status.code() == Some(-1978334975) || status.code() == Some(3010);
-                        if !success { error_msg = format!("Exit code: {:?}", status.code()); }
-                    }
-                    break;
-                }
-                std::thread::sleep(std::time::Duration::from_millis(500));
-                ticks += 1;
-                if show_progress && ticks % 2 == 0 {
-                    let fake_percent = std::cmp::min(95, 50 + ticks / 4);
-                    let _ = AppHandle.emit("tien-trinh-cai-dat", serde_json::json!({
-                        "name": &name,
-                        "status": "downloading",
-                        "percent": fake_percent
-                    }));
-                }
-            }
-        } else {
-            error_msg = format!("Failed to start updater: {:?}", child_res.err());
-        }
-
-        if show_progress {
-            let status = if success { "done" } else { "error" };
-            let _ = AppHandle.emit("tien-trinh-cai-dat", serde_json::json!({
-                "name": name,
-                "status": status,
-                "percent": 100
-            }));
-        }
-
-        results.push(serde_json::json!({
-            "name": name,
-            "success": success,
-            "error": error_msg
-        }));
-    }
-
-    Ok(results)
-}
 
 #[tauri::command]
 pub async fn QuetTanDuPhanMem(DanhSachApp: Vec<serde_json::Value>) -> Result<Vec<serde_json::Value>, String> {
+    let _guard = crate::HeThong::bat_uu_tien_cpu();
     use std::process::Command;
     use std::os::windows::process::CommandExt;
     
@@ -517,7 +464,7 @@ pub async fn QuetTanDuPhanMem(DanhSachApp: Vec<serde_json::Value>) -> Result<Vec
     if ps_array.ends_with(",") {
         ps_array.pop();
     }
-    ps_array.push_str(")");
+    ps_array.push(')');
 
     let script = format!(r#"
         $ErrorActionPreference = 'SilentlyContinue'
@@ -577,20 +524,16 @@ pub async fn QuetTanDuPhanMem(DanhSachApp: Vec<serde_json::Value>) -> Result<Vec
 
 #[tauri::command]
 pub async fn XoaTanDuThucSu(DanhSachTanDu: Vec<serde_json::Value>) -> Result<bool, String> {
+    let _guard = crate::HeThong::bat_uu_tien_cpu();
     use std::process::Command;
     use std::os::windows::process::CommandExt;
 
     let mut script = String::from("$ErrorActionPreference = 'SilentlyContinue';\n");
     for item in DanhSachTanDu {
-        let p_type = item.get("type").and_then(|v| v.as_str()).unwrap_or("");
         let p_path = item.get("path").and_then(|v| v.as_str()).unwrap_or("").replace("'", "''");
         if p_path.is_empty() { continue; }
 
-        if p_type == "registry" {
-            script.push_str(&format!("Remove-Item -Path '{}' -Recurse -Force;\n", p_path));
-        } else {
-            script.push_str(&format!("Remove-Item -Path '{}' -Recurse -Force;\n", p_path));
-        }
+        script.push_str(&format!("Remove-Item -Path '{}' -Recurse -Force;\n", p_path));
     }
 
     let encoded = crate::LayThongTin::encode_ps_command(&script);
@@ -600,4 +543,83 @@ pub async fn XoaTanDuThucSu(DanhSachTanDu: Vec<serde_json::Value>) -> Result<boo
         .output();
 
     Ok(true)
+}
+
+#[tauri::command]
+pub async fn XoaDiemKhoiPhuc(sequenceNumber: u32) -> Result<bool, String> {
+    use std::process::Command;
+    use std::os::windows::process::CommandExt;
+
+    let script = format!(
+        "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class RestorePointHelper {{ [DllImport(\"Srclient.dll\")] public static extern int SRRemoveRestorePoint(int dwRPNum); }}' -Language CSharp; $r = [RestorePointHelper]::SRRemoveRestorePoint({}); if ($r -eq 0) {{ exit 0 }} else {{ exit 1 }}",
+        sequenceNumber
+    );
+    let encoded = crate::LayThongTin::encode_ps_command(&script);
+    let output = Command::new("powershell")
+        .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &encoded])
+        .creation_flags(0x08000000)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    if output.status.success() {
+        Ok(true)
+    } else {
+        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+        if stderr.is_empty() {
+            Err("Không tìm thấy điểm khôi phục hoặc không đủ quyền".to_string())
+        } else {
+            Err(stderr)
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn LayDanhSachDiemKhoiPhuc() -> Result<Vec<serde_json::Value>, String> {
+    use std::process::Command;
+    use std::os::windows::process::CommandExt;
+
+    let script = "Get-ComputerRestorePoint | Select-Object Description, CreationTime, SequenceNumber | ConvertTo-Json -Compress";
+    let encoded = crate::LayThongTin::encode_ps_command(script);
+    let output = Command::new("powershell")
+        .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &encoded])
+        .creation_flags(0x08000000)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    if output.status.success() {
+        let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if stdout.is_empty() {
+            return Ok(vec![]);
+        }
+        let parsed: serde_json::Value = serde_json::from_str(&stdout).unwrap_or_else(|_| serde_json::json!([]));
+        if let Some(arr) = parsed.as_array() {
+            Ok(arr.clone())
+        } else if parsed.is_object() {
+            Ok(vec![parsed])
+        } else {
+            Ok(vec![])
+        }
+    } else {
+        Ok(vec![])
+    }
+}
+
+#[tauri::command]
+pub async fn TaoDiemKhoiPhuc(description: String) -> Result<bool, String> {
+    use std::process::Command;
+    use std::os::windows::process::CommandExt;
+
+    let script = format!("Checkpoint-Computer -Description '{}' -RestorePointType 'MODIFY_SETTINGS' -ErrorAction Stop", description.replace("'", "''"));
+    let encoded = crate::LayThongTin::encode_ps_command(&script);
+    let output = Command::new("powershell")
+        .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &encoded])
+        .creation_flags(0x08000000)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    if output.status.success() {
+        Ok(true)
+    } else {
+        Err(String::from_utf8_lossy(&output.stderr).to_string())
+    }
 }

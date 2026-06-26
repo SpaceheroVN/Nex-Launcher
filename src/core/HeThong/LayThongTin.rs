@@ -9,6 +9,7 @@ pub struct IconCacheState {
 #[tauri::command]
 pub async fn LayIconApp(
     TenApp: String,
+    isDeep: Option<bool>,
     State: tauri::State<'_, IconCacheState>
 ) -> Result<Option<String>, String> {
     {
@@ -18,13 +19,21 @@ pub async fn LayIconApp(
         }
     }
 
+    let is_deep = isDeep.unwrap_or(false);
     let mut icon = tim_icon_tu_registry(&TenApp).await;
-    if icon.is_none() {
+
+    if is_deep && icon.is_none() {
         icon = tim_icon_tu_start_menu(&TenApp).await;
+        let icon = icon
+            .or_else(|| tim_icon_tu_where(&TenApp))
+            .or_else(|| tim_icon_tu_program_files(&TenApp));
+
+        if let Some(ref icon_data) = icon {
+            let mut cache = State.cache.lock().unwrap();
+            cache.insert(TenApp.clone(), icon_data.clone());
+        }
+        return Ok(icon);
     }
-    let icon = icon
-        .or_else(|| tim_icon_tu_where(&TenApp))
-        .or_else(|| tim_icon_tu_program_files(&TenApp));
 
     if let Some(ref icon_data) = icon {
         let mut cache = State.cache.lock().unwrap();
@@ -35,71 +44,68 @@ pub async fn LayIconApp(
 }
 
 async fn tim_icon_tu_registry(app_name: &str) -> Option<String> {
-    use std::process::Command;
-    use std::os::windows::process::CommandExt;
+    use winreg::enums::*;
+    use winreg::RegKey;
 
     const UPDATER_NAMES: &[&str] = &["update.exe", "squirrel.exe", "uninstall.exe", "unins000.exe", "uninst.exe", "uninstaller.exe"];
 
-    let ps_script = format!(r#"
-        $ErrorActionPreference = 'SilentlyContinue'
-        $appName = '{}'
+    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
 
-        $paths = @(
-            "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
-            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
-            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
-        )
+    let reg_paths = vec![
+        (&hklm, r"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+        (&hklm, r"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+        (&hkcu, r"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+    ];
 
-        $app = Get-ItemProperty $paths | Where-Object {{ $_.DisplayName -eq $appName }} | Select-Object -First 1 DisplayIcon, InstallLocation
-        $targetPath = ""
+    let mut target_path = String::new();
+    let mut install_location = String::new();
 
-        if ($app.DisplayIcon) {{
-            $targetPath = $app.DisplayIcon -replace '"', ''
-            if ($targetPath -match ",") {{
-                $targetPath = $targetPath.Split(',')[0]
-            }}
-            $targetPath = $targetPath.Trim()
-        }}
-
-        if ($app.InstallLocation -and (Test-Path $app.InstallLocation)) {{
-            Write-Output "LOC:$($app.InstallLocation)"
-        }}
-
-        if (-not $targetPath -or -not (Test-Path $targetPath)) {{
-            exit
-        }}
-
-        if (Test-Path $targetPath -PathType Container) {{
-            Write-Output "DIR:$targetPath"
-            exit
-        }}
-
-        Write-Output "EXE:$targetPath"
-    "#, app_name.replace('\'', "''"));
-
-    let encoded = encode_ps_command(&ps_script);
-    let output = Command::new("powershell")
-        .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &encoded])
-        .creation_flags(0x08000000)
-        .output()
-        .ok()?;
-
-    let raw_output = String::from_utf8_lossy(&output.stdout).to_string();
+    for (root_key, path) in reg_paths {
+        if let Ok(uninstall_key) = root_key.open_subkey(path) {
+            for key_name in uninstall_key.enum_keys().filter_map(|k| k.ok()) {
+                if let Ok(app_key) = uninstall_key.open_subkey(&key_name) {
+                    let display_name: String = app_key.get_value("DisplayName").unwrap_or_default();
+                    if display_name == app_name {
+                        if let Ok(icon) = app_key.get_value::<String, _>("DisplayIcon") {
+                            target_path = icon.replace('"', "");
+                            if let Some(idx) = target_path.find(',') {
+                                target_path = target_path[..idx].to_string();
+                            }
+                            target_path = target_path.trim().to_string();
+                        }
+                        if let Ok(loc) = app_key.get_value::<String, _>("InstallLocation") {
+                            install_location = loc;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        if !target_path.is_empty() || !install_location.is_empty() {
+            break;
+        }
+    }
 
     let mut install_loc: Option<std::path::PathBuf> = None;
     let mut icon_path: Option<std::path::PathBuf> = None;
     let mut is_dir = false;
 
-    for line in raw_output.lines() {
-        let line = line.trim();
-        if let Some(loc) = line.strip_prefix("LOC:") {
-            install_loc = Some(std::path::PathBuf::from(loc));
-        } else if let Some(dir) = line.strip_prefix("DIR:") {
-            icon_path = Some(std::path::PathBuf::from(dir));
-            is_dir = true;
-        } else if let Some(exe) = line.strip_prefix("EXE:") {
-            icon_path = Some(std::path::PathBuf::from(exe));
-            is_dir = false;
+    if !install_location.is_empty() {
+        let p = std::path::PathBuf::from(&install_location);
+        if p.exists() { install_loc = Some(p); }
+    }
+
+    if !target_path.is_empty() {
+        let p = std::path::PathBuf::from(&target_path);
+        if p.exists() {
+            if p.is_dir() {
+                icon_path = Some(p);
+                is_dir = true;
+            } else {
+                icon_path = Some(p);
+                is_dir = false;
+            }
         }
     }
 
@@ -796,7 +802,7 @@ pub async fn LayThongTinThem(TenApp: String, ViTriCaiDat: Option<String>, NgayCa
                 rd[4..6].parse::<u32>(),
                 rd[6..8].parse::<u32>(),
             ) {
-                if y >= 2000 && y <= 2100 && m >= 1 && m <= 12 && d >= 1 && d <= 31 {
+                if (2000..=2100).contains(&y) && (1..=12).contains(&m) && (1..=31).contains(&d) {
                     date_str = format!("{}{:02}{:02}", y, m, d);
                 }
             }
@@ -939,7 +945,7 @@ pub async fn LayIconDebug(TenApp: String) -> serde_json::Value {
 
         const UPDATER_NAMES: &[&str] = &["update.exe","squirrel.exe","uninstall.exe","unins000.exe","uninst.exe"];
         if UPDATER_NAMES.contains(&file_name.as_str()) {
-            log.push(format!("[DisplayIcon] ⚠ Phát hiện updater exe! → sẽ tìm trong thư mục cha"));
+            log.push("[DisplayIcon] ⚠ Phát hiện updater exe! → sẽ tìm trong thư mục cha".to_string());
             let search = if !install_location.is_empty() && std::path::Path::new(&install_location).exists() {
                 install_location.clone()
             } else {

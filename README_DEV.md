@@ -2,6 +2,9 @@
 
 Cảm ơn bạn đã quan tâm đến Nex Launcher! Tài liệu này sẽ giúp bạn thiết lập môi trường, hiểu cấu trúc mã nguồn và bắt đầu đóng góp.
 
+> **⚠️ THÔNG BÁO TỪ NHÀ PHÁT TRIỂN (WIP)**
+> Phiên bản 1.6.3 hiện đang trong quá trình phát triển. Giao diện và một số tính năng có thể chưa hoàn thiện.
+
 ---
 
 ## Mục lục
@@ -67,9 +70,7 @@ Nex-Launcher/
     │
     └── ui/                   # ─── Frontend (WebView) ───
         ├── index.html        # Giao diện chính
-        ├── TienTrinh.html    # Cửa sổ tiến trình (multi-window)
         ├── KhoiChay.js       # Logic renderer (i18n, theme, UI, settings)
-        ├── TienTrinh.js      # Logic cửa sổ tiến trình
         ├── CauNoiTauri.js    # Tauri IPC Bridge (window.__TAURI__)
         │
         ├── KieuDang/         # CSS (3 files)

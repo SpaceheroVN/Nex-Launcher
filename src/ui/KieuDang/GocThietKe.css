@@ -117,7 +117,7 @@ body {
   position: relative;
 }
 body.da-phong-to {
-  border-radius: 0;
+  border-radius: 0 !important;
 }
 .NenApp {
   position: absolute;

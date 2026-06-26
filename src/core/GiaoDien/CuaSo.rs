@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
-use tauri::{Manager, Window};
+use tauri::Window;
 use serde::Serialize;
 
 #[tauri::command]
@@ -65,83 +65,6 @@ pub fn LayTrangThaiCuaSo(Window: Window) -> TrangThaiCuaSo {
 #[tauri::command]
 pub fn DatLuonTrenCung(Window: Window, GiaTri: bool) {
     Window.set_always_on_top(GiaTri).unwrap();
-}
-
-#[tauri::command]
-pub async fn MoCuaSoTienTrinh(AppHandle: tauri::AppHandle, TieuDe: String, DanhSachApp: serde_json::Value, ChuDe: Option<String>, DaLuong: Option<bool>) {
-    use tauri::Emitter;
-    use tauri::{WebviewWindowBuilder, WebviewUrl};
-    
-    let chu_de_str = ChuDe.unwrap_or_else(|| "dark".to_string());
-    let da_luong_val = DaLuong.unwrap_or(false);
-    
-    if let Some(existing) = AppHandle.get_webview_window("tien-trinh") {
-        let _ = existing.set_focus();
-        let _ = AppHandle.emit_to("tien-trinh", "khoi-tao-tien-trinh", serde_json::json!({
-            "tieuDe": TieuDe,
-            "danhSachApp": DanhSachApp,
-            "chuDe": chu_de_str,
-            "daLuong": da_luong_val
-        }));
-        return;
-    }
-    
-    let window = WebviewWindowBuilder::new(
-        &AppHandle,
-        "tien-trinh",
-        WebviewUrl::App("TienTrinh.html".into()),
-    )
-    .title("Tiến trình")
-    .inner_size(550.0, 400.0)
-    .decorations(false)
-    .transparent(true)
-    .resizable(false)
-    .always_on_top(true)
-    .center()
-    .visible(false)
-    .build();
-    
-    if let Ok(win) = window {
-        let _app_handle = AppHandle.clone();
-        let tieu_de = TieuDe.clone();
-        let ds_app = DanhSachApp.clone();
-        
-        win.on_window_event(move |_event| {
-        });
-        
-        let _ = win.show();
-        
-        use tauri::Listener;
-        let app_for_emit = AppHandle.clone();
-        let app_for_emit_inner = app_for_emit.clone();
-        app_for_emit.once_any("tien-trinh-ready", move |_event| {
-            let _ = app_for_emit_inner.emit_to("tien-trinh", "khoi-tao-tien-trinh", serde_json::json!({
-                "tieuDe": tieu_de,
-                "danhSachApp": ds_app,
-                "chuDe": chu_de_str,
-                "daLuong": da_luong_val
-            }));
-        });
-    }
-}
-
-#[tauri::command]
-pub fn DongCuaSoTienTrinh(AppHandle: tauri::AppHandle) {
-    if let Some(window) = AppHandle.get_webview_window("tien-trinh") {
-        let _ = window.close();
-    }
-}
-
-#[tauri::command]
-pub fn CapNhatCuaSoTienTrinh(AppHandle: tauri::AppHandle, DuLieu: serde_json::Value) {
-    use tauri::Emitter;
-    let _ = AppHandle.emit_to("tien-trinh", "cap-nhat-tien-trinh", DuLieu);
-}
-
-#[tauri::command]
-pub fn HoanTatCuaSoTienTrinh(AppHandle: tauri::AppHandle, KetQua: serde_json::Value) {
-    use tauri::Emitter;
-    let _ = AppHandle.emit_to("tien-trinh", "hoan-tat-tien-trinh", KetQua);
 }
 
 #[tauri::command]

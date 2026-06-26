@@ -6,11 +6,15 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-1.6.3-5865F2?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/status-WIP-FF5722?style=flat-square" alt="Status">
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/tauri-2.x-FFC131?style=flat-square" alt="Tauri">
   <img src="https://img.shields.io/badge/rust-1.77+-DEA584?style=flat-square" alt="Rust">
 </p>
+
+> **⚠️ THÔNG BÁO TỪ NHÀ PHÁT TRIỂN (WIP)**
+> Phiên bản 1.6.3 hiện đang trong quá trình phát triển. Giao diện và một số tính năng có thể chưa hoàn thiện.
 
 ---
 
