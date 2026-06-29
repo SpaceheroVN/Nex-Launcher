@@ -21,6 +21,12 @@ function CapNhatBanDich() {
       t('tray_quit')
     ).catch(e => { });
   }
+  if (typeof HienThiDanhSachInstaller === 'function' && typeof DanhSachPhanMem !== 'undefined' && DanhSachPhanMem && DanhSachPhanMem.length > 0) {
+    HienThiDanhSachInstaller(document.getElementById('o-tim-kiem-installer')?.value || '');
+  }
+  if (typeof HienThiDanhSachUninstaller === 'function' && typeof DanhSachDaCaiDat !== 'undefined' && DanhSachDaCaiDat && DanhSachDaCaiDat.length > 0) {
+    HienThiDanhSachUninstaller(document.getElementById('o-tim-kiem-uninstaller')?.value || '');
+  }
 }
 function KhoiTaoChuDe() { ChuDeHienTai = localStorage.getItem('nex_chu_de') || 'dark'; ApDungChuDe(ChuDeHienTai); }
 let ChuDeKhiMo = '', NgonNguKhiMo = '';
@@ -384,10 +390,21 @@ function DangKySuKien() {
     }
   });
   document.getElementById('dong-tien-trinh')?.addEventListener('click', DongHopThoaiTienTrinh);
-  if (window.DienTu?.KhiTrangThaiCuaSoThayDoi) window.DienTu.KhiTrangThaiCuaSoThayDoi(function (dl) {
-    document.body.classList.toggle('da-phong-to', dl.DaPhongTo);
-    if (typeof CapNhatBoTron === 'function') CapNhatBoTron(dl.DaPhongTo);
-  });
+  async function KiemTraPhongTo() {
+    if (window.DienTu && window.DienTu.LayTrangThaiCuaSo) {
+      try {
+        var dl = await window.DienTu.LayTrangThaiCuaSo();
+        document.body.classList.toggle('da-phong-to', dl.DaPhongTo);
+        if (typeof CapNhatBoTron === 'function') CapNhatBoTron(dl.DaPhongTo);
+        var btnPhongTo = document.getElementById('nut-phong-to');
+        if (btnPhongTo) {
+          btnPhongTo.title = dl.DaPhongTo ? (typeof t === 'function' ? t('restore_btn') || 'Thu nhỏ lại' : 'Thu nhỏ lại') : (typeof t === 'function' ? t('maximize_btn') || 'Phóng to' : 'Phóng to');
+        }
+      } catch (e) { console.error(e); }
+    }
+  }
+  window.addEventListener('resize', KiemTraPhongTo);
+  setTimeout(KiemTraPhongTo, 200);
   if (window.DienTu?.KhiChuyenTrang) window.DienTu.KhiChuyenTrang(function (trang) { ChuyenTrang(trang); });
   var iconRot = 0;
   document.getElementById('nut-thu-gon-menu')?.addEventListener('click', function () {
@@ -453,14 +470,11 @@ function DangKySuKien() {
       document.querySelectorAll('#ds-tien-ich .ThanhBen_MucCon').forEach(function (m) { m.classList.remove('dang-chon'); });
       n.classList.add('dang-chon');
       let boLoc = n.getAttribute('data-bo-loc');
-      if (document.getElementById('tab-khoi-phuc')) {
-        document.getElementById('tab-khoi-phuc').style.display = (boLoc === 'khoi-phuc') ? 'block' : 'none';
+      if (document.getElementById('tab-du-lieu')) {
+        document.getElementById('tab-du-lieu').style.display = (boLoc === 'du-lieu') ? 'flex' : 'none';
       }
-      if (document.getElementById('tab-pha-huy')) {
-        document.getElementById('tab-pha-huy').style.display = (boLoc === 'pha-huy') ? 'block' : 'none';
-      }
-      if (document.getElementById('tab-don-rac')) {
-        document.getElementById('tab-don-rac').style.display = (boLoc === 'don-rac') ? 'block' : 'none';
+      if (document.getElementById('tab-khoa-chuot')) {
+        document.getElementById('tab-khoa-chuot').style.display = (boLoc === 'khoa-chuot') ? 'block' : 'none';
       }
     });
   });
@@ -1064,8 +1078,17 @@ function HienThiDanhSachInstaller(TuKhoa, isRefresh) {
 function TaoHangInstaller(pm) {
   var d = document.createElement('div'); d.className = 'HangUngDung';
   if (pm.source && pm.source.type) {
+    let catName = pm.category;
+    if (catName === 'Web Browsers') catName = t('cat_web_browsers') || 'Trình duyệt web';
+    else if (catName === 'Developer Tools') catName = t('cat_dev_tools') || 'Công cụ lập trình';
+    else if (catName === 'Media') catName = t('cat_media') || 'Đa phương tiện';
+    else if (catName === 'Games') catName = t('cat_games') || 'Trò chơi';
+    else if (catName === 'Utilities') catName = t('cat_utilities') || 'Tiện ích';
+    else if (catName === 'Messaging') catName = t('cat_messaging') || 'Nhắn tin';
+    else if (catName === 'Compression') catName = t('cat_compression') || 'Nén dữ liệu';
+
     let editBtn = pm.khongSuaXoa === true ? '' : '<button class="NutSuaNho" title="' + t('edit_btn') + '" onclick="event.stopPropagation(); window.MoHopThoaiSuaPhanMem(\'' + pm.name.replace(/'/g, "\\'") + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>';
-    d.innerHTML = '<div class="HangUngDung_Chon"><input type="checkbox" class="OChon" data-ten="' + pm.name + '" ' + (pm.khongSuaXoa === true ? 'data-undeletable="true"' : '') + '></div><div class="HangUngDung_Ten">' + pm.name + '</div><div class="HangUngDung_Loai"><span>' + pm.category + '</span></div><div class="HangUngDung_Nguon" style="display:flex;align-items:center;justify-content:space-between;"><span class="NhanNguon--' + pm.source.type.toLowerCase() + '">' + pm.source.type + '</span>' + editBtn + '</div>';
+    d.innerHTML = '<div class="HangUngDung_Chon"><input type="checkbox" class="OChon" data-ten="' + pm.name + '" ' + (pm.khongSuaXoa === true ? 'data-undeletable="true"' : '') + '></div><div class="HangUngDung_Ten">' + pm.name + '</div><div class="HangUngDung_Loai"><span>' + catName + '</span></div><div class="HangUngDung_Nguon" style="display:flex;align-items:center;justify-content:space-between;"><span class="NhanNguon--' + pm.source.type.toLowerCase() + '">' + pm.source.type + '</span>' + editBtn + '</div>';
   }
   d.addEventListener('click', function (e) { if (e.target.type === 'checkbox') return; var cb = d.querySelector('.OChon'); if (cb) { cb.checked = !cb.checked; d.classList.toggle('da-chon', cb.checked); CapNhatNutDongGoi(); } });
   d.querySelector('.OChon')?.addEventListener('change', function () { d.classList.toggle('da-chon', this.checked); CapNhatNutDongGoi(); });
@@ -1513,7 +1536,19 @@ function MoHopThoaiCaiDat() {
     btn.addEventListener('click', function () {
       var target = document.getElementById('cai-dat-section-' + i);
       if (target) {
-        nd.scrollTo({ top: target.offsetTop - nd.offsetTop, behavior: 'smooth' });
+        var start = nd.scrollTop;
+        var to = target.offsetTop - nd.offsetTop;
+        var change = to - start;
+        var currentTime = 0, duration = 350;
+        function animateScroll() {
+          currentTime += 16;
+          var t = currentTime / (duration / 2);
+          var val = t < 1 ? change / 2 * t * t + start : -change / 2 * (--t * (t - 2) - 1) + start;
+          nd.scrollTop = val;
+          if (currentTime < duration) requestAnimationFrame(animateScroll);
+          else nd.scrollTop = to;
+        }
+        requestAnimationFrame(animateScroll);
       }
     });
     menu.appendChild(btn);
@@ -1576,30 +1611,30 @@ function MoHopThoaiCaiDat() {
       if (!window.DienTu || !window.DienTu.KiemTraCapNhatBasic) return;
       try {
         btnCapNhatBasic.disabled = true;
-        btnCapNhatBasic.innerText = 'Đang kiểm tra...';
+        btnCapNhatBasic.innerText = t("checking_data");
         let res = await window.DienTu.KiemTraCapNhatBasic();
         if (res.status === 'same') {
           HienThongBao('Dữ liệu hiện tại đã là mới nhất, không có thay đổi.', 'thong-tin');
         } else if (res.status === 'different') {
           let xacNhan = await HienHopThoaiXacNhanCustom('Có bản cập nhật dữ liệu Basic mới. Bạn có chắc chắn muốn thay thế toàn bộ dữ liệu hiện tại bằng bản cập nhật mới nhất từ Github không? Mọi chỉnh sửa cá nhân trước đó sẽ bị xóa sạch và không thể hoàn tác.');
           if (xacNhan) {
-            btnCapNhatBasic.innerText = 'Đang cập nhật...';
+            btnCapNhatBasic.innerText = t("updating_data");
             let success = await window.DienTu.ThucHienCapNhatBasic();
             if (success) {
-              HienThongBao('Cập nhật dữ liệu Basic thành công!', 'thanh-cong');
+              HienThongBao(t("data_update_success"), 'thanh-cong');
               if (typeof TaiDanhSachApp === 'function') TaiDanhSachApp(true);
             } else {
-              HienThongBao('Có lỗi xảy ra khi cập nhật.', 'loi');
+              HienThongBao(t("data_update_error"), 'loi');
             }
           }
         } else {
           HienThongBao('Lỗi kiểm tra dữ liệu từ Github hoặc định dạng không hợp lệ.', 'loi');
         }
       } catch (e) {
-        HienThongBao('Lỗi kết nối.', 'loi');
+        HienThongBao(t("connection_error"), 'loi');
       } finally {
         btnCapNhatBasic.disabled = false;
-        btnCapNhatBasic.innerText = 'Cập nhật dữ liệu từ Github';
+        btnCapNhatBasic.innerText = t("update_data_github");
       }
     };
   }
@@ -1674,7 +1709,7 @@ function LayHTMLCaiDatTrang(i, ChuDeHT, NgonNguHT) {
       '<div class="ChonChuDe">' +
       '<div class="ChonChuDe_Nut' + (ChuDeHT === 'light' ? ' dang-chon' : '') + '" data-chu-de="light"><img src="TaiNguyen/BieuTuong/theme-light.svg" alt="Light"><span>' + txtLight + '</span></div>' +
       '<div class="ChonChuDe_Nut' + (ChuDeHT === 'dark' ? ' dang-chon' : '') + '" data-chu-de="dark"><img src="TaiNguyen/BieuTuong/theme-dark.svg" alt="Dark"><span>' + txtDark + '</span></div>' +
-      '<div class="ChonChuDe_Nut' + (ChuDeHT === 'nex' ? ' dang-chon' : '') + '" data-chu-de="nex"><img src="TaiNguyen/BieuTuong/theme-nex.svg" alt="Nex"><span>Nex Launcher</span></div>' +
+      '<div class="ChonChuDe_Nut' + (ChuDeHT === 'nex' ? ' dang-chon' : '') + '" data-chu-de="nex"><img src="TaiNguyen/BieuTuong/theme-nex.svg" alt="Nex"><span>' + t('theme_midnight_blue') + '</span></div>' +
       '</div></div>' +
       '<div class="MucCaiDat" style="align-items:flex-start; gap:24px;">' +
       '  <div style="flex:1; display:flex; flex-direction:column; gap:12px;">' +
@@ -1898,62 +1933,59 @@ async function KiemTraCapNhat(tuDong = false) {
 
       let setupAsset = data.assets.find(a => a.name.endsWith('_x64-setup.exe') || a.name.includes('setup.exe'));
       if (!setupAsset) {
-        if (!tuDong) HienThongBao(t('update_error') + ': Không tìm thấy file cài đặt trên GitHub', 'canh-bao');
+        if (!tuDong) HienThongBao(t('update_error') + ' (No installer)', 'canh-bao');
         return;
       }
 
       if (!tuDong) {
-        let confirmUpdate = await HienHopThoaiXacNhanCustom("Có phiên bản mới: <b>" + data.tag_name + "</b><br>Bạn có muốn tải xuống và cài đặt ngay không?");
-        if (confirmUpdate) {
-          MoHopThoaiTienTrinh("Tải xuống bản cập nhật...", []);
-
-          let nutHuy = document.getElementById('dong-tien-trinh');
-          if (nutHuy) {
-            nutHuy.disabled = true;
-            nutHuy.style.opacity = '0.5';
-            nutHuy.textContent = 'Đang tải...';
-          }
-
-          let ds = document.getElementById('tien-trinh-danh-sach');
-          if (ds) {
-            ds.innerHTML = '<div class="TienTrinh_Muc"><div class="TienTrinh_Ten">Nex Launcher ' + latestVersion + '</div><div class="TienTrinh_TrangThai">Đang tải... 0%</div></div>';
-          }
-
-          let unlisten = await window.DienTu.KhiTienTrinhCapNhatApp((payload) => {
-            let percent = Math.round(payload.percent);
-            document.getElementById('tien-trinh-thanh').style.width = percent + '%';
-            document.getElementById('tien-trinh-phan-tram').textContent = percent + '%';
-            let mb = document.getElementById('mini-progress-bar');
-            if (mb) mb.style.width = percent + '%';
-            let mt = document.getElementById('mini-progress-percent');
-            if (mt) mt.textContent = percent + '%';
-
-            let muc = document.querySelector('.TienTrinh_TrangThai');
-            if (muc) {
-              muc.textContent = "Đang tải... " + percent + "%";
-              if (percent >= 100) {
-                muc.textContent = "Hoàn tất";
-                muc.className = "TienTrinh_TrangThai thanh-cong";
-                unlisten();
-              }
-            }
-          });
-
-          window.DienTu.TaiVaCaiDatCapNhat(setupAsset.browser_download_url, setupAsset.name).catch((e) => {
-            console.error(e);
-            HienThongBao(t('update_error') + ': Lỗi khi tải xuống', 'canh-bao');
-            let muc = document.querySelector('.TienTrinh_TrangThai');
-            if (muc) {
-              muc.textContent = "Lỗi";
-              muc.className = "TienTrinh_TrangThai loi";
-            }
+        if (window.DienTu && window.DienTu.HienHopThoaiXacNhan) {
+          let confirmUpdate = await HienHopThoaiXacNhanCustom(t('update_found_desc').replace('{0}', data.tag_name));
+          if (confirmUpdate) {
+            MoHopThoaiTienTrinh(t('downloading_update'), []);
+            let nutHuy = document.getElementById('dong-tien-trinh');
             if (nutHuy) {
-              nutHuy.disabled = false;
-              nutHuy.style.opacity = '1';
-              nutHuy.textContent = t('cancel_btn') || 'Đóng';
-              nutHuy.dataset.isCancel = 'false';
+              nutHuy.disabled = true;
+              nutHuy.style.opacity = '0.5';
+              nutHuy.textContent = t("loading_text_short");
             }
-          });
+            let ds = document.getElementById('tien-trinh-danh-sach');
+            if (ds) {
+              ds.innerHTML = '<div class="TienTrinh_Muc"><div class="TienTrinh_Ten">Nex Launcher ' + latestVersion + '</div><div class="TienTrinh_TrangThai">Đang tải... 0%</div></div>';
+            }
+            let unlisten = await window.DienTu.KhiTienTrinhCapNhatApp((payload) => {
+              let percent = Math.round(payload.percent);
+              document.getElementById('tien-trinh-thanh').style.width = percent + '%';
+              document.getElementById('tien-trinh-phan-tram').textContent = percent + '%';
+              let mb = document.getElementById('mini-progress-bar');
+              if (mb) mb.style.width = percent + '%';
+              let mt = document.getElementById('mini-progress-percent');
+              if (mt) mt.textContent = percent + '%';
+              let muc = document.querySelector('.TienTrinh_TrangThai');
+              if (muc) {
+                muc.textContent = "Đang tải... " + percent + "%";
+                if (percent >= 100) {
+                  muc.textContent = "Hoàn tất";
+                  muc.className = "TienTrinh_TrangThai thanh-cong";
+                  unlisten();
+                }
+              }
+            });
+            window.DienTu.TaiVaCaiDatCapNhat(setupAsset.browser_download_url, setupAsset.name).catch((e) => {
+              console.error(e);
+              HienThongBao(t('update_error') + ': Lỗi khi tải xuống', 'canh-bao');
+              let muc = document.querySelector('.TienTrinh_TrangThai');
+              if (muc) {
+                muc.textContent = "Lỗi";
+                muc.className = "TienTrinh_TrangThai loi";
+              }
+              if (nutHuy) {
+                nutHuy.disabled = false;
+                nutHuy.style.opacity = '1';
+                nutHuy.textContent = t('cancel_btn') || 'Đóng';
+                nutHuy.dataset.isCancel = 'false';
+              }
+            });
+          }
         }
       }
     }
@@ -1976,9 +2008,6 @@ function HienThongBao(nd, loai) {
   vung.appendChild(tb); setTimeout(function () { if (tb.parentNode) tb.remove(); }, 4000);
 }
 
-// ==========================================
-// === [ PROCESS & PROGRESS MANAGEMENT ] ===
-// ==========================================
 function MoHopThoaiTienTrinh(tieuDe, danhSachApp) {
   var h = document.getElementById('hop-thoai-tien-trinh');
   var lp = document.getElementById('lop-phu-modal');
@@ -2172,14 +2201,12 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
   var h = document.getElementById('hop-thoai-tien-trinh');
   if (!h || h.classList.contains('an')) return;
 
-  // --- Per-app progress tracking ---
   if (!window.phanTramTungApp) window.phanTramTungApp = {};
   if (!window.AppStatuses) window.AppStatuses = {};
   if (!window.AppErrorDetails) window.AppErrorDetails = {};
   if (!window.FakeInstallProgress) window.FakeInstallProgress = {};
   if (!window.LastStatusApp) window.LastStatusApp = {};
 
-  // Fake install progress for "installing" status (no real progress updates)
   if (rawStatus === 'installing') {
     if (!window.FakeInstallProgress[tenApp]) {
       let intervalId = null;
@@ -2212,7 +2239,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
     }
   }
 
-  // Update per-app progress
   window.phanTramTungApp[tenApp] = phanTram;
   if (rawStatus === 'done' || rawStatus === 'error') {
     window.phanTramTungApp[tenApp] = 100;
@@ -2224,7 +2250,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
     window.AppErrorDetails[tenApp] = fullStatus || "Lỗi không xác định";
   }
 
-  // Calculate total progress from all apps
   let tongPhanTram = 0;
   if (TienTrinhSoApp > 0 && window.danhSachAppTienTrinh) {
     let tongDiem = 0;
@@ -2236,7 +2261,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
     tongPhanTram = Math.min(100, tongDiem / TienTrinhSoApp);
   }
 
-  // --- Update status element ---
   var idTt = 'tien-trinh-tt-' + encodeURIComponent(tenApp).replace(/%/g, '_');
   var ttEl = document.getElementById(idTt);
   if (ttEl) {
@@ -2260,7 +2284,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
     }
   }
 
-  // --- Auto-scroll to active item ---
   if (ttEl && ttEl.parentElement) {
     if (!window.LastStatusApp) window.LastStatusApp = {};
     if (window.LastStatusApp[tenApp] !== rawStatus) {
@@ -2276,7 +2299,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
       }
     }
 
-    // Update thread mode display
     let threadModeEl = document.getElementById('thread-mode-' + encodeURIComponent(tenApp).replace(/%/g, '_'));
     if (threadModeEl && rawStatus === 'downloading') {
       threadModeEl.textContent = 'Đa luồng';
@@ -2285,7 +2307,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
     }
   }
 
-  // --- Global stage management ---
   if (window.GlobalAppList) {
     let hasDownloading = false;
     let allDoneOrError = true;
@@ -2325,7 +2346,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
         }
       }
     } else {
-      // Uninstall mode stage management
       let globalItems = document.querySelectorAll('.GlobalStage_Item');
       let targetStage = window.CurrentGlobalStage || 'un';
 
@@ -2364,7 +2384,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
       }
     }
 
-    // --- Button state management on completion ---
     if (isProcessFinished) {
       let btnHuy = document.getElementById('dong-tien-trinh');
       let btnBaoCao = document.getElementById('bao-cao-loi');
@@ -2401,7 +2420,6 @@ function CapNhatHopThoaiTienTrinh(tenApp, phanTram, trangThai, mauChu, fullStatu
     }
   }
 
-  // --- Smooth animated progress bar ---
   let isUninstall = window.isUninstallMode;
   let mauThanh = isUninstall ? 'var(--canh-bao)' : 'var(--mau-nhan)';
   if (tongPhanTram >= 100) mauThanh = 'var(--thanh-cong)';
@@ -2492,11 +2510,9 @@ function HoanTatHopThoaiTienTrinh(ketQua, hasLeftovers) {
     }
   }
 
-  // Sync animation state
   window.currentProgress = 100;
   window.targetProgress = 100;
   window.isProgressAnimating = false;
-  // Clean up fake progress intervals
   if (window.FakeInstallProgress) {
     for (let key in window.FakeInstallProgress) delete window.FakeInstallProgress[key];
   }
@@ -2699,7 +2715,7 @@ let demXacNhan = 0;
 document.addEventListener('DOMContentLoaded', () => {
   KiemTraCapNhat(true);
   const btnFile = document.getElementById('btn-chon-file');
-  const btnFolder = document.getElementById('bluong.style.widthtn-chon-folder');
+  const btnFolder = document.getElementById('btn-chon-folder');
   const btnDrive = document.getElementById('btn-chon-drive');
   const inputPath = document.getElementById('input-duong-dan-pha-huy');
   const btnPhaHuy = document.getElementById('btn-bat-dau-pha-huy');
@@ -2777,7 +2793,7 @@ document.addEventListener('DOMContentLoaded', () => {
         HienThongBao(t('destroy_error') + (ketQua.error || t('unknown_error')), 'loi');
       }
     } catch (e) {
-      HienThongBao("ÄĂ£ xáº£y ra lá»—i: " + e.message, "loi");
+      HienThongBao(t('general_error') + e.message, "loi");
     } finally {
       btnPhaHuy.disabled = false;
       demXacNhan = 0;
@@ -2834,10 +2850,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   if (window.DienTu && window.DienTu.KhiTienTrinhKhoiPhuc) {
     window.DienTu.KhiTienTrinhKhoiPhuc((percent) => {
-      txtTienTrinhKhoiPhuc.textContent = `Äang quĂ©t vĂ  khĂ´i phá»¥c... ${percent}%`;
+      txtTienTrinhKhoiPhuc.textContent = t('scanning_recovering').replace('{0}', percent);
       thanhTienTrinhKhoiPhuc.style.width = `${percent}%`;
       if (window.DienTu.DatTienTrinh) {
-        window.DienTu.DatTienTrinh(percent, `Nex Launcher - Äang khĂ´i phá»¥c: ${percent}%`);
+        window.DienTu.DatTienTrinh(percent, `Nex Launcher - ${t('recovering_title')}: ${percent}%`);
       }
     });
   }
@@ -2874,7 +2890,7 @@ document.addEventListener('DOMContentLoaded', () => {
         divTienTrinhKhoiPhuc.style.display = "none";
       }
     } catch (e) {
-      HienThongBao("Đã xảy ra lỗi: " + e.message, "loi");
+      HienThongBao(t('general_error') + e.message, "loi");
       divTienTrinhKhoiPhuc.style.display = "none";
     }
   });
@@ -3087,3 +3103,98 @@ async function TaiDanhSachDiemKhoiPhucCu() {
   }
 }
 
+
+
+// --- MOUSE LOCK UI LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+  const btnSetMonitor = document.getElementById('btn-set-lock-monitor');
+  const shortcutMonitor = document.getElementById('shortcut-lock-monitor');
+  
+  if (btnSetMonitor) {
+    btnSetMonitor.addEventListener('click', () => {
+      // Mock UI change
+      shortcutMonitor.value = 'Nhấn phím...';
+      setTimeout(() => { shortcutMonitor.value = 'Ctrl+Alt+M'; }, 1500);
+      // window.DienTu.invoke('set_mouse_lock_shortcut', { mode: 'monitor', ... })
+    });
+  }
+
+  const btnSetArea = document.getElementById('btn-set-lock-area');
+  const shortcutArea = document.getElementById('shortcut-lock-area');
+  const btnSelectWindow = document.getElementById('btn-select-window');
+  const selectedWindowName = document.getElementById('selected-window-name');
+
+  if (btnSelectWindow) {
+    btnSelectWindow.addEventListener('click', () => {
+      selectedWindowName.textContent = 'Đang chọn...';
+      setTimeout(() => { selectedWindowName.textContent = 'Cửa sổ: Task Manager'; }, 1500);
+    });
+  }
+
+  if (btnSetArea) {
+    btnSetArea.addEventListener('click', () => {
+      shortcutArea.value = 'Nhấn phím...';
+      setTimeout(() => { shortcutArea.value = 'Ctrl+Alt+A'; }, 1500);
+    });
+  }
+
+  const btnSetPoint = document.getElementById('btn-set-lock-point');
+  const shortcutPoint = document.getElementById('shortcut-lock-point');
+
+  if (btnSetPoint) {
+    btnSetPoint.addEventListener('click', () => {
+      shortcutPoint.value = 'Nhấn phím...';
+      setTimeout(() => { shortcutPoint.value = 'Ctrl+Alt+P'; }, 1500);
+    });
+  }
+});
+
+
+// --- UX IMPROVEMENTS: Escape to close modals & dropdowns, Focus management ---
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    // 1. Close dropdowns
+    document.querySelectorAll('.CaiDat_Dropdown.mo').forEach(el => el.classList.remove('mo'));
+    
+    // 2. Close modals if any is open
+    const openModals = document.querySelectorAll('.HopThoai:not(.an)');
+    if (openModals.length > 0) {
+      // Find the one with highest z-index
+      let highestModal = openModals[0];
+      let maxZ = parseInt(window.getComputedStyle(highestModal).zIndex) || 0;
+      
+      openModals.forEach(m => {
+        let z = parseInt(window.getComputedStyle(m).zIndex) || 0;
+        if (z > maxZ) {
+          maxZ = z;
+          highestModal = m;
+        }
+      });
+      
+      // Close the modal (unless it's the progress modal which shouldn't be canceled by ESC)
+      if (highestModal.id !== 'hop-thoai-tien-trinh') {
+        BatTatHopThoai(highestModal.id, false);
+      }
+    }
+  }
+});
+
+// Overwrite BatTatHopThoai to include focus management
+const _originalBatTatHopThoai = window.BatTatHopThoai;
+if (_originalBatTatHopThoai) {
+  window.BatTatHopThoai = function(id, hien) {
+    _originalBatTatHopThoai(id, hien);
+    if (hien) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        // Find first focusable element
+        const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusable) {
+          setTimeout(() => focusable.focus(), 50);
+        }
+      }
+    } else {
+      // Restore focus could be added here if we tracked it
+    }
+  };
+}

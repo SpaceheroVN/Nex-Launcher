@@ -21,6 +21,8 @@
   --thanh-cong: #57F287;
   --mau-tien-ich: #57F287;
   --mau-tien-ich-nen: rgba(87, 242, 135, 0.1);
+  --mau-dang-xu-ly: #cca000;
+  --mau-canh-bao-nhe: #f19b38;
   --canh-bao: #FEE75C;
   --thong-tin: #5865F2;
   --vien: #3F4147;
@@ -58,6 +60,8 @@ html[data-chu-de="light"] {
   --mau-nhan-nhat: rgba(88, 101, 242, 0.1);
   --mau-tien-ich: #248046;
   --mau-tien-ich-nen: rgba(36, 128, 70, 0.1);
+  --mau-dang-xu-ly: #cca000;
+  --mau-canh-bao-nhe: #f19b38;
   --mau-uoc-tinh: #d97706; 
   --nguy-hiem: #DA373C;
   --nguy-hiem-chon: #A1282D;
@@ -89,6 +93,8 @@ html[data-chu-de="nex"] {
   --mau-nhan-nhat: rgba(59, 130, 246, 0.15);
   --mau-tien-ich: #57F287;
   --mau-tien-ich-nen: rgba(87, 242, 135, 0.15);
+  --mau-dang-xu-ly: #cca000;
+  --mau-canh-bao-nhe: #f19b38;
   --mau-uoc-tinh: #FBBF24; 
   --nguy-hiem: #EF4444;
   --nguy-hiem-chon: #F87171;
@@ -112,12 +118,8 @@ html {
 body { 
   display: flex; flex-direction: column; width: 100%; height: 100%; 
   background-color: transparent;
-  border-radius: 7px;
   overflow: hidden;
   position: relative;
-}
-body.da-phong-to {
-  border-radius: 0 !important;
 }
 .NenApp {
   position: absolute;

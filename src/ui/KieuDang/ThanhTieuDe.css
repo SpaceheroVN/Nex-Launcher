@@ -4,7 +4,7 @@
   justify-content: space-between;
   height: var(--thanh-tieu-de-cao);
   background-color: var(--nen-tang0);
-  padding: 0 10px 0 15px;
+  padding: 0;
   -webkit-app-region: drag;
   flex-shrink: 0;
   z-index: 100;
@@ -14,6 +14,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  height: 100%;
 }
 .ThanhTieuDe_TenUngDung {
   font-size: 0.929rem;
@@ -24,29 +25,48 @@
 .ThanhTieuDe_Phai {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0;
   position: relative;
+  height: 100%;
 }
 .ThanhTieuDe_NganCach {
-  width: 1px;
+  width: 2px;
   height: 18px;
-  background-color: var(--vien);
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 1px;
   margin: 0 6px;
 }
 .ThanhTieuDe_Nut {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 28px;
-  border-radius: var(--do-bo);
+  width: 46px;
+  height: 100%;
+  border-radius: 0;
   color: var(--chu-phu);
-  transition: all var(--chuyen-dong);
+  transition: background-color var(--chuyen-dong-nhanh), color var(--chuyen-dong-nhanh);
   -webkit-app-region: no-drag;
+}
+.ThanhTieuDe_Trai .ThanhTieuDe_Nut {
+  width: 60px;
 }
 .ThanhTieuDe_Nut:hover {
   background-color: var(--nen-tang3);
   color: var(--chu-chinh);
+}
+.ThanhTieuDe_Nut svg {
+  width: 18px;
+  height: 18px;
+}
+.ThanhTieuDe_Phai .ThanhTieuDe_Nut svg {
+  width: 16px;
+  height: 16px;
+}
+body.da-phong-to .svg-phong-to {
+  display: none !important;
+}
+body.da-phong-to .svg-thu-nho-lai {
+  display: block !important;
 }
 .ThanhTieuDe_Nut--dong:hover {
   background-color: var(--nguy-hiem) !important;

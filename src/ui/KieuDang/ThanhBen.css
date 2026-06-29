@@ -19,16 +19,23 @@
   width: var(--thanh-ben-thu-gon);
   min-width: var(--thanh-ben-thu-gon);
 }
+
 .ThanhBen.thu-gon .ThanhBen_Logo {
   padding: 0;
 }
 .ThanhBen.thu-gon .ThanhBen_TenPhienBan,
 .ThanhBen.thu-gon .ThanhBen_MuiTen,
-.ThanhBen.thu-gon .ThanhBen_DanhSachCon,
 .ThanhBen.thu-gon .ThanhBen_NhomTieuDe span {
-  opacity: 0;
+  opacity: 0 !important;
   width: 0;
   overflow: hidden;
+  flex: 0 !important;
+  margin: 0;
+}
+.ThanhBen.thu-gon .ThanhBen_DanhSachCon {
+  opacity: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
 }
 .ThanhBen.thu-gon .MiniProgress_Text {
   display: none !important;
@@ -62,6 +69,7 @@
   height: 1px;
   background: var(--vien);
   margin: 12px 8px;
+  flex-shrink: 0;
 }
 .ThanhBen_Nhom {
   margin-bottom: 4px;
@@ -89,8 +97,13 @@
 .ThanhBen_NhomTieuDe.dang-chon svg:first-child {
   color: var(--mau-nhan);
 }
+.ThanhBen_NhomTieuDe svg:first-child {
+  flex-shrink: 0;
+  transition: transform var(--chuyen-dong);
+}
 .ThanhBen_NhomTieuDe span {
   flex: 1;
+  text-align: left;
   white-space: nowrap;
   transition: opacity var(--chuyen-dong);
 }

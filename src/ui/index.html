@@ -92,13 +92,12 @@
         <svg class="svg-phong-to" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;">
           <rect x="5" y="5" width="14" height="14" rx="1.5"></rect>
         </svg>
-        <svg class="svg-thu-nho-lai an" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
-          <path d="M9 9V6.5A1.5 1.5 0 0 1 10.5 5h7A1.5 1.5 0 0 1 19 6.5v7A1.5 1.5 0 0 1 17.5 15H15"></path>
-          <rect x="5" y="9" width="10" height="10" rx="1.5"></rect>
+        <svg class="svg-thu-nho-lai an" viewBox="0 0 48 48" style="pointer-events: none;">
+          <path d="M11.5 11.5H7A3.503 3.503 0 0 0 3.5 15v26A3.503 3.503 0 0 0 7 44.5h26a3.503 3.503 0 0 0 3.5-3.5v-4.5H41a3.502 3.502 0 0 0 3.5-3.5V7A3.503 3.503 0 0 0 41 3.5H15A3.503 3.503 0 0 0 11.5 7zm22 3.5v26c0 .133-.053.26-.146.354A.504.504 0 0 1 33 41.5H7a.504.504 0 0 1-.354-.146A.504.504 0 0 1 6.5 41V15c0-.133.053-.26.146-.354A.504.504 0 0 1 7 14.5h26c.133 0 .26.053.354.146A.504.504 0 0 1 33.5 15zm3 18.5H41c.133 0 .26-.053.354-.146A.504.504 0 0 0 41.5 33V7a.504.504 0 0 0-.146-.354A.504.504 0 0 0 41 6.5H15a.504.504 0 0 0-.354.146A.504.504 0 0 0 14.5 7v4.5H33a3.503 3.503 0 0 1 3.5 3.5z" fill="currentColor"></path>
         </svg>
       </button>
       <button id="nut-dong" class="ThanhTieuDe_Nut ThanhTieuDe_Nut--dong" title="Đóng">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;">
           <line x1="20" y1="4" x2="4" y2="20"></line>
           <line x1="4" y1="4" x2="20" y2="20"></line>
         </svg>
@@ -133,7 +132,7 @@
         </div>
       </div>
       <div class="ThanhBen_Nhom">
-        <button class="ThanhBen_NhomTieuDe" id="nav-uninstaller" data-trang="uninstaller">
+        <button class="ThanhBen_NhomTieuDe" id="nav-uninstaller" data-trang="uninstaller" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 512 512" fill="currentColor">
             <path
               d="m62.205 150 26.569 320.735C90.678 493.865 110.38 512 133.598 512h244.805c23.218 0 42.92-18.135 44.824-41.265L449.795 150H62.205zm118.781 302c-7.852 0-14.458-6.108-14.956-14.063l-15-242c-.513-8.276 5.771-15.395 14.033-15.908 8.569-.601 15.381 5.757 15.908 14.033l15 242c.531 8.57-6.25 15.938-14.985 15.938zM271 437c0 8.291-6.709 15-15 15s-15-6.709-15-15V195c0-8.291 6.709-15 15-15s15 6.709 15 15v242zm89.97-241.062-15 242c-.493 7.874-7.056 14.436-15.908 14.033-8.262-.513-14.546-7.632-14.033-15.908l15-242c.513-8.276 7.764-14.297 15.908-14.033 8.262.513 14.546 7.632 14.033 15.908zM451 60h-90V45c0-24.814-20.186-45-45-45H196c-24.814 0-45 20.186-45 45v15H61c-16.569 0-30 13.431-30 30 0 16.567 13.431 30 30 30h390c16.569 0 30-13.433 30-30 0-16.569-13.431-30-30-30zm-120 0H181V45c0-8.276 6.724-15 15-15h120c8.276 0 15 6.724 15 15v15z">
@@ -145,16 +144,16 @@
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </button>
-        <div class="ThanhBen_DanhSachCon" id="ds-uninstaller">
-          <button class="ThanhBen_MucCon" data-bo-loc="all-programs">Mọi chương trình</button>
-          <button class="ThanhBen_MucCon" data-bo-loc="recent">Cài đặt gần đây</button>
-          <button class="ThanhBen_MucCon" data-bo-loc="large">Phần mềm lớn</button>
-          <button class="ThanhBen_MucCon" data-bo-loc="system">Hệ thống</button>
-          <button class="ThanhBen_MucCon" data-bo-loc="external">Bên ngoài</button>
+        <div id="danh-sach-bo-loc-uninstaller" class="ThanhBen_DanhSachMucCon an">
+          <button class="ThanhBen_MucCon dang-chon" data-bo-loc="all-programs" data-i18n="uninstaller_all">Mọi chương trình</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="recent" data-i18n="uninstaller_recent">Cài đặt gần đây</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="large" data-i18n="uninstaller_large">Phần mềm lớn</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="system" data-i18n="uninstaller_system">Hệ thống</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="external" data-i18n="uninstaller_external">Bên ngoài</button>
         </div>
       </div>
       <div class="ThanhBen_Nhom">
-        <button class="ThanhBen_NhomTieuDe" id="nav-tien-ich" data-trang="tien-ich">
+        <button class="ThanhBen_NhomTieuDe" id="nav-tien-ich" data-trang="tien-ich" aria-expanded="false">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="none">
             <g>
               <path
@@ -169,9 +168,8 @@
           </svg>
         </button>
         <div class="ThanhBen_DanhSachCon" id="ds-tien-ich">
-          <button class="ThanhBen_MucCon dang-chon" data-bo-loc="don-rac">Dọn dẹp</button>
-          <button class="ThanhBen_MucCon" data-bo-loc="khoi-phuc">Khôi phục</button>
-          <button class="ThanhBen_MucCon" data-bo-loc="pha-huy">Phá hủy</button>
+          <button class="ThanhBen_MucCon dang-chon" data-bo-loc="du-lieu" data-i18n="utilities_data">Dữ liệu</button>
+          <button class="ThanhBen_MucCon" data-bo-loc="khoa-chuot" data-i18n="utilities_mouse_lock">Khóa chuột</button>
         </div>
       </div>
       
@@ -215,7 +213,7 @@
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                 <line x1="12" y1="22.08" x2="12" y2="12"></line>
               </svg>
-              <span>Đóng gói</span>
+              <span data-i18n="pack_btn">Đóng gói</span>
             </button>
             <button id="nut-xoa-chon" class="Nut Nut--nguy-hiem">
               <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor">
@@ -316,160 +314,153 @@
           <span id="so-luong-da-chon" data-i18n="status_selected">Đã chọn 0 phần mềm</span>
         </div>
       </section>
-      <section id="trang-tien-ich" class="Trang" style="opacity: 0.4; pointer-events: none; filter: grayscale(100%);" title="Tính năng đang được phát triển">
-        <div id="tab-don-rac" class="TabDichVu" style="display: block;">
-          <div
-            style="padding: 24px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
-            <h2 style="font-size: 1.714rem; font-weight: 500; color: var(--chu-chinh); margin-bottom: 8px;">Dọn Dẹp Hệ
-              Thống</h2>
-            <p style="color: var(--chu-phu); line-height: 1.5; font-size: 1rem;">Tự động phân tích và loại bỏ các tệp
-              tin rác, registry lỗi giúp giải phóng dung lượng và tăng tốc hệ thống.</p>
-            <div
-              style="background: var(--nen-chinh); border: 1px solid var(--vien); border-radius: 8px; padding: 30px; display: flex; flex-direction: row; align-items: flex-end; justify-content: center; gap: 20px; flex-wrap: wrap;">
-              <div style="width: 100%; max-width: 400px; text-align: left; flex: 1;">
-                <label style="display: block; margin-bottom: 8px; color: var(--chu-chinh); font-weight: 500;">Chế độ
-                  quét:</label>
-                <div class="CustomSelect" id="dropdown-che-do-quet">
-                  <div class="CustomSelect_HienThi" id="btn-mo-dropdown-quet">
-                    <span id="txt-che-do-quet" data-value="thong-minh">Quét thông minh (Khuyên dùng)</span>
-                    <svg class="CustomSelect_Icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2">
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  </div>
-                  <div class="CustomSelect_DanhSach" id="ds-dropdown-quet">
-                    <div class="CustomSelect_Muc dang-chon" data-value="thong-minh">
-                      <div style="font-weight: 500;">Quét thông minh (Khuyên dùng)</div>
-                      <div style="font-size: 0.857rem; color: var(--chu-phu); margin-top: 2px;">Tối ưu hóa thời gian và
-                        hiệu quả</div>
-                    </div>
-                    <div class="CustomSelect_Muc" data-value="nhanh">
-                      <div style="font-weight: 500;">Quét nhanh</div>
-                      <div style="font-size: 0.857rem; color: var(--chu-phu); margin-top: 2px;">Chỉ quét các vị trí phổ
-                        biến</div>
-                    </div>
-                    <div class="CustomSelect_Muc" data-value="toan-bo">
-                      <div style="font-weight: 500;">Quét toàn bộ</div>
-                      <div style="font-size: 0.857rem; color: var(--chu-phu); margin-top: 2px;">Quét sâu toàn hệ thống
-                        (Chậm)</div>
-                    </div>
-                  </div>
+      <section id="trang-tien-ich" class="Trang">
+        <!-- Tab Dữ liệu (Gộp chung) -->
+        <div id="tab-du-lieu" class="TabDichVu" style="display: flex;">
+          <div class="TabDichVu_ThongTin">
+            <h2 class="TabDichVu_TieuDe" data-i18n="util_data_management">Quản Lý Dữ Liệu</h2>
+            <p class="TabDichVu_MoTa" data-i18n="util_data_management_desc">Tối ưu hóa, dọn dẹp, khôi phục hoặc phá hủy an toàn các tệp tin trên hệ thống của bạn.</p>
+          </div>
+          
+          <div class="TabDichVu_KhungChinh">
+            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_system_cleanup">1. Dọn Dẹp Hệ Thống</h3>
+            <div class="TabDichVu_Hang">
+              <div>
+                <div class="TabDichVu_Nhan" data-i18n="util_scan_mode">Chế độ quét:</div>
+                <div class="TabDichVu_GhiChu" data-i18n="util_scan_mode_desc">Loại bỏ tệp tin rác, registry lỗi</div>
+              </div>
+              <div class="CaiDat_Dropdown" tabindex="0">
+                <div class="CaiDat_Dropdown_Chon" id="btn-mo-dropdown-quet">
+                  <span id="txt-che-do-quet" data-value="thong-minh" data-i18n="util_mode_smart">Quét thông minh</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="CaiDat_Dropdown_DanhSach" id="ds-dropdown-quet">
+                  <div class="CaiDat_Dropdown_Muc dang-chon" data-value="thong-minh" data-i18n="util_mode_smart">Quét thông minh</div>
+                  <div class="CaiDat_Dropdown_Muc" data-value="nhanh" data-i18n="util_mode_quick">Quét nhanh</div>
+                  <div class="CaiDat_Dropdown_Muc" data-value="toan-bo" data-i18n="util_mode_all">Quét toàn bộ</div>
                 </div>
               </div>
-              <button id="btn-bat-dau-quet-rac" class="Nut"
-                style="width: 100%; max-width: 250px; padding: 16px; font-size: 1.286rem; font-weight: bold; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s, background 0.2s; height: 56px; flex-shrink: 0;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                  QUÉT NGAY
-                </div>
-              </button>
+              <button id="btn-bat-dau-quet-rac" class="Nut Nut--chinh" data-i18n="util_scan_now">QUÉT NGAY</button>
             </div>
-            <div id="tien-trinh-don-dep"
-              style="display: none; background: var(--nen-chinh); border: 1px solid var(--vien); border-radius: 8px; padding: 20px; text-align: center;">
-              <p style="color: var(--chu-phu); margin-bottom: 8px;" id="txt-tien-trinh-don-dep">Đang phân tích hệ
-                thống... 0%</p>
-              <div
-                style="width: 100%; background: var(--nen-ung-dung); height: 8px; border-radius: 4px; overflow: hidden;">
-                <div id="thanh-tien-trinh-don-dep"
-                  style="width: 0%; height: 100%; background: #3498db; transition: width 0.3s;"></div>
+          </div>
+          
+          <div class="TabDichVu_KhungChinh">
+            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_data_recovery_title">2. Khôi Phục Dữ Liệu</h3>
+            <div class="TabDichVu_Hang">
+              <div style="flex: 1;">
+                <div class="TabDichVu_Nhan" data-i18n="util_choose_scan_drive">Chọn Ổ Đĩa Cần Quét:</div>
+                <input type="text" id="input-duong-dan-khoi-phuc" class="OTimKiem_Input" autocomplete="off" style="width: 100%; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; margin-top: 8px;" placeholder="Ví dụ: C:, D:, E:" data-i18n-placeholder="util_drive_placeholder">
               </div>
+              <div style="flex: 1;">
+                <div class="TabDichVu_Nhan" data-i18n="util_save_folder">Thư Mục Lưu Tệp:</div>
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                  <button class="Nut Nut--phu" id="btn-chon-folder-khoi-phuc" data-i18n="util_choose_folder">Chọn Thư Mục</button>
+                  <input type="text" id="input-thu-muc-khoi-phuc" class="OTimKiem_Input" autocomplete="off" style="flex: 1; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px;" placeholder="Chưa chọn..." data-i18n-placeholder="util_folder_placeholder" readonly>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+              <button id="btn-bat-dau-khoi-phuc" class="Nut" style="background: var(--thanh-cong); color: white;" data-i18n="util_start_scan">TIẾN HÀNH QUÉT</button>
+            </div>
+          </div>
+          
+          <div class="TabDichVu_KhungChinh">
+            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_data_destruction_title">3. Phá Hủy Dữ Liệu (Secure Erase)</h3>
+            <div class="TabDichVu_Hang">
+              <div style="flex: 1;">
+                <div class="TabDichVu_Nhan" data-i18n="util_choose_destroy_target">Chọn đối tượng cần tiêu hủy:</div>
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                  <button class="Nut Nut--phu" id="btn-chon-file" data-i18n="util_choose_file">Chọn Tệp</button>
+                  <button class="Nut Nut--phu" id="btn-chon-folder" data-i18n="util_choose_folder">Chọn Thư Mục</button>
+                  <button class="Nut Nut--phu" id="btn-chon-drive" data-i18n="util_choose_drive">Chọn Ổ Đĩa</button>
+                </div>
+                <input type="text" id="input-duong-dan-pha-huy" class="OTimKiem_Input" autocomplete="off" style="width: 100%; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; margin-top: 8px;" placeholder="Đường dẫn..." data-i18n-placeholder="util_path_placeholder" readonly>
+              </div>
+              <div style="flex: 1;">
+                <div class="TabDichVu_Nhan" data-i18n="util_overwrite_passes_label">Số lần ghi đè (Passes):</div>
+                <div class="CaiDat_Dropdown" tabindex="0" style="width: 100%; margin-top: 8px;">
+                  <div class="CaiDat_Dropdown_Chon" id="btn-mo-dropdown-ghi-de">
+                    <span id="txt-so-lan-ghi-de" data-value="3" data-i18n="util_pass_3_rec">3 Passes (Khuyến nghị)</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </div>
+                  <div class="CaiDat_Dropdown_DanhSach" id="ds-dropdown-ghi-de">
+                    <div class="CaiDat_Dropdown_Muc" data-value="1" data-i18n="util_pass_1_fast">1 Pass (Nhanh)</div>
+                    <div class="CaiDat_Dropdown_Muc dang-chon" data-value="3" data-i18n="util_pass_3_rec">3 Passes (Khuyến nghị)</div>
+                    <div class="CaiDat_Dropdown_Muc" data-value="7" data-i18n="util_pass_7_secure">7 Passes (Cực kỳ an toàn)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="TabDichVu_CanhBao" style="display: none;" id="canh-bao-pha-huy">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <div>
+                <strong data-i18n="util_destroy_warning_sys">CẢNH BÁO QUAN TRỌNG: Đây là thư mục/ổ đĩa hệ thống! Phá hủy sẽ làm hỏng Windows.</strong>
+                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                  <button class="Nut" id="btn-xac-nhan-lan-1" style="background: transparent; border: 1px solid var(--nguy-hiem); color: var(--nguy-hiem);" data-i18n="util_delete_anyway">Vẫn Xóa</button>
+                  <button class="Nut" id="btn-huy-pha-huy" style="background: var(--nen-chinh); border: 1px solid var(--vien); color: var(--chu-chinh);" data-i18n="util_cancel">Hủy Bỏ</button>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+              <button id="btn-bat-dau-pha-huy" class="Nut" style="background: var(--nguy-hiem); color: white;" disabled data-i18n="util_start_destruction">TIẾN HÀNH PHÁ HỦY</button>
             </div>
           </div>
         </div>
-        <div id="tab-khoi-phuc" class="TabDichVu" style="display: none;">
-          <div
-            style="padding: 24px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
-            <h2 style="font-size: 1.714rem; font-weight: 500; color: var(--chu-chinh); margin-bottom: 8px;">Khôi Phục Dữ
-              Liệu</h2>
-            <p style="color: var(--chu-phu); line-height: 1.5; font-size: 1rem;">Quét sâu ổ đĩa ở cấp độ phần cứng (File
-              Carving) để tìm và khôi phục các tệp tin đã bị xóa vĩnh viễn hoặc do format nhầm.</p>
-            <div
-              style="background: var(--nen-chinh); border: 1px solid var(--vien); border-radius: 8px; padding: 20px;">
-              <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; color: var(--chu-chinh); font-weight: 500;">Chọn Ổ Đĩa
-                  Cần Quét:</label>
-                <input type="text" id="input-duong-dan-khoi-phuc" class="OTimKiem_Input" autocomplete="off"
-                  style="width: 100%; border: 1px solid var(--vien); border-radius: 4px; padding: 8px;"
-                  placeholder="Ví dụ: C:, D:, E: hoặc cắm USB vào và nhập kí tự ổ đĩa...">
+
+        <!-- Tab Khóa Chuột -->
+        <div id="tab-khoa-chuot" class="TabDichVu" style="display: none;">
+          <div class="TabDichVu_ThongTin">
+            <h2 class="TabDichVu_TieuDe" data-i18n="util_mouse_lock_title">Khóa Chuột (Mouse Lock)</h2>
+            <p class="TabDichVu_MoTa" data-i18n="util_mouse_lock_desc">Giới hạn khu vực di chuyển chuột bằng các phím tắt.</p>
+          </div>
+          
+          <div class="TabDichVu_KhungChinh">
+            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_lock_1_monitor">1. Khóa ở 1 Màn Hình</h3>
+            <div class="TabDichVu_Hang">
+              <div>
+                <div class="TabDichVu_Nhan" data-i18n="util_lock_1_monitor_desc">Chống trỏ chuột tràn sang màn hình khác khi dùng đa màn hình.</div>
+                <div class="TabDichVu_GhiChu" data-i18n="util_shortcut_toggle">Phím tắt kích hoạt/tắt:</div>
               </div>
-              <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; color: var(--chu-chinh); font-weight: 500;">Thư Mục
-                  Lưu Tệp Khôi Phục:</label>
-                <div style="display: flex; gap: 12px;">
-                  <button class="Nut Nut--phu" id="btn-chon-folder-khoi-phuc">Chọn Thư Mục</button>
-                  <input type="text" id="input-thu-muc-khoi-phuc" class="OTimKiem_Input" autocomplete="off"
-                    style="width: 100%; border: 1px solid var(--vien); border-radius: 4px; padding: 8px;"
-                    placeholder="Chưa chọn..." readonly>
-                </div>
-              </div>
-              <button id="btn-bat-dau-khoi-phuc" class="Nut"
-                style="width: 100%; background: #2ecc71; color: white; border: none; font-weight: bold; margin-top: 8px;">TIẾN
-                HÀNH QUÉT</button>
-            </div>
-            <div id="tien-trinh-khoi-phuc"
-              style="display: none; background: var(--nen-chinh); border: 1px solid var(--vien); border-radius: 8px; padding: 20px; text-align: center;">
-              <p style="color: var(--chu-phu); margin-bottom: 8px;" id="txt-tien-trinh-khoi-phuc">Đang quét... 0%</p>
-              <div
-                style="width: 100%; background: var(--nen-ung-dung); height: 8px; border-radius: 4px; overflow: hidden;">
-                <div id="thanh-tien-trinh-khoi-phuc"
-                  style="width: 0%; height: 100%; background: #2ecc71; transition: width 0.3s;"></div>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <input type="text" id="shortcut-lock-monitor" class="OTimKiem_Input" autocomplete="off" style="width: 150px; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; text-align: center;" placeholder="Chưa gán phím" data-i18n-placeholder="util_no_shortcut" readonly>
+                <button class="Nut Nut--phu" id="btn-set-lock-monitor" data-i18n="util_set_shortcut">Cài phím</button>
               </div>
             </div>
           </div>
-        </div>
-        <div id="tab-pha-huy" class="TabDichVu" style="display: none;">
-          <div class="TienIch_PhaHuy"
-            style="padding: 24px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
-            <h2 style="font-size: 1.714rem; font-weight: 500; color: var(--chu-chinh); margin-bottom: 8px;">Phá Hủy Dữ
-              Liệu An Toàn (Secure Erase)</h2>
-            <p style="color: var(--chu-phu); line-height: 1.5; font-size: 1rem;">Tính năng này sử dụng C++ Addon Native
-              để ghi đè dữ liệu cấp thấp lên ổ cứng, đảm bảo không thể khôi phục bằng các phần mềm thông thường.
-              <strong>Hãy cẩn thận!</strong>
-            </p>
-            <div
-              style="background: var(--nen-chinh); border: 1px solid var(--vien); border-radius: 8px; padding: 20px;">
-              <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; color: var(--chu-chinh); font-weight: 500;">Chọn đối
-                  tượng cần tiêu hủy:</label>
-                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                  <button class="Nut Nut--phu" id="btn-chon-file">Chọn Tệp</button>
-                  <button class="Nut Nut--phu" id="btn-chon-folder">Chọn Thư Mục</button>
-                  <button class="Nut Nut--phu" id="btn-chon-drive">Chọn Ổ Đĩa</button>
+
+          <div class="TabDichVu_KhungChinh">
+            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_lock_limit_area">2. Khóa trong 1 Vùng Giới Hạn</h3>
+            <div class="TabDichVu_Hang">
+              <div style="flex: 1;">
+                <div class="TabDichVu_Nhan" data-i18n="util_lock_limit_area_desc">Giới hạn chuột trong một vùng cửa sổ chỉ định.</div>
+                <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
+                  <button class="Nut Nut--chinh" id="btn-select-window" data-i18n="util_choose_window">Chọn Cửa Sổ</button>
+                  <span id="selected-window-name" class="TabDichVu_GhiChu" data-i18n="util_folder_placeholder">Chưa chọn...</span>
                 </div>
-                <input type="text" id="input-duong-dan-pha-huy" class="OTimKiem_Input" autocomplete="off"
-                  style="width: 100%; border: 1px solid var(--vien); border-radius: 4px; padding: 8px;"
-                  placeholder="Đường dẫn sẽ được hiển thị ở đây..." readonly>
               </div>
-              <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; color: var(--chu-chinh); font-weight: 500;">Số lần ghi
-                  đè (Passes):</label>
-                <select id="input-so-lan-ghi"
-                  style="width: 100%; background: var(--nen-chinh); color: var(--chu-chinh); border: 1px solid var(--vien); border-radius: 4px; padding: 8px;">
-                  <option value="1">1 Pass (Nhanh - Vừa đủ an toàn)</option>
-                  <option value="3" selected>3 Passes (Khuyến nghị - Tương đương DoD)</option>
-                  <option value="7">7 Passes (Cực kỳ an toàn - Tốn thời gian)</option>
-                </select>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="TabDichVu_GhiChu" data-i18n="util_shortcut">Phím tắt:</div>
+                <input type="text" id="shortcut-lock-area" class="OTimKiem_Input" autocomplete="off" style="width: 150px; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; text-align: center;" placeholder="Chưa gán phím" data-i18n-placeholder="util_no_shortcut" readonly>
+                <button class="Nut Nut--phu" id="btn-set-lock-area" data-i18n="util_set_shortcut">Cài phím</button>
               </div>
-              <button id="btn-bat-dau-pha-huy" class="Nut"
-                style="width: 100%; background: #e74c3c; color: white; border: none; font-weight: bold; margin-top: 8px;"
-                disabled>TIẾN HÀNH PHÁ HỦY</button>
             </div>
-            <div id="canh-bao-pha-huy"
-              style="display: none; padding: 16px; border-left: 4px solid #e74c3c; background: rgba(231, 76, 60, 0.1); border-radius: 4px; color: #e74c3c; line-height: 1.5; font-size: 1rem;">
-              <strong>CẢNH BÁO QUAN TRỌNG:</strong> Đây là thư mục/ổ đĩa hệ thống! Việc phá hủy sẽ làm hỏng Windows. Bạn
-              có chắc chắn muốn tiếp tục?
-              <div style="margin-top: 12px; display: flex; gap: 12px;">
-                <button class="Nut" id="btn-xac-nhan-lan-1"
-                  style="background: transparent; border: 1px solid #e74c3c; color: #e74c3c;">Vẫn Xóa</button>
-                <button class="Nut" id="btn-huy-pha-huy"
-                  style="background: var(--nen-chinh); border: 1px solid var(--vien); color: var(--chu-chinh);">Hủy
-                  Bỏ</button>
+          </div>
+
+          <div class="TabDichVu_KhungChinh">
+            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_lock_position">3. Khóa Tại Vị Trí</h3>
+            <div class="TabDichVu_Hang">
+              <div style="flex: 1;">
+                <div class="TabDichVu_Nhan" data-i18n="util_lock_position_desc">Khóa cứng chuột tại một tọa độ nhất định.</div>
+                <label class="TuyChonCheckbox" style="display: flex; align-items: center; gap: 8px; margin-top: 8px; cursor: pointer;">
+                  <input type="checkbox" id="chk-auto-lock-pos" class="OChon" checked>
+                  <span class="TabDichVu_GhiChu" data-i18n="util_auto_get_cursor">Tự động lấy tọa độ con trỏ hiện tại khi bấm phím tắt</span>
+                </label>
               </div>
-              <p id="canh-bao-text"></p>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="TabDichVu_GhiChu" data-i18n="util_shortcut">Phím tắt:</div>
+                <input type="text" id="shortcut-lock-pos" class="OTimKiem_Input" autocomplete="off" style="width: 150px; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; text-align: center;" placeholder="Chưa gán phím" data-i18n-placeholder="util_no_shortcut" readonly>
+                <button class="Nut Nut--phu" id="btn-set-lock-pos" data-i18n="util_set_shortcut">Cài phím</button>
+              </div>
             </div>
           </div>
         </div>
@@ -477,7 +468,7 @@
     </main>
   </div>
   <div id="lop-phu-modal" class="LopPhuModal an"></div>
-  <div id="hop-thoai-gioi-thieu" class="HopThoai an">
+  <div id="hop-thoai-gioi-thieu" class="HopThoai an" role="dialog" aria-modal="true">
     <div class="HopThoai_NoiDung">
       <img src="TaiNguyen/BieuTuong/logo.svg" alt="Nex" class="HopThoai_Logo">
       <h2 class="HopThoai_TieuDe">Nex Launcher</h2>
@@ -497,9 +488,8 @@
     <option value="Messaging"></option>
     <option value="Compression"></option>
   </datalist>
-  <div id="hop-thoai-them-app" class="HopThoai an" style="z-index: 1002;">
-    <div class="HopThoai_NoiDung"
-      style="text-align: left; padding: 16px 24px; width: 540px; max-width: 90%; border-radius: var(--do-bo-lon); box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid var(--vien);">
+  <div id="hop-thoai-them-app" class="HopThoai an" style="z-index: 1002;" role="dialog" aria-modal="true">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--them-app">
       <h3 id="them-app-tieu-de"
         style="margin-top: 0; margin-bottom: 20px; font-size: 1.429rem; font-weight: 600; color: var(--chu-chinh); text-align: center; width: 100%;"
         data-i18n="add_app_title">Thêm phần mềm mới</h3>
@@ -525,24 +515,24 @@
             style="position: absolute; top: 100%; left: 0; right: 0; background: var(--nen-tang2, var(--nen-chinh)); border: 1px solid var(--vien); border-radius: var(--do-bo); margin-top: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 10; max-height: 200px; overflow-y: auto;">
             <div class="CustomSelect_Item"
               style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Web Browsers'">Web Browsers</div>
+              onmousedown="document.getElementById('them-app-loai').value='Web Browsers'" data-i18n="cat_web_browsers">Trình duyệt web</div>
             <div class="CustomSelect_Item"
               style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Developer Tools'">Developer Tools</div>
+              onmousedown="document.getElementById('them-app-loai').value='Developer Tools'" data-i18n="cat_dev_tools">Công cụ lập trình</div>
             <div class="CustomSelect_Item"
               style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Media'">Media</div>
+              onmousedown="document.getElementById('them-app-loai').value='Media'" data-i18n="cat_media">Đa phương tiện</div>
             <div class="CustomSelect_Item"
               style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Games'">Games</div>
+              onmousedown="document.getElementById('them-app-loai').value='Games'" data-i18n="cat_games">Trò chơi</div>
             <div class="CustomSelect_Item"
               style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Utilities'">Utilities</div>
+              onmousedown="document.getElementById('them-app-loai').value='Utilities'" data-i18n="cat_utilities">Tiện ích</div>
             <div class="CustomSelect_Item"
               style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Messaging'">Messaging</div>
+              onmousedown="document.getElementById('them-app-loai').value='Messaging'" data-i18n="cat_messaging">Nhắn tin</div>
             <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 1rem; cursor: pointer;"
-              onmousedown="document.getElementById('them-app-loai').value='Compression'">Compression</div>
+              onmousedown="document.getElementById('them-app-loai').value='Compression'" data-i18n="cat_compression">Nén dữ liệu</div>
           </div>
         </div>
       </div>
@@ -648,9 +638,8 @@
       </div>
     </div>
   </div>
-  <div id="hop-thoai-tim-winget" class="HopThoai an" style="z-index: 1003;">
-    <div class="HopThoai_NoiDung"
-      style="text-align: left; padding: 24px; width: 600px; max-width: 90%; border-radius: var(--do-bo-lon); box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--vien); display: flex; flex-direction: column; align-items: stretch; max-height: 80vh;">
+  <div id="hop-thoai-tim-winget" class="HopThoai an" style="z-index: 1003;" role="dialog" aria-modal="true">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--tim-winget">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
         <h3 id="tim-winget-tieu-de" style="margin: 0; font-size: 1.286rem; color: var(--chu); font-weight: 600;">Tìm
           kiếm Winget</h3>
@@ -681,7 +670,7 @@
       </div>
     </div>
   </div>
-  <div id="hop-thoai-cai-dat" class="HopThoai an">
+  <div id="hop-thoai-cai-dat" class="HopThoai an" role="dialog" aria-modal="true">
     <div class="HopThoai_NoiDung HopThoai_NoiDung--rong">
       <div class="CaiDat_ThanhBen">
         <div class="CaiDat_TieuDe" data-i18n="menu_settings">Cài đặt</div>
@@ -707,8 +696,8 @@
       </div>
     </div>
   </div>
-  <div id="hop-thoai-tro-giup" class="HopThoai an" style="z-index: 1001;">
-    <div class="HopThoai_NoiDung" style="text-align: left; padding: 24px; min-width: 320px; max-width: 400px;">
+  <div id="hop-thoai-tro-giup" class="HopThoai an" style="z-index: 1001;" role="dialog" aria-modal="true">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--tro-giup">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
         <h3 id="tro-giup-tieu-de" style="margin: 0; font-size: 1.286rem; color: var(--chu);">Trợ giúp</h3>
       </div>
@@ -718,9 +707,8 @@
         style="width: 100%;">OK</button>
     </div>
   </div>
-  <div id="hop-thoai-xac-nhan" class="HopThoai an" style="z-index: 1005;">
-    <div class="HopThoai_NoiDung"
-      style="text-align: center; padding: 32px; width: 600px; max-width: 90%; border-radius: var(--do-bo-lon); border: 1px solid var(--vien); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+  <div id="hop-thoai-xac-nhan" class="HopThoai an" style="z-index: 1005;" role="dialog" aria-modal="true">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--xac-nhan">
       <div style="position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 16px;">
         <h3 id="xac-nhan-tieu-de" style="margin: 0; font-size: 1.286rem; color: var(--chu); font-weight: 600;" data-i18n="confirm_title">
           Xác nhận</h3>
@@ -739,9 +727,8 @@
       </div>
     </div>
   </div>
-  <div id="hop-thoai-xac-nhan-go" class="HopThoai an" style="z-index: 1002;">
-    <div class="HopThoai_NoiDung"
-      style="text-align: center; padding: 32px; width: 600px; max-width: 90%; border-radius: var(--do-bo-lon); box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--vien);">
+  <div id="hop-thoai-xac-nhan-go" class="HopThoai an" style="z-index: 1002;" role="dialog" aria-modal="true">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--xac-nhan">
       <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px;">
         <button class="XacNhanGo_NutChuyen" id="xac-nhan-go-prev" disabled>&lt;</button>
         <div id="xac-nhan-go-danh-sach" class="XacNhanGo_DanhSachApp"
@@ -778,9 +765,8 @@
     </div>
   </div>
 
-  <div id="hop-thoai-bao-cao-loi" class="HopThoai an" style="z-index: 1005;">
-    <div class="HopThoai_NoiDung"
-      style="text-align: left; padding: 24px; min-width: 400px; max-width: 600px; border-radius: var(--do-bo-lon); border: 1px solid var(--vien); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+  <div id="hop-thoai-bao-cao-loi" class="HopThoai an" style="z-index: 1005;" role="dialog" aria-modal="true">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--bao-cao-loi">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
         <h3
           style="margin: 0; font-size: 1.286rem; color: var(--nguy-hiem); display: flex; align-items: center; gap: 8px;">
@@ -814,51 +800,9 @@
       </div>
     </div>
   </div>
-  <div id="hop-thoai-tien-trinh" class="HopThoai an" style="z-index: 1003;">
-    <style>
-      .Nut--Huy { background: var(--nen-tang3); color: var(--chu-chinh); border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.2s; }
-      .Nut--Huy:hover:not(:disabled) { background: var(--nen-tang3); filter: brightness(0.85); box-shadow: 0 4px 8px rgba(0,0,0,0.2); transform: translateY(-1px); }
-      
-      .TienTrinh_Muc {
-        background: var(--nen-tang2);
-        border: 1px solid var(--vien);
-        border-radius: var(--do-bo);
-        margin-bottom: 8px;
-        padding: 12px 16px !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        transition: all var(--chuyen-dong);
-      }
-      .TienTrinh_Muc:last-child { margin-bottom: 0; }
-      
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      .spinner {
-        display: inline-block; width: 14px; height: 14px;
-        border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
-        border-top-color: currentColor; animation: spin 1s ease-in-out infinite;
-        margin-right: 6px; vertical-align: -2px;
-      }
-      
-      @keyframes progress-stripes { from { background-position: 40px 0; } to { background-position: 0 0; } }
-      #tien-trinh-thanh {
-        background-image: 
-          linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent),
-          linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.3) 100%);
-        background-size: 40px 40px, 100% 100%;
-        box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), inset 0 -1px 2px rgba(0,0,0,0.4);
-        animation: progress-stripes 1s linear infinite;
-      }
-      #tien-trinh-thanh.hoan-tat {
-        background-image: none !important;
-        animation: none !important;
-        box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -1px 2px rgba(0,0,0,0.2) !important;
-      }
-      .TienTrinh_DanhSach::-webkit-scrollbar, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar { width: 6px; }
-      .TienTrinh_DanhSach::-webkit-scrollbar-track, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar-track, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar-track { background: transparent; }
-      .TienTrinh_DanhSach::-webkit-scrollbar-thumb, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar-thumb, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-      .TienTrinh_DanhSach::-webkit-scrollbar-thumb:hover, #tien-trinh-tong-ket-don-dep::-webkit-scrollbar-thumb:hover, #tien-trinh-diem-khoi-phuc::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
-    </style>
-    <div class="HopThoai_NoiDung"
-      style="background: var(--nen-tang0); display: flex; flex-direction: column; text-align: left; padding: 24px; width: 650px; height: auto; max-width: 95%; max-height: 90vh; border-radius: var(--do-bo-lon); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid var(--vien);">
+  <div id="hop-thoai-tien-trinh" class="HopThoai an" style="z-index: 1003;" role="dialog" aria-modal="true">
+    
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--tien-trinh">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%;">
         <h3 id="tien-trinh-tieu-de" style="margin: 0; font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh);">Tiến trình cài đặt</h3>
         <button class="ThanhTieuDe_Nut" id="an-tien-trinh" style="border: none; background: transparent; cursor: pointer; padding: 4px;" title="Ẩn xuống nền">
@@ -907,7 +851,7 @@
       </div>
     </div>
   </div>
-  <div id="vung-thong-bao" class="VungThongBao"></div>
+  <div id="vung-thong-bao" class="VungThongBao" aria-live="polite"></div>
   <script src="TaiNguyen/Languages.js"></script>
   <script src="CauNoiTauri.js"></script>
   <script src="KhoiChay.js"></script>

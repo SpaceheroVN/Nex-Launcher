@@ -28,7 +28,7 @@
 .CaiDat_NutDongX { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--do-bo); color: var(--chu-tat); transition: all var(--chuyen-dong-nhanh); }
 .CaiDat_NutDongX:hover { background-color: var(--nen-tang3); color: var(--chu-chinh); }
 .CaiDat_NutDongX svg { width: 20px; height: 20px; }
-.CaiDat_CuonNoiDung { flex: 1; overflow-y: auto; padding: 0 24px 20px; }
+.CaiDat_CuonNoiDung { flex: 1; overflow-y: auto; padding: 0 24px 20px; scroll-behavior: smooth; }
 .CaiDat_CuonNoiDung::-webkit-scrollbar { width: 6px; }
 .CaiDat_CuonNoiDung::-webkit-scrollbar-thumb { background-color: var(--vien); border-radius: 4px; }
 .CaiDat_Phan { padding-bottom: 30px; margin-bottom: 20px; border-bottom: 1px solid var(--vien); }
@@ -93,7 +93,7 @@
   border: 1px solid transparent;
   border-radius: var(--do-bo-nho);
   color: var(--chu-chinh);
-  transition: border-color 0.2s, background-color 0.2s;
+  transition: border-color var(--chuyen-dong), background-color var(--chuyen-dong);
 }
 .CaiDat_Dropdown:hover .CaiDat_Dropdown_Chon {
   background: var(--nen-tang3);
@@ -115,7 +115,7 @@
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
-  transition: opacity 0.2s, transform 0.2s;
+  transition: opacity var(--chuyen-dong), transform var(--chuyen-dong);
 }
 .CaiDat_Dropdown.mo .CaiDat_Dropdown_DanhSach {
   opacity: 1;
@@ -125,7 +125,7 @@
 .CaiDat_Dropdown_Muc {
   padding: 8px 12px;
   color: var(--chu-chinh);
-  transition: background-color 0.2s;
+  transition: background-color var(--chuyen-dong);
 }
 .CaiDat_Dropdown_Muc:first-child { border-radius: var(--do-bo-nho) var(--do-bo-nho) 0 0; }
 .CaiDat_Dropdown_Muc:last-child { border-radius: 0 0 var(--do-bo-nho) var(--do-bo-nho); }
