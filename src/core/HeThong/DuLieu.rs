@@ -16,15 +16,30 @@ fn basic_json_path(app: &tauri::AppHandle) -> std::path::PathBuf {
     p
 }
 
+fn custom_apps_json_path(app: &tauri::AppHandle) -> std::path::PathBuf {
+    basic_json_path(app).with_file_name("CustomApps.json")
+}
+
 #[tauri::command]
 pub async fn LayDanhSachUngDung(AppHandle: tauri::AppHandle) -> serde_json::Value {
     let p = basic_json_path(&AppHandle);
+    let p_custom = custom_apps_json_path(&AppHandle);
+    
+    let mut combined_data = vec![];
+
     if let Ok(content) = std::fs::read_to_string(&p) {
-        if let Ok(data) = serde_json::from_str(&content) {
-            return data;
+        if let Ok(data) = serde_json::from_str::<Vec<serde_json::Value>>(&content) {
+            combined_data.extend(data);
         }
     }
-    serde_json::json!([])
+    
+    if let Ok(custom_content) = std::fs::read_to_string(&p_custom) {
+        if let Ok(custom_data) = serde_json::from_str::<Vec<serde_json::Value>>(&custom_content) {
+            combined_data.extend(custom_data);
+        }
+    }
+    
+    serde_json::json!(combined_data)
 }
 
 #[tauri::command]
@@ -78,7 +93,7 @@ pub async fn ThucHienCapNhatBasic(AppHandle: tauri::AppHandle) -> bool {
 
 #[tauri::command]
 pub fn ThemUngDungInstaller(AppHandle: tauri::AppHandle, ThongTinApp: serde_json::Value) -> bool {
-    let p = basic_json_path(&AppHandle);
+    let p = custom_apps_json_path(&AppHandle);
     let mut data: Vec<serde_json::Value> = match std::fs::read_to_string(&p) {
         Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
         Err(_) => vec![],
@@ -93,29 +108,29 @@ pub fn ThemUngDungInstaller(AppHandle: tauri::AppHandle, ThongTinApp: serde_json
 
 #[tauri::command]
 pub fn SuaUngDungInstaller(AppHandle: tauri::AppHandle, TenCu: String, ThongTinMoi: serde_json::Value) -> bool {
-    let p = basic_json_path(&AppHandle);
-    let mut data: Vec<serde_json::Value> = match std::fs::read_to_string(&p) {
+    let p_custom = custom_apps_json_path(&AppHandle);
+    
+    let mut data: Vec<serde_json::Value> = match std::fs::read_to_string(&p_custom) {
         Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
-        Err(_) => return false,
+        Err(_) => vec![],
     };
+    
     if let Some(idx) = data.iter().position(|a| a.get("name").and_then(|v| v.as_str()) == Some(&TenCu)) {
         let mut ThongTinSua = ThongTinMoi;
         if let Some(obj) = ThongTinSua.as_object_mut() {
             obj.insert("edit".to_string(), serde_json::json!(true));
         }
         data[idx] = ThongTinSua;
-        return std::fs::write(&p, serde_json::to_string_pretty(&data).unwrap_or_default()).is_ok();
+        return std::fs::write(&p_custom, serde_json::to_string_pretty(&data).unwrap_or_default()).is_ok();
     }
+    
     false
 }
 
 #[tauri::command]
 pub fn XoaUngDungInstaller(AppHandle: tauri::AppHandle, TenApp: serde_json::Value) -> bool {
-    let p = basic_json_path(&AppHandle);
-    let mut data: Vec<serde_json::Value> = match std::fs::read_to_string(&p) {
-        Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
-        Err(_) => return false,
-    };
+    let p_basic = basic_json_path(&AppHandle);
+    let p_custom = custom_apps_json_path(&AppHandle);
     
     let names_to_remove: Vec<String> = if let Some(arr) = TenApp.as_array() {
         arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
@@ -125,27 +140,53 @@ pub fn XoaUngDungInstaller(AppHandle: tauri::AppHandle, TenApp: serde_json::Valu
         return false;
     };
     
-    let mut changed = false;
-    for item in data.iter_mut() {
-        if let Some(name) = item.get("name").and_then(|v| v.as_str()) {
-            if names_to_remove.contains(&name.to_string()) {
-                if let Some(obj) = item.as_object_mut() {
-                    obj.insert("delete".to_string(), serde_json::json!(true));
-                    changed = true;
+    let mut changed_basic = false;
+    if let Ok(content) = std::fs::read_to_string(&p_basic) {
+        if let Ok(mut data) = serde_json::from_str::<Vec<serde_json::Value>>(&content) {
+            for item in data.iter_mut() {
+                if let Some(name) = item.get("name").and_then(|v| v.as_str()) {
+                    if names_to_remove.contains(&name.to_string()) {
+                        if let Some(obj) = item.as_object_mut() {
+                            obj.insert("delete".to_string(), serde_json::json!(true));
+                            changed_basic = true;
+                        }
+                    }
                 }
+            }
+            if changed_basic {
+                let _ = std::fs::write(&p_basic, serde_json::to_string_pretty(&data).unwrap_or_default());
             }
         }
     }
     
-    if changed {
-        return std::fs::write(&p, serde_json::to_string_pretty(&data).unwrap_or_default()).is_ok();
+    let mut changed_custom = false;
+    if let Ok(content) = std::fs::read_to_string(&p_custom) {
+        if let Ok(mut data) = serde_json::from_str::<Vec<serde_json::Value>>(&content) {
+            let original_len = data.len();
+            data.retain(|item| {
+                if let Some(name) = item.get("name").and_then(|v| v.as_str()) {
+                    !names_to_remove.contains(&name.to_string())
+                } else {
+                    true
+                }
+            });
+            if data.len() != original_len {
+                changed_custom = true;
+                let _ = std::fs::write(&p_custom, serde_json::to_string_pretty(&data).unwrap_or_default());
+            }
+        }
     }
-    false
+    
+    changed_basic || changed_custom
 }
 
 #[tauri::command]
 pub fn DatLaiDanhSachUngDung(AppHandle: tauri::AppHandle) -> bool {
     let p = basic_json_path(&AppHandle);
+    let p_custom = custom_apps_json_path(&AppHandle);
+    
+    let _ = std::fs::remove_file(&p_custom);
+    
     let mut data: Vec<serde_json::Value> = match std::fs::read_to_string(&p) {
         Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
         Err(_) => return false,

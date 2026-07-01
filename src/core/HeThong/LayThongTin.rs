@@ -15,6 +15,9 @@ pub async fn LayIconApp(
     {
         let cache = State.cache.lock().unwrap();
         if let Some(icon) = cache.get(&TenApp) {
+            if icon.is_empty() {
+                return Ok(None);
+            }
             return Ok(Some(icon.clone()));
         }
     }
@@ -28,16 +31,20 @@ pub async fn LayIconApp(
             .or_else(|| tim_icon_tu_where(&TenApp))
             .or_else(|| tim_icon_tu_program_files(&TenApp));
 
+        let mut cache = State.cache.lock().unwrap();
         if let Some(ref icon_data) = icon {
-            let mut cache = State.cache.lock().unwrap();
             cache.insert(TenApp.clone(), icon_data.clone());
+        } else {
+            cache.insert(TenApp.clone(), String::new());
         }
         return Ok(icon);
     }
 
+    let mut cache = State.cache.lock().unwrap();
     if let Some(ref icon_data) = icon {
-        let mut cache = State.cache.lock().unwrap();
         cache.insert(TenApp.clone(), icon_data.clone());
+    } else {
+        cache.insert(TenApp.clone(), String::new());
     }
 
     Ok(icon)

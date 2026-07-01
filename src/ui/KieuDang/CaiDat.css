@@ -1,10 +1,16 @@
 .HopThoai {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  display: flex; align-items: center; justify-content: center; z-index: 500; animation: hienHopThoai 0.2s ease;
+  display: flex; align-items: center; justify-content: center; z-index: 500;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--chuyen-dong);
 }
-.LopPhuModal { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 400; animation: mooDanVao 0.2s ease; border-radius: var(--do-bo-lon); }
-.HopThoai_NoiDung { border-radius: var(--do-bo-lon); padding: 32px; max-width: 420px; width: 90%; box-shadow: var(--bong-lon); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; position: relative; z-index: 1; }
-.HopThoai_NoiDung::before { content: ''; position: absolute; inset: 0; background-color: var(--nen-tang0); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: inherit; z-index: -1; }
+.HopThoai.mo-hop-thoai {
+  opacity: 1; pointer-events: auto;
+}
+.LopPhuModal { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 400; opacity: 0; pointer-events: none; transition: opacity var(--chuyen-dong); border-radius: var(--do-bo-lon); }
+.LopPhuModal.mo-hop-thoai { opacity: 1; pointer-events: auto; }
+.HopThoai_NoiDung { border-radius: var(--do-bo-lon); padding: 32px; max-width: 420px; width: 90%; box-shadow: 0 2px 5px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; position: relative; z-index: 1;  transform: scale(0.95) translateY(15px); transition: transform var(--chuyen-dong); }
+.HopThoai_NoiDung::before { content: ''; position: absolute; inset: 0; background-color: var(--nen-tang0); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: var(--do-bo-lon); z-index: -1; }
 .HopThoai_NoiDung--rong { max-width: 700px; width: 95%; padding: 0; text-align: left; align-items: stretch; display: flex; flex-direction: row; max-height: 520px; }
 .HopThoai_Logo { width: 72px; height: 72px; border-radius: var(--do-bo-lon); }
 .HopThoai_TieuDe { font-size: 1.571rem; font-weight: 700; color: var(--chu-chinh); }
@@ -35,8 +41,8 @@
 .CaiDat_Phan:last-child { border-bottom: none; padding-bottom: 0; }
 .CaiDat_TieuDePhan { font-size: 1.429rem; font-weight: 700; color: var(--chu-chinh); margin-bottom: 24px; padding-top: 10px; }
 .NhomCaiDat { margin-bottom: 28px; }
-.NhomCaiDat_TieuDe { font-size: 0.786rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--chu-tat); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--vien-nhat); }
-.MucCaiDat { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--vien-nhat); }
+.NhomCaiDat_TieuDe { font-size: 0.786rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--chu-tat); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--vien); }
+.MucCaiDat { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--vien); }
 .MucCaiDat_Nhan { font-size: 1rem; color: var(--chu-chinh); }
 .MucCaiDat_MoTa { font-size: 0.857rem; color: var(--chu-tat); margin-top: 2px; }
 .CongTac { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
@@ -60,7 +66,7 @@
 .ChonNgonNgu_Nut.dang-chon { background-color: var(--mau-nhan); color: white; }
 .ThanhTruot { display: flex; align-items: center; gap: 12px; }
 .ThanhTruot_Nhan { font-size: 1rem; color: var(--chu-chinh); min-width: 100px; }
-.ThanhTruot input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; appearance: none; background: var(--nen-tang4); border-radius: 3px; outline: none; }
+.ThanhTruot input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; appearance: none; background: var(--nen-tang3); border-radius: 3px; outline: none; }
 .ThanhTruot input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--mau-nhan); cursor: pointer; }
 .ThanhTruot input[type="range"]::-webkit-slider-thumb:hover { background: var(--mau-nhan-hover); }
 .ThanhTruot_GiaTri { font-size: 0.929rem; color: var(--chu-phu); min-width: 40px; text-align: right; }
@@ -89,10 +95,11 @@
   width: 100%;
   box-sizing: border-box;
   padding: 8px 12px;
-  background: var(--nen-tang4);
+  background: var(--nen-tang3);
   border: 1px solid transparent;
   border-radius: var(--do-bo-nho);
   color: var(--chu-chinh);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
   transition: border-color var(--chuyen-dong), background-color var(--chuyen-dong);
 }
 .CaiDat_Dropdown:hover .CaiDat_Dropdown_Chon {
@@ -102,15 +109,21 @@
   border-color: var(--mau-nhan);
   background: var(--nen-tang3);
 }
+.CaiDat_Dropdown_Chon svg {
+  transition: transform var(--chuyen-dong);
+}
+.CaiDat_Dropdown.mo .CaiDat_Dropdown_Chon svg {
+  transform: rotate(180deg);
+}
 .CaiDat_Dropdown_DanhSach {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   width: 100%;
-  background: var(--nen-tang4);
+  background: var(--nen-tang3);
   border: 1px solid transparent;
   border-radius: var(--do-bo-nho);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
   z-index: 100;
   opacity: 0;
   pointer-events: none;
@@ -140,8 +153,17 @@
   margin-top: 24px;
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid var(--vien-nhat);
+  border-bottom: 1px solid var(--vien);
 }
 .NhomCaiDat > .MucCaiDat_TieuDePhu:first-child {
   margin-top: 0;
 }
+
+@keyframes anHopThoai { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1); } }
+@keyframes hienThiTrangAnim { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.Trang.hien-thi-trang { animation: hienThiTrangAnim var(--chuyen-dong) cubic-bezier(0.2, 0, 0, 1) forwards; }
+
+.CaiDat_Dropdown_Muc { position: relative; }
+.CaiDat_Dropdown_Muc:not(:last-child)::after { content: ''; position: absolute; bottom: 0; left: 16px; right: 16px; height: 1px; background-color: var(--chu-tat); opacity: 0.5; border-radius: 1px; }
+
+.HopThoai.mo-hop-thoai .HopThoai_NoiDung { transform: scale(1) translateY(0); transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1); }

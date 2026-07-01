@@ -1,63 +1,81 @@
+// === [ LANGUAGE LOGIC ] ===
+
+var NgonNguHienTai = 'EN';
+
+function KhoiTaoNgonNgu() {
+  var l = localStorage.getItem('nex_ngon_ngu');
+  NgonNguHienTai = l || (navigator.language.startsWith('vi') ? 'VN' : 'EN');
+}
+
+function DatNgonNgu(m) {
+  NgonNguHienTai = m;
+  localStorage.setItem('nex_ngon_ngu', m);
+  CapNhatBanDich();
+}
+
+function LayNgonNgu() {
+  return NgonNguHienTai;
+}
+
+function t(k) {
+  return (typeof Languages !== 'undefined' && Languages[NgonNguHienTai] && Languages[NgonNguHienTai][k]) || k;
+}
+
+function CapNhatBanDich() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    var k = el.getAttribute('data-i18n'), v = t(k);
+    if (v !== k) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+    var k = el.getAttribute('data-i18n-placeholder'), v = t(k);
+    if (v !== k) el.placeholder = v;
+  });
+  if (window.DienTu && window.DienTu.CapNhatTrayMenu) {
+    window.DienTu.CapNhatTrayMenu(
+      t('tray_show'),
+      t('tray_installer'),
+      t('tray_uninstaller'),
+      t('tray_quit')
+    ).catch(e => { });
+  }
+  if (typeof HienThiDanhSachInstaller === 'function' && typeof DanhSachPhanMem !== 'undefined' && DanhSachPhanMem && DanhSachPhanMem.length > 0) {
+    HienThiDanhSachInstaller(document.getElementById('o-tim-kiem-installer')?.value || '');
+  }
+  if (typeof HienThiDanhSachUninstaller === 'function' && typeof DanhSachDaCaiDat !== 'undefined' && DanhSachDaCaiDat && DanhSachDaCaiDat.length > 0) {
+    HienThiDanhSachUninstaller(document.getElementById('o-tim-kiem-uninstaller')?.value || '');
+  }
+}
+
+// === [ LANGUAGE DATA ] ===
+
 var Languages = {
   EN: {
-    // === STATUS & PROGRESS ===
-    downloading: "Downloading ",
-    installing: "Installing",
-    uninstalling: "Uninstalling ",
-    processing_wait: "Processing, please wait...",
-    processing: "Processing",
-    completed: "Completed",
-    error_status: "Error",
-    scanning_status: "Scanning...",
-    scanning_updates: "Scanning for updates...",
-    software_up_to_date: "Software is up to date",
-    no_updates_found: "No updates were found.",
-    unknown_error: "Unknown error",
-    unknown: "Unknown",
-    deleting: "Deleting...",
-    cleanup_status: "Cleaning up system leftovers...",
-    deleted: "Deleted",
-    loading_text: "Scanning installed applications...",
-    recovering_progress: "Scanning and recovering... {0}%",
-    destroying_wait: "Destroying data. Please do not turn off the computer...",
-    canceling: "Canceling...",
-    clean_analyzing: "Analyzing and cleaning...",
-
-    // === GENERAL UI & MENU ===
+    
     window_title: "Nex-Launcher - Advanced Utility Tool",
     installer_btn: "Installer",
     uninstaller_btn: "Uninstaller",
+    utilities_btn: "Utilities",
     about_btn: "About",
     update_btn: "Check for Updates",
     menu_settings: "Settings",
     maximize_btn: "Maximize",
     restore_btn: "Restore",
-    utilities_btn: "Utilities",
-    tab_rec: "Recommended",
-    tab_apps: "Apps",
-    tab_games: "Games",
-    tab_updates: "Updates",
-    search_placeholder: "Search software...",
-    install_btn: "Install",
-    add_btn: "Add",
-    delete_btn: "Delete",
-    select_all: "Select All",
-    deselect_all: "Deselect All",
     menu_refresh: "Refresh list",
-    header_category: "Category",
-    header_source: "Source",
-    header_publisher: "Publisher",
-    header_date: "Install Date",
-    header_size: "Size",
     refresh_btn: "Refresh",
-    uninstall_btn: "Uninstall",
-    next_btn: "Next",
     close_btn: "Close",
     cancel_btn: "Cancel",
     save_btn: "Save",
     reset_btn: "Reset",
     edit_btn: "Edit",
     confirm_btn: "Confirm",
+    next_btn: "Next",
+    add_btn: "Add",
+    delete_btn: "Delete",
+    install_btn: "Install",
+    uninstall_btn: "Uninstall",
+    update_app_btn: "Update",
+    select_all: "Select All",
+    deselect_all: "Deselect All",
     tray_show: "Show",
     tray_installer: "Installer",
     tray_uninstaller: "Uninstaller",
@@ -71,10 +89,68 @@ var Languages = {
     lang_en: "English",
     lang_vi: "Tiếng Việt",
     date_format: "MM/DD/YYYY",
+    system_label: "System",
+    skip_btn: "Skip",
 
-    // === INSTALLER ===
+    
+    downloading_data: "Downloading data...",
+    installing_app: "Installing app...",
+    updating_app: "Updating app...",
+    uninstalling_app: "Uninstalling app...",
+    downloading: "Downloading ",
+    installing: "Installing",
+    uninstalling: "Uninstalling ",
+    processing_wait: "Processing, please wait...",
+    processing: "Processing",
+    completed: "Completed",
+    skipped: "Skipped",
+    error_status: "Error",
+    scanning_status: "Scanning...",
+    scanning_updates: "Scanning for updates...",
+    software_up_to_date: "Software is up to date",
+    no_updates_found: "No updates were found.",
+    unknown_error: "Unknown error",
+    unknown: "Unknown",
+    deleting: "Deleting...",
+    cleanup_status: "Cleaning up system leftovers...",
+    deleted: "Deleted",
+    cannot_delete_locked_apps: "Cannot delete required/recommended apps",
+    waiting_status: "Waiting...",
+    process_ended: "Process completed",
+    process_ended_error: "Process ended (Error)",
+    loading_text: "Scanning installed applications...",
+    loading_text_short: "Loading...",
+    recovering_progress: "Scanning and recovering... {0}%",
+    destroying_wait: "Destroying data. Please do not turn off the computer...",
+    canceling: "Canceling...",
+    clean_analyzing: "Analyzing and cleaning...",
+    checking_data: "Checking...",
+    data_up_to_date: "Data is already up to date.",
+    data_update_available: "New Basic data update available...",
+    updating_data: "Updating...",
+    data_update_success: "Basic data updated successfully!",
+    data_update_error: "An error occurred while updating.",
+    data_check_error: "Error checking data from Github.",
+    connection_error: "Connection error.",
+    update_data_github: "Update data from Github",
+    creating_restore_point: "Creating restore point...",
+    report_error_title: "Error Report",
+    report_error_desc: "Please copy the details below and send an error report on GitHub so we can fix it.",
+
+    
+    tab_rec: "Recommended",
+    tab_apps: "Apps",
+    tab_games: "Games",
+    tab_updates: "Updates",
+    search_placeholder: "Search software...",
+    header_category: "Category",
+    header_source: "Source",
+    header_publisher: "Publisher",
+    header_date: "Install Date",
+    header_size: "Size",
     no_software_selected: "No software selected",
     confirm_install_apps: "Are you sure you want to install {0} selected software?",
+    confirm_update_apps: "Are you sure you want to update {0} selected software?",
     start_installing: "Starting installation for ",
     apps_suffix: " apps...",
     apps_suffix_short: " apps",
@@ -112,8 +188,15 @@ var Languages = {
     downloading_prefix: "Downloading (",
     edit_software_title: "Edit Software",
     add_software_title: "Add new software",
+    enter_name_id: "Please enter App Name and ID/Link",
+    added_app: "Added ",
 
-    // === UNINSTALLER ===
+    
+    uninstaller_all: "All programs",
+    uninstaller_recent: "Recently installed",
+    uninstaller_large: "Large software",
+    uninstaller_system: "System",
+    uninstaller_external: "External",
     confirm_uninstall: "Show confirmation dialog before uninstalling",
     minimize_tray_uninst_label: "Minimize to tray on uninstall",
     start_uninstalling: "Starting uninstallation for ",
@@ -128,8 +211,13 @@ var Languages = {
     no_file_leftovers: "No file/folder leftovers found.",
     registry_entries: "Registry entries",
     orphan_files: "Orphan files",
+    old_restore_points: "Old restore points",
+    no_restore_points: "No restore points found on your computer.",
+    error_restore_points: "Error loading restore points. (Requires Admin privileges)",
 
-    // === UTILITIES ===
+    
+    utilities_data: "Data",
+    utilities_mouse_lock: "Mouse Lock",
     enter_destroy_path: "Enter the drive path to destroy (E.g.: \\\\.\\PhysicalDrive1 or D:)\\nWARNING: Destroying a drive will permanently erase all data!",
     destroy_anyway: "Destroy Anyway (Pass {0}/3)",
     destroy_complete: "Data destruction complete!",
@@ -161,11 +249,10 @@ var Languages = {
     clean_error_occurred: "An error occurred.",
     clean_error: "Cleanup error!",
     feature_dev: "Feature is under development!",
-    
-    // Utilities Tab UI
     util_data_management: "Data Management",
     util_data_management_desc: "Optimize, clean up, recover, or safely destroy files on your system.",
     util_system_cleanup: "1. System Cleanup",
+    uninstall_cleanup_leftovers: "Automatically remove leftover files",
     util_scan_mode: "Scan mode:",
     util_scan_mode_desc: "Remove junk files, faulty registry",
     util_scan_now: "SCAN NOW",
@@ -189,7 +276,6 @@ var Languages = {
     util_delete_anyway: "Delete Anyway",
     util_cancel: "Cancel",
     util_start_destruction: "START DESTRUCTION",
-
     util_mouse_lock_title: "Mouse Lock",
     util_mouse_lock_desc: "Limit mouse movement area using shortcuts.",
     util_lock_1_monitor: "1. Lock to 1 Monitor",
@@ -205,7 +291,7 @@ var Languages = {
     util_lock_position_desc: "Lock mouse strictly at a specific coordinate.",
     util_auto_get_cursor: "Automatically get current cursor coordinates when shortcut is pressed",
 
-    // === SETTINGS ===
+    
     settings_ui: "User Interface",
     settings_general: "General",
     settings_installer: "Installer",
@@ -255,8 +341,11 @@ var Languages = {
     about_author: "Author: SpaceheroVN",
     about_github: "Source Code on GitHub",
     btn_update: "Update",
+    error_saving: "Error saving",
+    settings_saved: "Settings saved",
+    settings_reset: "Settings reset",
 
-    // === HELP TEXT ===
+    
     help_text_ui_title: "User Interface",
     help_text_ui: "<ul style='margin:0;padding-left:20px'><li><b>Theme</b>: Change the appearance of Nex Launcher to Light or Dark.</li><li><b>Language</b>: Switch between English and Vietnamese.</li><li><b>Font Size</b>: Adjust the overall size of text.</li><li><b>Transparency</b>: Adjust the transparency of the window background.</li><li><b>Rounded Corners</b>: Enable or disable modern rounded corners.</li><li><b>Disable Animations</b>: Automatically toggle animations based on hardware, or disable manually for better performance.</li></ul>",
     help_text_general_title: "General Settings",
@@ -266,95 +355,35 @@ var Languages = {
     help_text_uninstaller_title: "Uninstaller",
     help_text_uninstaller: "<ul style='margin:0;padding-left:20px'><li><b>Show Confirmation</b>: Asks for confirmation before uninstalling.</li><li><b>Remember Scan Data</b>: Caches app icons and dates to significantly speed up future scans. Disable to force a fresh scan.</li></ul>",
     help_text_utilities_title: "Utilities",
-    help_text_utilities: "<ul style='margin:0;padding-left:20px'><li><b>Data Destruction</b>: (Under development) Securely overwrite files.</li><li><b>Data Recovery</b>: (Under development) Retrieve lost files.</li><li><b>Cleanup</b>: (Under development) Free up disk space.</li></ul>",
-
-    // === OTHERS ===
-    system_label: "System",
-    enter_name_id: "Please enter App Name and ID/Link",
-    added_app: "Added ",
-    error_saving: "Error saving",
-    settings_saved: "Settings saved",
-    settings_reset: "Settings reset",
-    uninstaller_all: "All programs",
-    uninstaller_recent: "Recently installed",
-    uninstaller_large: "Large software",
-    uninstaller_system: "System",
-    uninstaller_external: "External",
-    utilities_data: "Data",
-    utilities_mouse_lock: "Mouse Lock",
-    checking_data: "Checking...",
-    data_up_to_date: "Data is already up to date.",
-    data_update_available: "New Basic data update available...",
-    updating_data: "Updating...",
-    data_update_success: "Basic data updated successfully!",
-    data_update_error: "An error occurred while updating.",
-    data_check_error: "Error checking data from Github.",
-    connection_error: "Connection error.",
-    update_data_github: "Update data from Github",
-    creating_restore_point: "Creating restore point...",
-    skip_btn: "Skip",
-    old_restore_points: "Old restore points",
-    loading_text_short: "Loading..."
+    help_text_utilities: "<ul style='margin:0;padding-left:20px'><li><b>Data Destruction</b>: (Under development) Securely overwrite files.</li><li><b>Data Recovery</b>: (Under development) Retrieve lost files.</li><li><b>Cleanup</b>: (Under development) Free up disk space.</li></ul>"
   },
   VN: {
-    // === TRẠNG THÁI & TIẾN TRÌNH ===
-    downloading: "Đang tải ",
-    installing: "Đang cài đặt",
-    uninstalling: "Đang gỡ ",
-    processing_wait: "Đang xử lý...",
-    processing: "Đang xử lý",
-    completed: "Hoàn tất",
-    error_status: "Lỗi",
-    scanning_status: "Đang quét...",
-    scanning_updates: "Đang quét bản cập nhật...",
-    software_up_to_date: "Phần mềm đã được cập nhật",
-    no_updates_found: "Không tìm thấy bản cập nhật nào.",
-    unknown_error: "Không xác định",
-    unknown: "Không rõ",
-    deleting: "Đang xóa...",
-    cleanup_status: "Đang dọn dẹp tàn dư hệ thống...",
-    deleted: "Đã xóa",
-    loading_text: "Đang quét các phần mềm được cài đặt...",
-    recovering_progress: "Đang quét và khôi phục... {0}%",
-    destroying_wait: "Đang tiến hành phá hủy dữ liệu. Vui lòng không tắt máy...",
-    canceling: "Đang hủy...",
-    clean_analyzing: "Đang phân tích và dọn dẹp...",
-
-    // === GIAO DIỆN CHUNG & MENU ===
+    
     window_title: "Nex-Launcher - Công cụ tiện ích tiên tiến",
     installer_btn: "Trình Cài Đặt",
     uninstaller_btn: "Trình Gỡ Cài Đặt",
+    utilities_btn: "Tiện ích",
     about_btn: "Giới thiệu",
     update_btn: "Kiểm tra cập nhật",
     menu_settings: "Cài đặt",
     maximize_btn: "Phóng to",
     restore_btn: "Thu nhỏ lại",
-    utilities_btn: "Tiện ích",
-    tab_rec: "Đề xuất",
-    tab_apps: "Phần mềm",
-    tab_games: "Trò chơi",
-    tab_updates: "Cập nhật",
-    search_placeholder: "Tìm kiếm phần mềm...",
-    install_btn: "Cài đặt",
-    add_btn: "Thêm",
-    delete_btn: "Xóa",
-    select_all: "Chọn tất cả",
-    deselect_all: "Bỏ chọn tất cả",
     menu_refresh: "Làm mới danh sách",
-    header_category: "Thể loại",
-    header_source: "Nguồn",
-    header_publisher: "Nhà phát hành",
-    header_date: "Ngày cài đặt",
-    header_size: "Dung lượng",
     refresh_btn: "Làm mới",
-    uninstall_btn: "Gỡ cài đặt",
-    next_btn: "Tiếp theo",
     close_btn: "Đóng",
     cancel_btn: "Hủy",
     save_btn: "Lưu",
     reset_btn: "Đặt lại",
     edit_btn: "Chỉnh sửa",
     confirm_btn: "Xác nhận",
+    next_btn: "Tiếp theo",
+    add_btn: "Thêm",
+    delete_btn: "Xóa",
+    install_btn: "Cài đặt",
+    uninstall_btn: "Gỡ cài đặt",
+    update_app_btn: "Cập nhật",
+    select_all: "Chọn tất cả",
+    deselect_all: "Bỏ chọn tất cả",
     tray_show: "Hiển thị",
     tray_installer: "Trình cài đặt",
     tray_uninstaller: "Trình gỡ cài đặt",
@@ -368,10 +397,68 @@ var Languages = {
     lang_en: "English",
     lang_vi: "Tiếng Việt",
     date_format: "DD/MM/YYYY",
+    system_label: "Hệ thống",
+    skip_btn: "Bỏ qua",
 
-    // === TRÌNH CÀI ĐẶT ===
+    
+    downloading_data: "Đang tải xuống dữ liệu...",
+    installing_app: "Đang tiến hành cài đặt...",
+    updating_app: "Đang tiến hành cập nhật...",
+    uninstalling_app: "Đang tiến hành gỡ cài đặt...",
+    downloading: "Đang tải ",
+    installing: "Đang cài đặt",
+    uninstalling: "Đang gỡ ",
+    processing_wait: "Đang xử lý...",
+    processing: "Đang xử lý",
+    completed: "Hoàn tất",
+    skipped: "Đã bỏ qua",
+    error_status: "Lỗi",
+    scanning_status: "Đang quét...",
+    scanning_updates: "Đang quét bản cập nhật...",
+    software_up_to_date: "Phần mềm đã được cập nhật",
+    no_updates_found: "Không tìm thấy bản cập nhật nào.",
+    unknown_error: "Không xác định",
+    unknown: "Không rõ",
+    deleting: "Đang xóa...",
+    cleanup_status: "Đang dọn dẹp tàn dư hệ thống...",
+    deleted: "Đã xóa",
+    cannot_delete_locked_apps: "Không thể xóa các phần mềm bắt buộc/đề xuất",
+    waiting_status: "Đang chờ...",
+    process_ended: "Hoàn tất tiến trình",
+    process_ended_error: "Tiến trình kết thúc (Có lỗi)",
+    loading_text: "Đang quét các phần mềm được cài đặt...",
+    loading_text_short: "Đang tải...",
+    recovering_progress: "Đang quét và khôi phục... {0}%",
+    destroying_wait: "Đang tiến hành phá hủy dữ liệu. Vui lòng không tắt máy...",
+    canceling: "Đang hủy...",
+    clean_analyzing: "Đang phân tích và dọn dẹp...",
+    checking_data: "Đang kiểm tra...",
+    data_up_to_date: "Dữ liệu hiện tại đã là mới nhất.",
+    data_update_available: "Có bản cập nhật dữ liệu Basic mới...",
+    updating_data: "Đang cập nhật...",
+    data_update_success: "Cập nhật dữ liệu Basic thành công!",
+    data_update_error: "Có lỗi xảy ra khi cập nhật.",
+    data_check_error: "Lỗi kiểm tra dữ liệu từ Github.",
+    connection_error: "Lỗi kết nối.",
+    update_data_github: "Cập nhật dữ liệu từ Github",
+    creating_restore_point: "Đang tiến hành tạo điểm khôi phục...",
+    report_error_title: "Báo cáo lỗi",
+    report_error_desc: "Vui lòng sao chép nội dung dưới đây và gửi báo cáo lỗi trên GitHub hoặc diễn đàn hỗ trợ để chúng tôi có thể khắc phục.",
+
+    
+    tab_rec: "Đề xuất",
+    tab_apps: "Phần mềm",
+    tab_games: "Trò chơi",
+    tab_updates: "Cập nhật",
+    search_placeholder: "Tìm kiếm phần mềm...",
+    header_category: "Thể loại",
+    header_source: "Nguồn",
+    header_publisher: "Nhà phát hành",
+    header_date: "Ngày cài đặt",
+    header_size: "Dung lượng",
     no_software_selected: "Chưa chọn phần mềm nào",
     confirm_install_apps: "Bạn có chắc chắn muốn cài đặt {0} phần mềm đã chọn?",
+    confirm_update_apps: "Bạn có chắc chắn muốn cập nhật {0} phần mềm đã chọn?",
     start_installing: "Bắt đầu cài đặt ",
     apps_suffix: " phần mềm...",
     apps_suffix_short: " phần mềm",
@@ -409,8 +496,15 @@ var Languages = {
     downloading_prefix: "Đang tải (",
     edit_software_title: "Chỉnh sửa phần mềm",
     add_software_title: "Thêm phần mềm mới",
+    enter_name_id: "Vui lòng nhập Tên phần mềm và ID/Link",
+    added_app: "Đã thêm ",
 
-    // === TRÌNH GỠ CÀI ĐẶT ===
+    
+    uninstaller_all: "Mọi chương trình",
+    uninstaller_recent: "Cài đặt gần đây",
+    uninstaller_large: "Phần mềm lớn",
+    uninstaller_system: "Hệ thống",
+    uninstaller_external: "Bên ngoài",
     confirm_uninstall: "Hiển thị hộp thoại xác nhận trước khi bắt đầu quá trình gỡ cài đặt",
     minimize_tray_uninst_label: "Thu nhỏ xuống khay khi gỡ cài đặt",
     start_uninstalling: "Bắt đầu gỡ cài đặt ",
@@ -425,8 +519,13 @@ var Languages = {
     no_file_leftovers: "Không tìm thấy file/thư mục thừa.",
     registry_entries: "Mục Registry",
     orphan_files: "File thừa",
+    old_restore_points: "Các điểm khôi phục cũ",
+    no_restore_points: "Không có điểm khôi phục nào trên máy.",
+    error_restore_points: "Lỗi khi tải danh sách điểm khôi phục. (Yêu cầu quyền Admin)",
 
-    // === TIỆN ÍCH ===
+    
+    utilities_data: "Dữ liệu",
+    utilities_mouse_lock: "Khóa chuột",
     enter_destroy_path: "Nhập đường dẫn ổ đĩa cần phá hủy (VD: \\\\.\\PhysicalDrive1 hoặc D:)\\nLƯU Ý: Phá hủy ổ đĩa sẽ mất toàn bộ dữ liệu vĩnh viễn!",
     destroy_anyway: "Vẫn Xóa (Lần {0}/3)",
     destroy_complete: "Phá hủy dữ liệu hoàn tất!",
@@ -458,11 +557,10 @@ var Languages = {
     clean_error_occurred: "Đã có lỗi xảy ra.",
     clean_error: "Lỗi khi dọn dẹp!",
     feature_dev: "Tính năng đang trong quá trình phát triển!",
-    
-    // Giao diện Tab Tiện ích
     util_data_management: "Quản Lý Dữ Liệu",
     util_data_management_desc: "Tối ưu hóa, dọn dẹp, khôi phục hoặc phá hủy an toàn các tệp tin trên hệ thống của bạn.",
     util_system_cleanup: "1. Dọn Dẹp Hệ Thống",
+    uninstall_cleanup_leftovers: "Tự động loại bỏ các tệp tin thừa",
     util_scan_mode: "Chế độ quét:",
     util_scan_mode_desc: "Loại bỏ tệp tin rác, registry lỗi",
     util_scan_now: "QUÉT NGAY",
@@ -486,7 +584,6 @@ var Languages = {
     util_delete_anyway: "Vẫn Xóa",
     util_cancel: "Hủy Bỏ",
     util_start_destruction: "TIẾN HÀNH PHÁ HỦY",
-
     util_mouse_lock_title: "Khóa Chuột (Mouse Lock)",
     util_mouse_lock_desc: "Giới hạn khu vực di chuyển chuột bằng các phím tắt.",
     util_lock_1_monitor: "1. Khóa ở 1 Màn Hình",
@@ -502,7 +599,7 @@ var Languages = {
     util_lock_position_desc: "Khóa cứng chuột tại một tọa độ nhất định.",
     util_auto_get_cursor: "Tự động lấy tọa độ con trỏ hiện tại khi bấm phím tắt",
 
-    // === CÀI ĐẶT (SETTINGS) ===
+    
     settings_ui: "Giao diện",
     settings_general: "Chung",
     settings_installer: "Trình Cài Đặt",
@@ -552,8 +649,11 @@ var Languages = {
     about_author: "Tác giả: SpaceheroVN",
     about_github: "Mã nguồn trên GitHub",
     btn_update: "Cập nhật",
+    error_saving: "Có lỗi khi lưu",
+    settings_saved: "Đã lưu cài đặt",
+    settings_reset: "Đã đặt lại cài đặt",
 
-    // === TRỢ GIÚP (HELP TEXT) ===
+    
     help_text_ui_title: "Giao diện",
     help_text_ui: "<ul style='margin:0;padding-left:20px'><li><b>Giao diện</b>: Chuyển đổi giữa chế độ Sáng và Tối.</li><li><b>Ngôn ngữ</b>: Chuyển đổi giữa Tiếng Anh và Tiếng Việt.</li><li><b>Cỡ chữ</b>: Điều chỉnh kích thước văn bản hiển thị.</li><li><b>Độ trong suốt</b>: Điều chỉnh độ trong suốt của nền cửa sổ.</li><li><b>Bo tròn góc</b>: Bật/tắt thiết kế bo tròn hiện đại.</li><li><b>Tắt hiệu ứng</b>: Tự động tắt/bật hiệu ứng thông minh theo cấu hình máy, hoặc tắt thủ công để tối ưu hiệu suất.</li></ul>",
     help_text_general_title: "Cài đặt chung",
@@ -563,34 +663,6 @@ var Languages = {
     help_text_uninstaller_title: "Trình Gỡ Cài Đặt",
     help_text_uninstaller: "<ul style='margin:0;padding-left:20px'><li><b>Hiện hộp thoại xác nhận</b>: Hỏi ý kiến trước khi gỡ.</li><li><b>Ghi nhớ dữ liệu khi quét</b>: Lưu lại dữ liệu biểu tượng và ngày cài đặt để tăng tốc độ tải trong những lần mở sau. Nếu tắt, ứng dụng sẽ quét lại từ đầu.</li></ul>",
     help_text_utilities_title: "Tiện Ích",
-    help_text_utilities: "<ul style='margin:0;padding-left:20px'><li><b>Phá hủy dữ liệu</b>: (Đang phát triển) Ghi đè tệp tin an toàn.</li><li><b>Khôi phục dữ liệu</b>: (Đang phát triển) Lấy lại các tệp tin đã mất.</li><li><b>Dọn dẹp</b>: (Đang phát triển) Giải phóng dung lượng ổ đĩa.</li></ul>",
-
-    // === KHÁC ===
-    system_label: "Hệ thống",
-    enter_name_id: "Vui lòng nhập Tên phần mềm và ID/Link",
-    added_app: "Đã thêm ",
-    error_saving: "Có lỗi khi lưu",
-    settings_saved: "Đã lưu cài đặt",
-    settings_reset: "Đã đặt lại cài đặt",
-    uninstaller_all: "Mọi chương trình",
-    uninstaller_recent: "Cài đặt gần đây",
-    uninstaller_large: "Phần mềm lớn",
-    uninstaller_system: "Hệ thống",
-    uninstaller_external: "Bên ngoài",
-    utilities_data: "Dữ liệu",
-    utilities_mouse_lock: "Khóa chuột",
-    checking_data: "Đang kiểm tra...",
-    data_up_to_date: "Dữ liệu hiện tại đã là mới nhất.",
-    data_update_available: "Có bản cập nhật dữ liệu Basic mới...",
-    updating_data: "Đang cập nhật...",
-    data_update_success: "Cập nhật dữ liệu Basic thành công!",
-    data_update_error: "Có lỗi xảy ra khi cập nhật.",
-    data_check_error: "Lỗi kiểm tra dữ liệu từ Github.",
-    connection_error: "Lỗi kết nối.",
-    update_data_github: "Cập nhật dữ liệu từ Github",
-    creating_restore_point: "Đang tiến hành tạo điểm khôi phục...",
-    skip_btn: "Bỏ qua",
-    old_restore_points: "Các điểm khôi phục cũ",
-    loading_text_short: "Đang tải..."
+    help_text_utilities: "<ul style='margin:0;padding-left:20px'><li><b>Phá hủy dữ liệu</b>: (Đang phát triển) Ghi đè tệp tin an toàn.</li><li><b>Khôi phục dữ liệu</b>: (Đang phát triển) Lấy lại các tệp tin đã mất.</li><li><b>Dọn dẹp</b>: (Đang phát triển) Giải phóng dung lượng ổ đĩa.</li></ul>"
   }
 };

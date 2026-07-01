@@ -21,7 +21,7 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
         
         let source_obj = app.get("source");
         let source_type = source_obj.and_then(|s| s.get("type")).and_then(|v| v.as_str()).unwrap_or("Winget").to_string();
-        let source_value = source_obj.and_then(|s| s.get("value")).and_then(|v| v.as_str()).unwrap_or(&name).to_string();
+        let source_value = source_obj.and_then(|s| s.get("value")).and_then(|v| v.as_str()).or_else(|| app.get("id").and_then(|v| v.as_str())).unwrap_or(&name).to_string();
         let silent_args = source_obj.and_then(|s| s.get("silent_args")).and_then(|v| v.as_str()).unwrap_or("").to_string();
         let post_install_cmd = source_obj.and_then(|s| s.get("post_install_cmd")).and_then(|v| v.as_str()).unwrap_or("").to_string();
         
@@ -47,7 +47,7 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
 
         let child_res = if source_type == "Winget" {
             let mut cmd = Command::new("winget");
-            cmd.args(["install", "--id", &source_value, "--accept-package-agreements", "--accept-source-agreements"]);
+            cmd.args(["install", "--id", &source_value, "--exact", "--accept-package-agreements", "--accept-source-agreements"]);
             if current_silent { cmd.arg("--silent"); } else { cmd.arg("--interactive"); }
             if current_silent && !silent_args.is_empty() {
                 cmd.args(silent_args.split_whitespace());
@@ -64,17 +64,31 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
             cmd.spawn()
         } else if source_type == "Link" {
             let args_to_use = if current_silent { &silent_args } else { "" };
+            let is_msi = source_value.to_lowercase().ends_with(".msi");
+            let ext = if is_msi { "msi" } else { "exe" };
+            
+            let exec_command = if is_msi {
+                if current_silent {
+                    format!("$proc = Start-Process -FilePath 'msiexec.exe' -ArgumentList '/i', `\"$temp_file`\", '/qn', '{}' -Wait -PassThru -Verb RunAs", args_to_use.replace("'", "''"))
+                } else {
+                    format!("$proc = Start-Process -FilePath 'msiexec.exe' -ArgumentList '/i', `\"$temp_file`\", '{}' -Wait -PassThru -Verb RunAs", args_to_use.replace("'", "''"))
+                }
+            } else {
+                format!("$proc = Start-Process -FilePath $temp_file -ArgumentList '{}' -Wait -PassThru -Verb RunAs", args_to_use.replace("'", "''"))
+            };
+            
             let ps_script = format!(
                 "$ErrorActionPreference = 'Stop'; \
-                 $temp_file = Join-Path $env:TEMP 'nex_installer_{}_{}.exe'; \
+                 $temp_file = Join-Path $env:TEMP 'nex_installer_{}_{}.{}'; \
                  Invoke-WebRequest -Uri '{}' -OutFile $temp_file; \
-                 $proc = Start-Process -FilePath $temp_file -ArgumentList '{}' -Wait -PassThru -Verb RunAs; \
+                 {}; \
                  Remove-Item -Path $temp_file -Force -ErrorAction SilentlyContinue; \
                  if ($proc) {{ exit $proc.ExitCode }} else {{ exit 1 }}",
                 name.replace(" ", "_").replace(|c: char| !c.is_alphanumeric() && c != '_', ""),
                 std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis(),
+                ext,
                 source_value.replace("'", "''"),
-                args_to_use.replace("'", "''")
+                exec_command
             );
             
             let mut cmd = Command::new("powershell");
@@ -89,6 +103,11 @@ pub async fn TienHanhCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serde_
             let mut ticks = 0;
             loop {
                 if HUY_TIEN_TRINH.load(Ordering::Relaxed) {
+                    let pid = child.id();
+                    let _ = Command::new("taskkill")
+                        .args(["/F", "/T", "/PID", &pid.to_string()])
+                        .creation_flags(0x08000000)
+                        .output();
                     let _ = child.kill();
                     error_msg = "Cancelled by user".to_string();
                     break;

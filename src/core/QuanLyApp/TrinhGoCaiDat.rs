@@ -150,7 +150,7 @@ pub async fn LayPhanMemDaCai() -> Result<serde_json::Value, String> {
         }
     }
 
-    // Fetch UWP apps (still via powershell, but only Appx, much faster)
+    
     let ps_script = r#"
         $ErrorActionPreference = 'SilentlyContinue'
         $apps = @()
@@ -195,7 +195,7 @@ pub async fn LayPhanMemDaCai() -> Result<serde_json::Value, String> {
                         }));
                     }
                 } else if json_data.is_object() {
-                    // In case there's only 1 app, ConvertTo-Json might return an object instead of array
+                    
                     let ten = json_data.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown");
                     let phien_ban = json_data.get("version").and_then(|v| v.as_str()).unwrap_or("");
                     let nha_phat_hanh = json_data.get("publisher").and_then(|v| v.as_str()).unwrap_or("");
@@ -325,8 +325,9 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
                 cmd.creation_flags(0x08000000);
                 cmd.spawn()
             } else {
+                let app_id = app.get("id").and_then(|v| v.as_str()).unwrap_or(&app_name);
                 let mut cmd = Command::new("winget");
-                cmd.args(["uninstall", "--name", &app_name, "--accept-source-agreements", "--disable-interactivity"]);
+                cmd.args(["uninstall", "--id", app_id, "--exact", "--accept-source-agreements", "--disable-interactivity"]);
                 if current_silent { cmd.arg("--silent"); } else { cmd.arg("--interactive"); }
                 cmd.creation_flags(0x08000000);
                 cmd.spawn()
@@ -350,6 +351,11 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
             let mut ticks = 0;
             loop {
                 if HUY_TIEN_TRINH.load(Ordering::Relaxed) {
+                    let pid = child.id();
+                    let _ = Command::new("taskkill")
+                        .args(["/F", "/T", "/PID", &pid.to_string()])
+                        .creation_flags(0x08000000)
+                        .output();
                     let _ = child.kill();
                     error_msg = "Cancelled by user".to_string();
                     break;
@@ -373,7 +379,7 @@ pub async fn TienHanhGoCaiDat(AppHandle: tauri::AppHandle, DanhSachApp: Vec<serd
                                 }
                             }
                             
-                            // Timeout after 15 minutes (15 * 60 = 900 seconds)
+                            
                             if wait_ticks >= 900 {
                                 still_exists = true;
                                 error_msg = "Hết thời gian chờ trình gỡ cài đặt".to_string();
@@ -600,7 +606,7 @@ pub async fn LayDanhSachDiemKhoiPhuc() -> Result<Vec<serde_json::Value>, String>
             Ok(vec![])
         }
     } else {
-        Ok(vec![])
+        Err("Không có quyền Administrator hoặc tính năng Khôi phục hệ thống bị tắt.".to_string())
     }
 }
 
@@ -609,7 +615,12 @@ pub async fn TaoDiemKhoiPhuc(description: String) -> Result<bool, String> {
     use std::process::Command;
     use std::os::windows::process::CommandExt;
 
-    let script = format!("Checkpoint-Computer -Description '{}' -RestorePointType 'MODIFY_SETTINGS' -ErrorAction Stop", description.replace("'", "''"));
+    let ps_cmd = format!("Checkpoint-Computer -Description '{}' -RestorePointType 'MODIFY_SETTINGS' -ErrorAction Stop", description.replace("'", "''"));
+    let ps_encoded = crate::LayThongTin::encode_ps_command(&ps_cmd);
+    let script = format!(
+        "$proc = Start-Process powershell -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', '{}' -WindowStyle Hidden -PassThru -Verb RunAs -Wait; if ($proc -and $proc.ExitCode -ne 0) {{ exit $proc.ExitCode }}",
+        ps_encoded
+    );
     let encoded = crate::LayThongTin::encode_ps_command(&script);
     let output = Command::new("powershell")
         .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &encoded])

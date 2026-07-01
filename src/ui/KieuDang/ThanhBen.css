@@ -27,6 +27,7 @@
 .ThanhBen.thu-gon .ThanhBen_MuiTen,
 .ThanhBen.thu-gon .ThanhBen_NhomTieuDe span {
   opacity: 0 !important;
+  max-width: 0px;
   width: 0;
   overflow: hidden;
   flex: 0 !important;
@@ -40,6 +41,12 @@
 .ThanhBen.thu-gon .MiniProgress_Text {
   display: none !important;
 }
+.ThanhBen.thu-gon .ThanhBen_TenPhienBan,
+.ThanhBen_MuiTen {
+  transition: opacity var(--chuyen-dong-cham), width var(--chuyen-dong-cham), flex var(--chuyen-dong-cham), margin var(--chuyen-dong-cham);
+  white-space: nowrap;
+}
+
 .ThanhBen_Logo {
   display: flex;
   flex-direction: column;
@@ -105,7 +112,9 @@
   flex: 1;
   text-align: left;
   white-space: nowrap;
-  transition: opacity var(--chuyen-dong);
+  overflow: hidden;
+  max-width: 200px;
+  transition: opacity var(--chuyen-dong-cham), max-width var(--chuyen-dong-cham);
 }
 .ThanhBen_MuiTen {
   transition: transform var(--chuyen-dong), opacity var(--chuyen-dong);
@@ -176,3 +185,22 @@
 [data-chu-de="light"] .ThanhBen_NhomTieuDe:hover {
   background-color: rgba(0, 0, 0, 0.04);
 }
+
+
+#nav-uninstaller.dang-chon { color: var(--nguy-hiem); }
+#nav-uninstaller.dang-chon svg:first-child { color: var(--nguy-hiem); }
+#nav-uninstaller.dang-chon::after { background-color: var(--nguy-hiem); }
+#ds-uninstaller .ThanhBen_MucCon.dang-chon {
+    color: var(--nguy-hiem);
+    background-color: rgba(237, 66, 69, 0.15);
+}
+#ds-uninstaller .ThanhBen_MucCon.dang-chon::before { background-color: var(--nguy-hiem); }
+
+#nav-tien-ich.dang-chon { color: var(--mau-tien-ich); }
+#nav-tien-ich.dang-chon svg:first-child { color: var(--mau-tien-ich); }
+#nav-tien-ich.dang-chon::after { background-color: var(--mau-tien-ich); }
+#ds-tien-ich .ThanhBen_MucCon.dang-chon {
+    color: var(--mau-tien-ich);
+    background-color: var(--mau-tien-ich-nen);
+}
+#ds-tien-ich .ThanhBen_MucCon.dang-chon::before { background-color: var(--mau-tien-ich); }

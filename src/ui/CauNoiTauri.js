@@ -1,3 +1,4 @@
+// === [ TAURI IPC BRIDGE ] ===
 const { invoke } = window.__TAURI__.core;
 const { listen } = window.__TAURI__.event;
 
@@ -16,7 +17,7 @@ window.DienTu = {
   KiemTraCapNhat: () => invoke('KiemTraCapNhat'),
   LayIconApp: (tenApp, isDeep = false) => invoke('LayIconApp', { tenApp, isDeep }),
   LayIconDebug: (tenApp) => invoke('LayIconDebug', { tenApp }),
-  LayThongTinThem: (tenApp, viTriCaiDat) => invoke('LayThongTinThem', { tenApp, viTriCaiDat }),
+  LayThongTinThem: (tenApp, viTriCaiDat, ngayCaiRegistry) => invoke('LayThongTinThem', { tenApp, viTriCaiDat, ngayCaiRegistry }),
   KiemTraTaiNguyen: () => invoke('KiemTraTaiNguyen'),
   KiemTraDevMode: () => invoke('KiemTraDevMode'),
   DonDepHeThong: (cheDo) => invoke('DonDepHeThong', { cheDo }),

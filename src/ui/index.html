@@ -19,6 +19,7 @@
 </head>
 <body>
   <div id="nen-app" class="NenApp"></div>
+  <!-- === [ 1. TITLE BAR ] === -->
   <header id="thanh-tieu-de" class="ThanhTieuDe">
     <div class="ThanhTieuDe_Trai">
       <button id="nut-thu-gon-menu" class="ThanhTieuDe_Nut" title="Thu gọn sidebar">
@@ -104,7 +105,9 @@
       </button>
     </div>
   </header>
+  <!-- === [ 2. MAIN LAYOUT ] === -->
   <div id="bo-cuc-chinh" class="BoCucChinh">
+    <!-- === [ 2.1. SIDEBAR ] === -->
     <aside id="thanh-ben" class="ThanhBen">
       <div class="ThanhBen_Logo">
         <img src="TaiNguyen/BieuTuong/logo.svg" alt="Nex" class="ThanhBen_BieuTuongLogo" id="logo-sidebar">
@@ -144,7 +147,7 @@
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </button>
-        <div id="danh-sach-bo-loc-uninstaller" class="ThanhBen_DanhSachMucCon an">
+        <div class="ThanhBen_DanhSachCon" id="ds-uninstaller">
           <button class="ThanhBen_MucCon dang-chon" data-bo-loc="all-programs" data-i18n="uninstaller_all">Mọi chương trình</button>
           <button class="ThanhBen_MucCon" data-bo-loc="recent" data-i18n="uninstaller_recent">Cài đặt gần đây</button>
           <button class="ThanhBen_MucCon" data-bo-loc="large" data-i18n="uninstaller_large">Phần mềm lớn</button>
@@ -153,7 +156,7 @@
         </div>
       </div>
       <div class="ThanhBen_Nhom">
-        <button class="ThanhBen_NhomTieuDe" id="nav-tien-ich" data-trang="tien-ich" aria-expanded="false">
+        <button class="ThanhBen_NhomTieuDe" id="nav-tien-ich" disabled style="opacity: 0.5; cursor: not-allowed;" style="opacity: 0.5; cursor: not-allowed;" onclick="event.preventDefault(); window.HienThongBao ? HienThongBao('Tính năng Tiện ích đang trong quá trình phát triển và sẽ ra mắt ở phiên bản 1.7+', 'thong-tin') : alert('Tính năng Tiện ích đang trong quá trình phát triển và sẽ ra mắt ở phiên bản 1.7+');" data-trang="tien-ich" aria-expanded="false">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="none">
             <g>
               <path
@@ -172,20 +175,21 @@
           <button class="ThanhBen_MucCon" data-bo-loc="khoa-chuot" data-i18n="utilities_mouse_lock">Khóa chuột</button>
         </div>
       </div>
-      
-      <!-- Mini Progress on Sidebar -->
+
       <div id="sidebar-mini-progress" style="display: none; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--vien); flex-direction: column; gap: 8px; cursor: pointer; transition: all var(--chuyen-dong);" title="Nhấp để mở chi tiết tiến trình">
         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; color: var(--chu-chinh);">
           <span id="mini-progress-title" class="MiniProgress_Text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">Đang xử lý...</span>
           <span id="mini-progress-percent" class="MiniProgress_Text" style="color: var(--mau-nhan); margin-left: 8px;">0%</span>
         </div>
         <div style="height: 6px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden;">
-          <div id="mini-progress-bar" style="height: 100%; width: 0%; background: var(--mau-nhan); transition: width 0.3s ease;"></div>
+          <div id="mini-progress-bar" class="ProgressGradientBar" style="height: 100%; width: 0%; transition: width 0.3s ease;"></div>
         </div>
       </div>
     </aside>
+    <!-- === [ 2.2. MAIN CONTENT ] === -->
     <main id="noi-dung-chinh" class="NoiDungChinh">
-      <section id="trang-installer" class="Trang dang-hien">
+      <!-- === [ 2.2.1. INSTALLER TAB ] === -->
+        <section id="trang-installer" class="Trang dang-hien">
         <div class="ThanhCongCu">
           <div class="ThanhCongCu_Trai">
             <div class="OTimKiem">
@@ -314,8 +318,9 @@
           <span id="so-luong-da-chon" data-i18n="status_selected">Đã chọn 0 phần mềm</span>
         </div>
       </section>
-      <section id="trang-tien-ich" class="Trang">
-        <!-- Tab Dữ liệu (Gộp chung) -->
+      <!-- === [ 2.2.3. UTILITIES TAB ] === -->
+        <section id="trang-tien-ich" class="Trang">
+        
         <div id="tab-du-lieu" class="TabDichVu" style="display: flex;">
           <div class="TabDichVu_ThongTin">
             <h2 class="TabDichVu_TieuDe" data-i18n="util_data_management">Quản Lý Dữ Liệu</h2>
@@ -323,7 +328,7 @@
           </div>
           
           <div class="TabDichVu_KhungChinh">
-            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_system_cleanup">1. Dọn Dẹp Hệ Thống</h3>
+            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="uninstall_cleanup_leftovers">1. Dọn Dẹp Hệ Thống</h3>
             <div class="TabDichVu_Hang">
               <div>
                 <div class="TabDichVu_Nhan" data-i18n="util_scan_mode">Chế độ quét:</div>
@@ -407,52 +412,84 @@
           </div>
         </div>
 
-        <!-- Tab Khóa Chuột -->
         <div id="tab-khoa-chuot" class="TabDichVu" style="display: none;">
           <div class="TabDichVu_ThongTin">
             <h2 class="TabDichVu_TieuDe" data-i18n="util_mouse_lock_title">Khóa Chuột (Mouse Lock)</h2>
             <p class="TabDichVu_MoTa" data-i18n="util_mouse_lock_desc">Giới hạn khu vực di chuyển chuột bằng các phím tắt.</p>
           </div>
-          
+
           <div class="TabDichVu_KhungChinh">
-            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_lock_1_monitor">1. Khóa ở 1 Màn Hình</h3>
+            <h3 style="font-size: 0.857rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--chu-tat); border-bottom: 1px solid var(--vien); padding-bottom: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;" data-i18n="util_lock_1_monitor">
+              <svg width="24" height="24" viewBox="0 0 904 759" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path d="M852.82 0H51.0234C37.4958 0.0149522 24.5264 5.39542 14.9609 14.9609C5.39542 24.5264 0.0149522 37.4958 0 51.0234V590.414C0.0149522 603.942 5.39542 616.911 14.9609 626.477C24.5264 636.042 37.4958 641.423 51.0234 641.438H346.668L337.921 685.172H276.984C273.118 685.172 269.41 686.708 266.676 689.442C263.942 692.176 262.406 695.884 262.406 699.75V743.484C262.406 747.351 263.942 751.059 266.676 753.793C269.41 756.527 273.118 758.062 276.984 758.062H626.859C630.726 758.062 634.434 756.527 637.168 753.793C639.902 751.059 641.438 747.351 641.438 743.484V699.75C641.438 695.884 639.902 692.176 637.168 689.442C634.434 686.708 630.726 685.172 626.859 685.172H565.923L557.176 641.438H852.82C866.348 641.423 879.317 636.042 888.883 626.477C898.448 616.911 903.829 603.942 903.844 590.414V51.0234C903.829 37.4958 898.448 24.5264 888.883 14.9609C879.317 5.39542 866.348 0.0149522 852.82 0ZM612.281 714.328V728.906H291.562V714.328H612.281ZM367.66 685.172L376.407 641.438H527.437L536.183 685.172H367.66ZM874.688 590.414C874.683 596.212 872.377 601.771 868.277 605.871C864.178 609.971 858.618 612.276 852.82 612.281H51.0234C45.2254 612.276 39.6662 609.971 35.5663 605.871C31.4665 601.771 29.1611 596.212 29.1562 590.414V553.969H874.688V590.414ZM874.688 524.812H29.1562V51.0234C29.1611 45.2254 31.4665 39.6662 35.5663 35.5663C39.6662 31.4665 45.2254 29.1611 51.0234 29.1562H852.82C858.618 29.1611 864.178 31.4665 868.277 35.5663C872.377 39.6662 874.683 45.2254 874.688 51.0234V524.812Z"/>
+<path d="M466.5 568.547H437.344C433.477 568.547 429.769 570.083 427.035 572.817C424.302 575.551 422.766 579.259 422.766 583.125C422.766 586.991 424.302 590.699 427.035 593.433C429.769 596.167 433.477 597.703 437.344 597.703H466.5C470.366 597.703 474.074 596.167 476.808 593.433C479.542 590.699 481.078 586.991 481.078 583.125C481.078 579.259 479.542 575.551 476.808 572.817C474.074 570.083 470.366 568.547 466.5 568.547Z"/>
+<path d="M567.565 318.691L333.578 103.531L333.422 421.405L404.426 353.466L446.13 448.531L511.194 419.989L469.49 324.924L567.565 318.691ZM484.564 409.598L456.519 421.902L411.328 318.888L353.656 374.07L353.767 149.556L519.032 301.523L439.373 306.585L484.564 409.598Z"/>
+<path d="M592.823 399.003H592.689V390.397C592.689 376.813 581.526 365.65 567.942 365.65C554.357 365.65 543.197 376.812 543.197 390.397V399.003H542.658C539.028 399.003 536.07 401.962 536.07 405.594V441.637C536.07 445.268 539.028 448.227 542.658 448.227H592.959C596.59 448.227 599.549 445.268 599.549 441.637V405.459C599.28 401.828 596.455 399.003 592.823 399.003ZM571.574 423.357C571.036 423.76 570.902 424.028 570.902 424.701V432.636C570.902 433.712 570.363 434.788 569.422 435.326C567.136 436.536 564.85 434.923 564.85 432.636V424.7C564.85 424.163 564.714 423.76 564.311 423.49C561.89 421.742 561.084 418.649 562.295 416.093C563.505 413.538 566.329 412.059 569.019 412.597C571.977 413.135 574.129 415.556 574.129 418.649C573.994 420.398 573.188 422.146 571.574 423.357ZM581.796 399.003H553.955V390.397C553.955 382.73 560.141 376.41 567.941 376.41C575.608 376.41 581.929 382.596 581.929 390.397V399.004L581.796 399.003Z"/>
+              </svg>
+              <span>1. Khóa ở 1 Màn Hình</span>
+            </h3>
             <div class="TabDichVu_Hang">
               <div>
-                <div class="TabDichVu_Nhan" data-i18n="util_lock_1_monitor_desc">Chống trỏ chuột tràn sang màn hình khác khi dùng đa màn hình.</div>
-                <div class="TabDichVu_GhiChu" data-i18n="util_shortcut_toggle">Phím tắt kích hoạt/tắt:</div>
+                <div class="TabDichVu_Nhan" data-i18n="util_select_monitor">Chọn Màn Hình:</div>
+                <div class="TabDichVu_GhiChu" data-i18n="util_select_monitor_desc">Màn hình sẽ bị giới hạn con trỏ</div>
               </div>
-              <div style="display: flex; gap: 12px; align-items: center;">
-                <input type="text" id="shortcut-lock-monitor" class="OTimKiem_Input" autocomplete="off" style="width: 150px; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; text-align: center;" placeholder="Chưa gán phím" data-i18n-placeholder="util_no_shortcut" readonly>
-                <button class="Nut Nut--phu" id="btn-set-lock-monitor" data-i18n="util_set_shortcut">Cài phím</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="TabDichVu_KhungChinh">
-            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_lock_limit_area">2. Khóa trong 1 Vùng Giới Hạn</h3>
-            <div class="TabDichVu_Hang">
-              <div style="flex: 1;">
-                <div class="TabDichVu_Nhan" data-i18n="util_lock_limit_area_desc">Giới hạn chuột trong một vùng cửa sổ chỉ định.</div>
-                <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-                  <button class="Nut Nut--chinh" id="btn-select-window" data-i18n="util_choose_window">Chọn Cửa Sổ</button>
-                  <span id="selected-window-name" class="TabDichVu_GhiChu" data-i18n="util_folder_placeholder">Chưa chọn...</span>
+              <div class="CaiDat_Dropdown" tabindex="0">
+                <div class="CaiDat_Dropdown_Chon" id="btn-mo-dropdown-man-hinh">
+                  <span id="txt-man-hinh-khoa" data-value="1" data-i18n="util_monitor_1">Màn hình 1</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="CaiDat_Dropdown_DanhSach" id="ds-dropdown-man-hinh">
+                  <div class="CaiDat_Dropdown_Muc dang-chon" data-value="1" data-i18n="util_monitor_1">Màn hình 1</div>
                 </div>
               </div>
-              <div style="display: flex; gap: 12px; align-items: center;">
-                <div class="TabDichVu_GhiChu" data-i18n="util_shortcut">Phím tắt:</div>
-                <input type="text" id="shortcut-lock-area" class="OTimKiem_Input" autocomplete="off" style="width: 150px; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; text-align: center;" placeholder="Chưa gán phím" data-i18n-placeholder="util_no_shortcut" readonly>
-                <button class="Nut Nut--phu" id="btn-set-lock-area" data-i18n="util_set_shortcut">Cài phím</button>
-              </div>
+            </div>
+            <div class="TabDichVu_Hang" style="margin-top: 12px; justify-content: flex-end; align-items: center; gap: 12px;">
+              <div class="TabDichVu_GhiChu" data-i18n="util_shortcut_toggle">Phím tắt kích hoạt/tắt:</div>
+              <input type="text" id="shortcut-lock-monitor" class="OTimKiem_Input" autocomplete="off" style="width: 150px; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; text-align: center;" placeholder="Chưa gán phím" data-i18n-placeholder="util_no_shortcut" readonly>
+              <button class="Nut Nut--phu" id="btn-set-lock-monitor" data-i18n="util_set_shortcut">Cài phím</button>
             </div>
           </div>
 
           <div class="TabDichVu_KhungChinh">
-            <h3 style="font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh); border-bottom: 1px solid var(--vien); padding-bottom: 8px;" data-i18n="util_lock_position">3. Khóa Tại Vị Trí</h3>
+            <h3 style="font-size: 0.857rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--chu-tat); border-bottom: 1px solid var(--vien); padding-bottom: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;" data-i18n="util_lock_limit_area">
+              <svg width="24" height="24" viewBox="0 0 484 480" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path d="M468.8 480H444.8C438.4 480 432 475.2 432 467.2C432 459.2 436.8 454.4 444.8 454.4H457.6V441.6C457.6 435.2 462.4 428.8 470.4 428.8C478.4 428.8 483.2 433.6 483.2 441.6V465.6C480 475.2 475.2 480 468.8 480ZM398.4 480H353.6C347.2 480 340.8 475.2 340.8 467.2C340.8 459.2 345.6 454.4 353.6 454.4H398.4C404.8 454.4 411.2 459.2 411.2 467.2C411.2 475.2 404.8 480 398.4 480ZM308.8 480H264C257.6 480 251.2 475.2 251.2 467.2C251.2 459.2 256 454.4 264 454.4H308.8C315.2 454.4 321.6 459.2 321.6 467.2C321.6 475.2 315.2 480 308.8 480ZM217.6 480H172.8C166.4 480 160 475.2 160 467.2C160 459.2 164.8 454.4 172.8 454.4H217.6C224 454.4 230.4 459.2 230.4 467.2C230.4 475.2 224 480 217.6 480ZM126.4 480H81.6C75.2 480 68.8 475.2 68.8 467.2C68.8 459.2 73.6 454.4 81.6 454.4H126.4C132.8 454.4 139.2 459.2 139.2 467.2C139.2 475.2 132.8 480 126.4 480ZM36.8 480H12.8C4.8 480 0 475.2 0 468.8V444.8C0 436.8 4.8 432 12.8 432C20.8 432 25.6 436.8 25.6 444.8V457.6H38.4C44.8 457.6 51.2 462.4 51.2 470.4C51.2 478.4 43.2 480 36.8 480ZM12.8 411.2C6.4 411.2 0 406.4 0 398.4V353.6C0 347.2 4.8 340.8 12.8 340.8C20.8 340.8 25.6 345.6 25.6 353.6V398.4C24 404.8 19.2 411.2 12.8 411.2ZM12.8 320C4.8 320 0 315.2 0 308.8V264C0 257.6 4.8 251.2 12.8 251.2C20.8 251.2 25.6 256 25.6 264V308.8C24 315.2 19.2 320 12.8 320ZM12.8 228.8C4.8 228.8 0 224 0 217.6V172.8C0 164.8 4.8 160 12.8 160C20.8 160 25.6 164.8 25.6 172.8V217.6C24 224 19.2 228.8 12.8 228.8ZM12.8 139.2C4.8 139.2 0 132.8 0 126.4V81.6C0 75.2 4.8 68.8 12.8 68.8C20.8 68.8 25.6 73.6 25.6 81.6V126.4C24 132.8 19.2 139.2 12.8 139.2ZM12.8 48C4.8 48 0 43.2 0 36.8V12.8C0 4.8 4.8 0 12.8 0H36.8C43.2 0 48 4.8 48 12.8C48 20.8 43.2 24 36.8 24H24V36.8C24 43.2 19.2 48 12.8 48ZM398.4 24H353.6C347.2 24 340.8 19.2 340.8 11.2C340.8 3.2 347.2 0 353.6 0H398.4C404.8 0 411.2 4.8 411.2 12.8C411.2 20.8 404.8 24 398.4 24ZM308.8 24H264C257.6 24 251.2 19.2 251.2 11.2C251.2 3.2 256 0 262.4 0H307.2C315.2 0 320 4.8 320 12.8C320 20.8 315.2 24 308.8 24ZM217.6 24H172.8C166.4 24 160 19.2 160 11.2C160 3.2 164.8 0 172.8 0H217.6C224 0 230.4 4.8 230.4 12.8C230.4 20.8 224 24 217.6 24ZM126.4 24H81.6C75.2 24 68.8 19.2 68.8 11.2C68.8 3.2 75.2 0 81.6 0H126.4C132.8 0 139.2 4.8 139.2 12.8C139.2 20.8 132.8 24 126.4 24ZM468.8 48C462.4 48 456 43.2 456 35.2V24H443.2C436.8 24 430.4 19.2 430.4 11.2C430.4 3.2 436.8 0 444.8 0H468.8C475.2 0 480 4.8 480 12.8V36.8C480 43.2 475.2 48 468.8 48ZM468.8 411.2C462.4 411.2 456 406.4 456 398.4V353.6C456 347.2 460.8 340.8 468.8 340.8C476.8 340.8 481.6 345.6 481.6 353.6V398.4C480 404.8 475.2 411.2 468.8 411.2ZM468.8 320C462.4 320 456 315.2 456 307.2V262.4C456 256 460.8 249.6 468.8 249.6C476.8 249.6 480 256 480 262.4V307.2C480 315.2 475.2 320 468.8 320ZM468.8 228.8C462.4 228.8 456 224 456 216V171.2C456 164.8 460.8 158.4 468.8 158.4C476.8 158.4 481.6 163.2 481.6 171.2V216C480 224 475.2 228.8 468.8 228.8ZM468.8 139.2C462.4 139.2 456 134.4 456 126.4V81.6C456 75.2 460.8 68.8 468.8 68.8C476.8 68.8 480 75.2 480 81.6V126.4C480 132.8 475.2 139.2 468.8 139.2Z"/>
+              </svg>
+              <span>2. Khóa trong 1 Vùng Giới Hạn</span>
+            </h3>
             <div class="TabDichVu_Hang">
-              <div style="flex: 1;">
-                <div class="TabDichVu_Nhan" data-i18n="util_lock_position_desc">Khóa cứng chuột tại một tọa độ nhất định.</div>
-                <label class="TuyChonCheckbox" style="display: flex; align-items: center; gap: 8px; margin-top: 8px; cursor: pointer;">
-                  <input type="checkbox" id="chk-auto-lock-pos" class="OChon" checked>
+              <div>
+                <div class="TabDichVu_Nhan" data-i18n="util_choose_window">Chọn Cửa Sổ:</div>
+                <div class="TabDichVu_GhiChu" data-i18n="util_lock_limit_area_desc">Giới hạn chuột trong một vùng cửa sổ chỉ định.</div>
+              </div>
+              <div class="CaiDat_Dropdown" tabindex="0" style="flex: 1; max-width: 250px;">
+                <div class="CaiDat_Dropdown_Chon" id="btn-mo-dropdown-cua-so">
+                  <span id="txt-cua-so-khoa" data-value="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Đang quét...</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="CaiDat_Dropdown_DanhSach" id="ds-dropdown-cua-so" style="max-height: 200px; overflow-y: auto;">
+                </div>
+              </div>
+            </div>
+            <div class="TabDichVu_Hang" style="margin-top: 12px; justify-content: flex-end; align-items: center; gap: 12px;">
+              <div class="TabDichVu_GhiChu" data-i18n="util_shortcut_toggle">Phím tắt kích hoạt/tắt:</div>
+              <input type="text" id="shortcut-lock-area" class="OTimKiem_Input" autocomplete="off" style="width: 150px; border: 1px solid var(--vien); border-radius: var(--do-bo); padding: 8px; text-align: center;" placeholder="Chưa gán phím" data-i18n-placeholder="util_no_shortcut" readonly>
+              <button class="Nut Nut--phu" id="btn-set-lock-area" data-i18n="util_set_shortcut">Cài phím</button>
+            </div>
+          </div>
+
+          <div class="TabDichVu_KhungChinh">
+            <h3 style="font-size: 0.857rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--chu-tat); border-bottom: 1px solid var(--vien); padding-bottom: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;" data-i18n="util_lock_position">
+              <svg width="24" height="24" viewBox="0 0 267 345" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path d="M234.143 215.16L0.155651 0L0 317.874L71.0045 249.934L112.708 345L177.772 316.458L136.069 221.393L234.143 215.16ZM151.142 306.067L123.097 318.37L77.9065 215.356L20.2343 270.539L20.3449 46.0244L185.61 197.992L105.951 203.054L151.142 306.067Z"/>
+<path d="M259.401 295.472H259.267V286.865C259.267 273.282 248.105 262.119 234.52 262.119C220.936 262.119 209.775 273.281 209.775 286.865V295.472H209.237C205.606 295.472 202.648 298.431 202.648 302.062V338.106C202.648 341.737 205.606 344.696 209.237 344.696H259.537C263.168 344.696 266.127 341.737 266.127 338.106V301.928C265.858 298.297 263.033 295.472 259.401 295.472ZM238.152 319.825C237.614 320.229 237.48 320.497 237.48 321.17V329.105C237.48 330.18 236.941 331.257 236 331.795C233.714 333.005 231.428 331.391 231.428 329.105V321.169C231.428 320.632 231.293 320.229 230.889 319.959C228.468 318.211 227.662 315.117 228.873 312.562C230.083 310.006 232.907 308.528 235.597 309.066C238.555 309.604 240.707 312.025 240.707 315.117C240.573 316.866 239.766 318.614 238.152 319.825ZM248.374 295.472H220.533V286.865C220.533 279.199 226.72 272.879 234.519 272.879C242.186 272.879 248.507 279.065 248.507 286.865V295.473L248.374 295.472Z"/>
+              </svg>
+              <span>3. Khóa Tại Vị Trí</span>
+            </h3>
+            <div class="TabDichVu_Hang" style="flex-direction: column; align-items: stretch; gap: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label class="TabDichVu_Nhan" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" id="cb-auto-get-cursor" class="OChon" checked>
                   <span class="TabDichVu_GhiChu" data-i18n="util_auto_get_cursor">Tự động lấy tọa độ con trỏ hiện tại khi bấm phím tắt</span>
                 </label>
               </div>
@@ -467,6 +504,7 @@
       </section>
     </main>
   </div>
+  <!-- === [ 3. MODALS & OVERLAYS ] === -->
   <div id="lop-phu-modal" class="LopPhuModal an"></div>
   <div id="hop-thoai-gioi-thieu" class="HopThoai an" role="dialog" aria-modal="true">
     <div class="HopThoai_NoiDung">
@@ -488,92 +526,61 @@
     <option value="Messaging"></option>
     <option value="Compression"></option>
   </datalist>
-  <div id="hop-thoai-them-app" class="HopThoai an" style="z-index: 1002;" role="dialog" aria-modal="true">
+  <!-- === [ 3.1. ADD APP MODAL ] === -->
+      <div id="hop-thoai-them-app" class="HopThoai an" style="z-index: 1002;" role="dialog" aria-modal="true">
     <div class="HopThoai_NoiDung HopThoai_NoiDung--them-app">
       <h3 id="them-app-tieu-de"
         style="margin-top: 0; margin-bottom: 20px; font-size: 1.429rem; font-weight: 600; color: var(--chu-chinh); text-align: center; width: 100%;"
         data-i18n="add_app_title">Thêm phần mềm mới</h3>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; width: 100%; box-sizing: border-box;">
         <div style="flex: 1;">
-          <label
-            style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);"
-            data-i18n="add_app_name">Tên phần mềm</label>
+          <label for="them-app-ten" style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);" data-i18n="add_app_name">Tên phần mềm</label>
           <input type="text" id="them-app-ten" spellcheck="false" placeholder="VD: Zalo" data-i18n-placeholder="add_app_name_ph" autocomplete="off"
             style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s;"
-            onfocus="this.style.borderColor='var(--mau-chinh)'" onblur="this.style.borderColor='var(--vien)'">
+            onfocus="this.style.borderColor='var(--mau-nhan)'" onblur="this.style.borderColor='var(--vien)'">
         </div>
-        <div style="flex: 1; position: relative;">
-          <label
-            style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);"
-            data-i18n="add_app_category">Thể loại</label>
-          <input type="text" id="them-app-loai" spellcheck="false" placeholder="Tự nhập hoặc chọn..."
-            data-i18n-placeholder="add_app_category_ph" autocomplete="off"
-            style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s;"
-            onfocus="this.style.borderColor='var(--mau-chinh)'; document.getElementById('dropdown-loai').classList.remove('an');"
-            onblur="this.style.borderColor='var(--vien)'; setTimeout(()=>document.getElementById('dropdown-loai')?.classList.add('an'), 200);">
-          <div id="dropdown-loai" class="CustomSelect_Dropdown an"
-            style="position: absolute; top: 100%; left: 0; right: 0; background: var(--nen-tang2, var(--nen-chinh)); border: 1px solid var(--vien); border-radius: var(--do-bo); margin-top: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 10; max-height: 200px; overflow-y: auto;">
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Web Browsers'" data-i18n="cat_web_browsers">Trình duyệt web</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Developer Tools'" data-i18n="cat_dev_tools">Công cụ lập trình</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Media'" data-i18n="cat_media">Đa phương tiện</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Games'" data-i18n="cat_games">Trò chơi</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Utilities'" data-i18n="cat_utilities">Tiện ích</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-loai').value='Messaging'" data-i18n="cat_messaging">Nhắn tin</div>
-            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 1rem; cursor: pointer;"
-              onmousedown="document.getElementById('them-app-loai').value='Compression'" data-i18n="cat_compression">Nén dữ liệu</div>
+        <div style="flex: 1;">
+          <label for="them-app-loai" style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);" data-i18n="add_app_category">Thể loại</label>
+          <div class="CaiDat_Dropdown" id="them-app-loai-wrapper" style="width: 100%;">
+            <input type="text" id="them-app-loai" class="CaiDat_Dropdown_Chon" spellcheck="false" placeholder="Tự nhập hoặc chọn..." data-i18n-placeholder="add_app_category_ph" autocomplete="off"
+              style="display: block; width: 100%; margin: 0; outline: none; height: 48px; font-family: inherit; font-size: 1rem; box-sizing: border-box;"
+              
+              >
+            <div class="CaiDat_Dropdown_DanhSach" style="max-height: 200px; overflow-y: auto;">
+              <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-loai').value='Web Browsers'" data-i18n="cat_web_browsers">Trình duyệt web</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-loai').value='Developer Tools'" data-i18n="cat_dev_tools">Công cụ lập trình</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-loai').value='Media'" data-i18n="cat_media">Đa phương tiện</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-loai').value='Games'" data-i18n="cat_games">Trò chơi</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-loai').value='Utilities'" data-i18n="cat_utilities">Tiện ích</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-loai').value='Messaging'" data-i18n="cat_messaging">Nhắn tin</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-loai').value='Compression'" data-i18n="cat_compression">Nén dữ liệu</div>
+            </div>
           </div>
         </div>
       </div>
+      
       <div style="margin-bottom: 16px; width: 100%; box-sizing: border-box;">
-        <label
-          style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);"
-          data-i18n="add_app_install_type">Hình thức cài đặt</label>
-        <div style="display: flex; gap: 16px; align-items: stretch; margin-bottom: 16px;">
-          <div style="position: relative; width: 180px; flex-shrink: 0;" tabindex="0"
-            onfocus="document.getElementById('dropdown-kieu').classList.remove('an'); this.style.borderColor='var(--mau-chinh)'"
-            onblur="setTimeout(()=>document.getElementById('dropdown-kieu')?.classList.add('an'), 200); this.style.borderColor='var(--vien)'">
-            <div id="them-app-kieu-nguon" data-value="Winget"
-              style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+        <label for="them-app-id" style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);" data-i18n="add_app_type">Hình thức cài đặt</label>
+        <div style="display: flex; gap: 12px; width: 100%;">
+          <div class="CaiDat_Dropdown" id="them-app-kieu-nguon-wrapper" style="width: 160px; flex-shrink: 0;" tabindex="0"
+            
+            >
+            <div id="them-app-kieu-nguon" data-value="Winget" class="CaiDat_Dropdown_Chon" style="height: 48px; margin: 0;">
               <span class="NhanText">Winget</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <div id="dropdown-kieu" class="CustomSelect_Dropdown an"
-              style="position: absolute; top: 100%; left: 0; right: 0; background: var(--nen-tang2, var(--nen-chinh)); border: 1px solid var(--vien); border-radius: var(--do-bo); margin-top: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 10;">
-              <div class="CustomSelect_Item"
-                style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-                onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Link'; el.querySelector('.NhanText').textContent='Link (.exe/.msi)'; document.getElementById('them-app-id').placeholder='https://...'; document.getElementById('btn-tim-winget').style.display='none'; document.getElementById('btn-chon-file-cai-dat').style.display='none';">
-                Link (.exe/.msi)</div>
-              <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-                onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Package'; el.querySelector('.NhanText').textContent='File (.exe/.msi)'; document.getElementById('them-app-id').placeholder='Ví dụ: C:\\Downloads\\installer.exe'; document.getElementById('btn-tim-winget').style.display='none'; document.getElementById('btn-chon-file-cai-dat').style.display='flex';">
-                File (.exe/.msi)</div>
-              <div class="CustomSelect_Item"
-                style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-                onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Winget'; el.querySelector('.NhanText').textContent='Winget'; document.getElementById('them-app-id').placeholder=t('add_app_id_ph'); document.getElementById('btn-tim-winget').style.display='flex'; document.getElementById('btn-chon-file-cai-dat').style.display='none';">
-                Winget</div>
-              <div class="CustomSelect_Item"
-                style="padding: 10px 14px; font-size: 1rem; cursor: pointer;"
-                onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Store'; el.querySelector('.NhanText').textContent='MS Store'; document.getElementById('them-app-id').placeholder=t('add_app_store_id_ph') || 'Nhập ID Store'; document.getElementById('btn-tim-winget').style.display='none'; document.getElementById('btn-chon-file-cai-dat').style.display='none';">
-                MS Store</div>
+            <div class="CaiDat_Dropdown_DanhSach" style="max-height: 200px; overflow-y: auto;">
+              <div class="CaiDat_Dropdown_Muc" onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Link'; el.querySelector('.NhanText').textContent='Link (.exe/.msi)'; document.getElementById('them-app-id').placeholder='https://...'; document.getElementById('btn-tim-winget').style.display='none'; document.getElementById('btn-chon-file-cai-dat').style.display='none'; document.getElementById('them-app-kieu-nguon-wrapper').classList.remove('mo');">Link (.exe/.msi)</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Package'; el.querySelector('.NhanText').textContent='File (.exe/.msi)'; document.getElementById('them-app-id').placeholder='Ví dụ: C:\\Downloads\\installer.exe'; document.getElementById('btn-tim-winget').style.display='none'; document.getElementById('btn-chon-file-cai-dat').style.display='flex'; document.getElementById('them-app-kieu-nguon-wrapper').classList.remove('mo');">File (.exe/.msi)</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Winget'; el.querySelector('.NhanText').textContent='Winget'; document.getElementById('them-app-id').placeholder=t('add_app_id_ph') || 'Nhập ID / Link / Từ khóa tìm kiếm'; document.getElementById('btn-tim-winget').style.display='flex'; document.getElementById('btn-chon-file-cai-dat').style.display='none'; document.getElementById('them-app-kieu-nguon-wrapper').classList.remove('mo');">Winget</div>
+              <div class="CaiDat_Dropdown_Muc" onmousedown="let el=document.getElementById('them-app-kieu-nguon'); el.dataset.value='Store'; el.querySelector('.NhanText').textContent='MS Store'; document.getElementById('them-app-id').placeholder=t('add_app_store_id_ph') || 'Nhập ID Store'; document.getElementById('btn-tim-winget').style.display='none'; document.getElementById('btn-chon-file-cai-dat').style.display='none'; document.getElementById('them-app-kieu-nguon-wrapper').classList.remove('mo');">MS Store</div>
             </div>
           </div>
-          <input type="text" id="them-app-id" spellcheck="false" placeholder="Nhập ID / Link / Từ khóa tìm kiếm"
-            data-i18n-placeholder="add_app_id_ph" autocomplete="off"
+          <input type="text" id="them-app-id" spellcheck="false" placeholder="Nhập ID / Link / Từ khóa tìm kiếm" data-i18n-placeholder="add_app_id_ph" autocomplete="off"
             style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; flex: 1; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s; min-width: 0;"
-            onfocus="this.style.borderColor='var(--mau-chinh)'" onblur="this.style.borderColor='var(--vien)'">
+            onfocus="this.style.borderColor='var(--mau-nhan)'" onblur="this.style.borderColor='var(--vien)'">
           <button id="btn-tim-winget" class="Nut Nut--chinh" data-i18n-title="add_app_search_title"
             style="padding: 0 16px; border-radius: var(--do-bo); display: flex; align-items: center; justify-content: center;"
             title="Tìm kiếm trên Winget">
@@ -590,121 +597,28 @@
             </svg>
           </button>
         </div>
-        <div style="position: relative;">
-          <label
-            style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);"
-            data-i18n="add_app_silent_args">Tham số cài đặt im lặng (Tùy chọn)</label>
-          <input type="text" id="them-app-tham-so" spellcheck="false"
-            placeholder="VD: /S /v/qn (Bỏ trống nếu không cần)" data-i18n-placeholder="add_app_silent_args_ph" autocomplete="off"
-            style="width: 100%; box-sizing: border-box; margin: 0; height: 48px; border: 1px solid var(--vien); padding: 0 16px; border-radius: var(--do-bo); background: var(--nen-phu); color: var(--chu-chinh); font-size: 1rem; transition: border-color 0.2s;"
-            onfocus="this.style.borderColor='var(--mau-chinh)'; document.getElementById('dropdown-tham-so').classList.remove('an');"
-            onblur="this.style.borderColor='var(--vien)'; setTimeout(()=>document.getElementById('dropdown-tham-so')?.classList.add('an'), 200);">
-          <div id="dropdown-tham-so" class="CustomSelect_Dropdown an"
-            style="position: absolute; top: 100%; left: 0; right: 0; background: var(--nen-tang2, var(--nen-chinh)); border: 1px solid var(--vien); border-radius: var(--do-bo); margin-top: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 10; max-height: 200px; overflow-y: auto;">
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-tham-so').value='/S'">Inno Setup / NSIS (/S)</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-tham-so').value='/qn /norestart'">MSI (/qn /norestart)
-            </div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-tham-so').value='/quiet /norestart'">Windows Installer
-              (/quiet /norestart)</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-tham-so').value='/silent'">WiX / Others (/silent)</div>
-            <div class="CustomSelect_Item"
-              style="padding: 10px 14px; font-size: 1rem; cursor: pointer; border-bottom: 1px solid var(--vien);"
-              onmousedown="document.getElementById('them-app-tham-so').value='/s /v&quot;/qn&quot;'">InstallShield (/s
-              /v"/qn")</div>
-            <div class="CustomSelect_Item" style="padding: 10px 14px; font-size: 1rem; cursor: pointer;"
-              onmousedown="document.getElementById('them-app-tham-so').value='/exenoui /qn'">Advanced Installer
-              (/exenoui /qn)</div>
+      </div>
+      <div style="position: relative; width: 100%;">
+        <label for="them-app-tham-so" style="display:block; margin-bottom: 8px; font-size: 0.929rem; font-weight: 500; color: var(--chu-chinh);" data-i18n="add_app_silent_args">Tham số cài đặt im lặng (Tùy chọn)</label>
+        <div class="CaiDat_Dropdown" id="them-app-tham-so-wrapper" style="width: 100%;">
+          <input type="text" id="them-app-tham-so" class="CaiDat_Dropdown_Chon" spellcheck="false" placeholder="VD: /S /v/qn (Bỏ trống nếu không cần)" data-i18n-placeholder="add_app_silent_args_ph" autocomplete="off"
+            style="display: block; width: 100%; margin: 0; outline: none; height: 48px; font-family: inherit; font-size: 1rem; box-sizing: border-box;"
+            
+            >
+          <div class="CaiDat_Dropdown_DanhSach" style="max-height: 200px; overflow-y: auto;">
+            <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-tham-so').value='/S'">Inno Setup / NSIS (/S)</div>
+            <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-tham-so').value='/qn /norestart'">MSI (/qn /norestart)</div>
+            <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-tham-so').value='/quiet /norestart'">Windows Installer (/quiet /norestart)</div>
+            <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-tham-so').value='/silent'">WiX / Others (/silent)</div>
+            <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-tham-so').value='/s /v&quot;/qn&quot;'">InstallShield (/s /v"/qn")</div>
+            <div class="CaiDat_Dropdown_Muc" onmousedown="document.getElementById('them-app-tham-so').value='/exenoui /qn'">Advanced Installer (/exenoui /qn)</div>
           </div>
         </div>
       </div>
-      <div style="display: flex; gap: 16px; margin-top: 24px; justify-content: center;">
-        <button class="Nut" id="dong-them-app" data-i18n="add_app_cancel"
-          style="flex: 1; background: var(--nen-phu); color: var(--chu-chinh); border: 1px solid var(--vien); padding: 10px 20px; border-radius: var(--do-bo); font-weight: 500;">Hủy</button>
-        <button class="Nut Nut--chinh" id="luu-them-app"
-          style="flex: 1; padding: 10px 24px; border-radius: var(--do-bo); font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5v14"></path>
-          </svg>
-          <span data-i18n="add_app_add">Thêm</span>
-        </button>
+      <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; width: 100%;">
+        <button class="Nut Nut--Huy" id="dong-them-app" data-i18n="cancel_btn" style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Hủy</button>
+        <button class="Nut Nut--chinh" id="luu-them-app" data-i18n="add_btn" style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Thêm</button>
       </div>
-    </div>
-  </div>
-  <div id="hop-thoai-tim-winget" class="HopThoai an" style="z-index: 1003;" role="dialog" aria-modal="true">
-    <div class="HopThoai_NoiDung HopThoai_NoiDung--tim-winget">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-        <h3 id="tim-winget-tieu-de" style="margin: 0; font-size: 1.286rem; color: var(--chu); font-weight: 600;">Tìm
-          kiếm Winget</h3>
-        <button class="NutSuaNho" id="dong-tim-winget-x" style="padding: 4px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div id="tim-winget-trang-thai" style="font-size: 1rem; color: var(--chu-phu); margin-bottom: 16px;">Đang tìm
-        kiếm...</div>
-      <div id="tim-winget-danh-sach"
-        style="flex: 1; overflow-y: auto; border: 1px solid var(--vien); border-radius: var(--do-bo); background: var(--nen-phu); padding: 8px; display: flex; flex-direction: column; gap: 8px;">
-      </div>
-      <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
-        <button class="Nut Nut--phu" id="lam-moi-tim-winget" style="display: flex; align-items: center; gap: 6px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <g transform="matrix(1.24,0,0,1.24,-2.88,-2.88)">
-              <path
-                d="M19.602 12.635a.99.99 0 0 0-1.134.844 6.402 6.402 0 0 1-1.83 3.618 6.506 6.506 0 0 1-9.192 0 6.507 6.507 0 0 1 0-9.192 6.414 6.414 0 0 1 3.503-1.8 6.187 6.187 0 0 1 1.848-.055 6.414 6.414 0 0 1 2.466.828l-1.302.223a1 1 0 1 0 .338 1.971l3.49-.596a1.002 1.002 0 0 0 .816-1.155l-.597-3.49a1 1 0 1 0-1.97.338l.156.919a8.423 8.423 0 0 0-3.17-1.025 8.102 8.102 0 0 0-2.428.074 8.379 8.379 0 0 0-4.564 2.354c-3.313 3.314-3.313 8.705 0 12.02a8.471 8.471 0 0 0 6.01 2.485 8.471 8.471 0 0 0 6.01-2.485 8.39 8.39 0 0 0 2.394-4.741 1 1 0 0 0-.843-1.135z">
-              </path>
-            </g>
-          </svg>
-          <span data-i18n="refresh_btn">Làm mới</span>
-        </button>
-        <button class="Nut Nut--phu" id="dong-tim-winget" data-i18n="close_btn">Đóng</button>
-      </div>
-    </div>
-  </div>
-  <div id="hop-thoai-cai-dat" class="HopThoai an" role="dialog" aria-modal="true">
-    <div class="HopThoai_NoiDung HopThoai_NoiDung--rong">
-      <div class="CaiDat_ThanhBen">
-        <div class="CaiDat_TieuDe" data-i18n="menu_settings">Cài đặt</div>
-        <div id="caidat-menu"></div>
-      </div>
-      <div class="CaiDat_NoiDung">
-        <div class="CaiDat_TieuDeChia">
-          <button class="CaiDat_NutDongX" id="dong-cai-dat">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-        <div class="CaiDat_CuonNoiDung" id="noi-dung-cai-dat"></div>
-        <div class="CaiDat_ThanhDuoi">
-          <button class="Nut Nut--phu" id="caidat-dat-lai" data-i18n="reset_btn">Đặt lại</button>
-          <div style="display:flex;gap:8px;">
-            <button class="Nut Nut--phu" id="caidat-huy" data-i18n="cancel_btn">Hủy</button>
-            <button class="Nut Nut--chinh" id="caidat-luu" data-i18n="save_btn">Lưu</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="hop-thoai-tro-giup" class="HopThoai an" style="z-index: 1001;" role="dialog" aria-modal="true">
-    <div class="HopThoai_NoiDung HopThoai_NoiDung--tro-giup">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-        <h3 id="tro-giup-tieu-de" style="margin: 0; font-size: 1.286rem; color: var(--chu);">Trợ giúp</h3>
-      </div>
-      <div id="tro-giup-noi-dung"
-        style="font-size: 1rem; color: var(--chu-phu); line-height: 1.6; margin-bottom: 24px;"></div>
-      <button class="Nut Nut--chinh HopThoai_NutDong" onclick="BatTatHopThoai('hop-thoai-tro-giup', false)"
-        style="width: 100%;">OK</button>
     </div>
   </div>
   <div id="hop-thoai-xac-nhan" class="HopThoai an" style="z-index: 1005;" role="dialog" aria-modal="true">
@@ -719,48 +633,43 @@
           </svg>
         </button>
       </div>
-      <div id="xac-nhan-noi-dung" style="font-size: 1rem; color: var(--chu-phu); margin-bottom: 24px; line-height: 1.5; text-align: center;">
-      </div>
-      <div style="display: flex; gap: 12px; justify-content: center;">
-        <button class="Nut Nut--phu" id="xacnhan-huy-btn" data-i18n="cancel_btn" style="padding: 10px 32px; font-weight: 500;">Hủy bỏ</button>
-        <button class="Nut Nut--chinh" id="xacnhan-ok-btn" data-i18n="ok_btn" style="padding: 10px 32px; font-weight: 500;">OK</button>
+      <div id="xac-nhan-noi-dung" style="font-size: 1rem; color: var(--chu-phu); text-align: center; margin-bottom: 24px; line-height: 1.5;"></div>
+      <div style="display: flex; justify-content: center; gap: 12px;">
+        <button class="Nut Nut--phu" id="xacnhan-huy-btn" style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;" data-i18n="cancel_btn">Hủy</button>
+        <button class="Nut Nut--chinh" id="xacnhan-ok-btn" style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;" data-i18n="ok_btn">OK</button>
       </div>
     </div>
   </div>
   <div id="hop-thoai-xac-nhan-go" class="HopThoai an" style="z-index: 1002;" role="dialog" aria-modal="true">
     <div class="HopThoai_NoiDung HopThoai_NoiDung--xac-nhan">
-      <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px;">
+      <div style="position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0; font-size: 1.286rem; color: var(--chu); font-weight: 600;">Gỡ cài đặt</h3>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; margin-bottom: 16px; padding: 0 8px; box-sizing: border-box;">
         <button class="XacNhanGo_NutChuyen" id="xac-nhan-go-prev" disabled>&lt;</button>
-        <div id="xac-nhan-go-danh-sach" class="XacNhanGo_DanhSachApp"
-          style="display: flex; gap: 16px; justify-content: center; overflow: hidden; min-height: 120px; width: 450px;">
+        <div id="xac-nhan-go-danh-sach" style="display: flex; gap: 12px; flex: 1; overflow: hidden; justify-content: center;">
         </div>
         <button class="XacNhanGo_NutChuyen" id="xac-nhan-go-next" disabled>&gt;</button>
       </div>
-      <h3 id="xac-nhan-go-cau-hoi"
-        style="margin: 0 0 24px 0; font-size: 1.143rem; font-weight: 500; color: var(--chu-chinh);">Bạn có chắc chắn
-        muốn gỡ cài đặt N chương trình đã chọn không?</h3>
-      <div
-        style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 32px; max-width: fit-content; margin-left: auto; margin-right: auto;">
-        <label class="TuyChonCheckbox"
-          style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; text-align: left;">
-          <input type="checkbox" id="chk-tao-diem-khoi-phuc" class="OChon"
-            style="margin-top: 2px; flex-shrink: 0;">
-          <span style="font-size: 0.929rem; color: var(--chu-phu); line-height: 1.4;">Tạo điểm khôi phục hệ thống trước
-            khi gỡ cài đặt</span>
-        </label>
-        <label class="TuyChonCheckbox"
-          style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; text-align: left;">
-          <input type="checkbox" id="chk-don-tep-thua" class="OChon"
-            style="margin-top: 2px; flex-shrink: 0;">
-          <span style="font-size: 0.929rem; color: var(--chu-phu); line-height: 1.4;">Tự động loại bỏ các tệp tin
-            thừa</span>
-        </label>
+      <h3 id="xac-nhan-go-cau-hoi" style="margin: 0 0 24px 0; font-size: 1.143rem; font-weight: 500; color: var(--chu-chinh);">Bạn có chắc chắn muốn gỡ cài đặt N chương trình đã chọn không?</h3>
+      <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 32px; max-width: fit-content; margin-left: auto; margin-right: auto;">
+        <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+          <label class="TuyChonCheckbox" style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; text-align: left;">
+            <input type="checkbox" id="chk-tao-diem-khoi-phuc" class="OChon" style="margin-top: 2px; flex-shrink: 0;" checked>
+            <span style="font-size: 0.929rem; color: var(--chu-phu); line-height: 1.4;">Tạo điểm khôi phục hệ thống trước khi gỡ</span>
+          </label>
+          <div style="margin-top: 4px; margin-bottom: 4px; margin-left: 28px;">
+            <input type="text" id="ten-diem-khoi-phuc-input" placeholder="Tên điểm khôi phục (Tùy chọn)" class="OTimKiem" style="width: 100%; box-sizing: border-box;">
+          </div>
+          <label class="TuyChonCheckbox" style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; text-align: left;">
+            <input type="checkbox" id="chk-don-tep-thua" class="OChon" style="margin-top: 2px; flex-shrink: 0;">
+            <span style="font-size: 0.929rem; color: var(--chu-phu); line-height: 1.4;">Tự động loại bỏ các tệp tin thừa</span>
+          </label>
+        </div>
       </div>
       <div style="display: flex; justify-content: center; gap: 12px;">
-        <button class="Nut Nut--phu" id="dong-xac-nhan-go"
-          style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Hủy</button>
-        <button class="Nut Nut--nguy-hiem" id="luu-xac-nhan-go"
-          style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Gỡ cài đặt</button>
+        <button class="Nut Nut--phu" id="dong-xac-nhan-go" style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Hủy</button>
+        <button class="Nut Nut--nguy-hiem" id="luu-xac-nhan-go" style="padding: 10px 32px; border-radius: var(--do-bo); font-weight: 500;">Gỡ cài đặt</button>
       </div>
     </div>
   </div>
@@ -800,8 +709,8 @@
       </div>
     </div>
   </div>
+  <!-- === [ 3.3. PROGRESS MODAL ] === -->
   <div id="hop-thoai-tien-trinh" class="HopThoai an" style="z-index: 1003;" role="dialog" aria-modal="true">
-    
     <div class="HopThoai_NoiDung HopThoai_NoiDung--tien-trinh">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%;">
         <h3 id="tien-trinh-tieu-de" style="margin: 0; font-size: 1.143rem; font-weight: 600; color: var(--chu-chinh);">Tiến trình cài đặt</h3>
@@ -834,25 +743,33 @@
          <div id="danh-sach-diem-khoi-phuc-cu" style="display: flex; flex-direction: column; gap: 8px;"></div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 24px; margin-top: auto; width: 100%; box-sizing: border-box;">
+      <div style="display: flex; align-items: center; gap: 16px; margin-top: auto; width: 100%; box-sizing: border-box;">
         <div id="tien-trinh-wrapper"
           style="flex: 1; height: 32px; background: rgba(0,0,0,0.3); border-radius: var(--do-bo); overflow: hidden; position: relative; box-shadow: inset 0 3px 8px rgba(0,0,0,0.6), inset 0 1px 2px rgba(0,0,0,0.4), 0 1px 1px rgba(255,255,255,0.05); border: 1px solid rgba(0,0,0,0.8); transition: all 0.3s ease;">
           <div id="tien-trinh-thanh"
-            style="width: 0%; height: 100%; background-color: var(--mau-nhan); box-sizing: border-box;"></div>
-          <div id="tien-trinh-phan-tram"
-            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: 600; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);">
-            0%</div>
+            style="width: 0%; height: 100%; background-color: var(--mau-nhan); box-sizing: border-box; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+          <div id="tien-trinh-phan-tram" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.929rem; font-weight: 700; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.8); pointer-events: none;">0%</div>
         </div>
-        <button class="Nut Nut--nguy-hiem" id="bao-cao-loi"
-          style="padding: 8px 16px; border-radius: var(--do-bo); font-weight: 500; display: none;">Báo cáo lỗi</button>
-        <button class="Nut Nut--Huy" id="dong-tien-trinh" data-is-cancel="true"
-          style="padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 120px;">Hủy</button>
-        <button class="Nut Nut--chinh" id="tiep-theo-tien-trinh" style="display: none; padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 120px; background: var(--mau-nhan); color: #fff; border: none;">Tiếp theo</button>
+        <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+          <button class="Nut Nut--nguy-hiem" id="bao-cao-loi" data-i18n="report_error_title"
+            style="padding: 8px 16px; border-radius: var(--do-bo); font-weight: 500; display: none;">Báo cáo lỗi</button>
+          <button class="Nut Nut--phu" id="dong-tien-trinh" data-is-cancel="true" data-i18n="cancel_btn"
+            style="padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 100px;">Hủy</button>
+          <button class="Nut Nut--phu" id="bo-qua-tien-trinh" data-i18n="skip_btn" style="display: none; padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 100px;">Bỏ qua</button>
+          <button class="Nut Nut--chinh" id="tiep-theo-tien-trinh" data-i18n="next_btn" style="display: none; padding: 8px 32px; border-radius: var(--do-bo); font-weight: 500; min-width: 100px;">Tiếp theo</button>
+        </div>
       </div>
     </div>
   </div>
+  <!-- === [ 4. NOTIFICATIONS & SCRIPTS ] === -->
   <div id="vung-thong-bao" class="VungThongBao" aria-live="polite"></div>
   <script src="TaiNguyen/Languages.js"></script>
+  <script src="QuanLy/ChuDe.js"></script>
+  <script src="QuanLy/LuuTru.js"></script>
+  <script src="QuanLy/TrangThai.js"></script>
+  <script src="ThanhPhan/GiaoDien.js"></script>
+  <script src="ThanhPhan/HopThoai.js"></script>
+  <script src="ThanhPhan/SuKien.js"></script>
   <script src="CauNoiTauri.js"></script>
   <script src="KhoiChay.js"></script>
 </body>
