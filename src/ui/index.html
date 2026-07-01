@@ -506,6 +506,26 @@
   </div>
   <!-- === [ 3. MODALS & OVERLAYS ] === -->
   <div id="lop-phu-modal" class="LopPhuModal an"></div>
+  <div id="hop-thoai-cai-dat" class="HopThoai an" style="z-index: 1004;" role="dialog" aria-modal="true">
+    <div class="HopThoai_NoiDung HopThoai_NoiDung--rong">
+      <div class="CaiDat_ThanhBen">
+        <div class="CaiDat_TieuDe" data-i18n="settings_title">Cài đặt</div>
+        <div id="caidat-menu" style="display: flex; flex-direction: column; flex: 1; overflow-y: auto;"></div>
+      </div>
+      <div class="CaiDat_NoiDung">
+        <div class="CaiDat_TieuDeChia">
+          <button class="CaiDat_NutDongX" id="dong-cai-dat">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div id="noi-dung-cai-dat" class="CaiDat_CuonNoiDung"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--vien);">
+          <button id="caidat-huy" class="Nut Nut--phu" data-i18n="cancel">Hủy</button>
+          <button id="caidat-luu" class="Nut Nut--chinh" data-i18n="save">Lưu</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div id="hop-thoai-gioi-thieu" class="HopThoai an" role="dialog" aria-modal="true">
     <div class="HopThoai_NoiDung">
       <img src="TaiNguyen/BieuTuong/logo.svg" alt="Nex" class="HopThoai_Logo">
