@@ -1,3 +1,4 @@
+# Xin lỗi những ai quan tâm đến dựa án này. `Tạm thời` hoặc là vĩnh viễn tôi sẽ ko cập nhật. Chả phải lý do gì cao siêu đâu. Tôi mệt rồi...
 <p align="center">
   <img src="src-tauri/icons/128x128.png" alt="Nex Launcher" width="128">
 </p>
