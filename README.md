@@ -26,10 +26,10 @@
 
 ## Tính năng nổi bật
 
-- **Trình Cài Đặt Thông Minh** — Hỗ trợ cài đặt hàng loạt phần mềm phổ biến chỉ với vài cú nhấp chuột. Tích hợp trực tiếp với Windows Package Manager (Winget).
-- **Trình Gỡ Cài Đặt Mạnh Mẽ** — Quét toàn bộ phần mềm trên máy, hỗ trợ gỡ cài đặt ngầm (Silent Uninstall) một cách mượt mà.
-- **Giao diện Đẹp Mắt** — Thiết kế hiện đại, hỗ trợ hiệu ứng bo tròn góc, hình nền mờ (Glassmorphism), chuyển đổi mượt mà giữa Dark & Light theme.
-- **Đa ngôn ngữ** — Hỗ trợ Tiếng Việt & English, cập nhật Real-time toàn bộ ứng dụng kể cả dưới Khay Hệ Thống (System Tray).
+- **Trình Cài Đặt Thông Minh** - Hỗ trợ cài đặt hàng loạt phần mềm phổ biến chỉ với vài cú nhấp chuột. Tích hợp trực tiếp với Windows Package Manager (Winget).
+- **Trình Gỡ Cài Đặt Mạnh Mẽ** - Quét toàn bộ phần mềm trên máy, hỗ trợ gỡ cài đặt ngầm (Silent Uninstall) một cách mượt mà.
+- **Giao diện Đẹp Mắt** - Thiết kế hiện đại, hỗ trợ hiệu ứng bo tròn góc, hình nền mờ (Glassmorphism), chuyển đổi mượt mà giữa Dark & Light theme.
+- **Đa ngôn ngữ** - Hỗ trợ Tiếng Việt & English, cập nhật Real-time toàn bộ ứng dụng kể cả dưới Khay Hệ Thống (System Tray).
 
 ## Ảnh chụp màn hình
 
@@ -45,8 +45,8 @@ Bạn muốn tham gia cải thiện Nex Launcher? Vui lòng xem [**Hướng dẫ
 
 ## Giấy phép
 
-Được phân phối dưới giấy phép MIT — Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+Được phân phối dưới giấy phép MIT - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
 ## Tác giả
 
-Phát triển bởi **SpaceheroVN** — [GitHub](https://github.com/SpaceheroVN)
+Phát triển bởi **SpaceheroVN** - [GitHub](https://github.com/SpaceheroVN)
